@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<form onSubmit="{{ submit }}" noValidate="{{ true }}" style="display:flex; flex-direction:column; gap:12px; font-family:'Work Sans', system-ui, sans-serif; letter-spacing:.03em; color:#1d1f22;">
+  <input type="hidden" name="channel" value="meta">
+  <input type="hidden" name="offer" value="garage-conversion-ac-included">
+  <input type="hidden" name="source" value="{{ source }}">
+  <label style="display:flex; flex-direction:column; gap:6px;">
+    <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Name</span>
+    <input name="name" type="text" autoComplete="name" placeholder="Your full name" onBlur="{{ blur }}" style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid {{ bName }}; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+    <span style="font-size:13px; color:#a2361f;">{{ eName }}</span>
+  </label>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap:12px;">
+    <label style="display:flex; flex-direction:column; gap:6px;">
+      <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Mobile number</span>
+      <input name="phone" type="tel" autoComplete="tel" placeholder="07..." onBlur="{{ blur }}" style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid {{ bPhone }}; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+      <span style="font-size:13px; color:#a2361f;">{{ ePhone }}</span>
+    </label>
+    <label style="display:flex; flex-direction:column; gap:6px;">
+      <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Email</span>
+      <input name="email" type="email" autoComplete="email" placeholder="you@email.com" onBlur="{{ blur }}" style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid {{ bEmail }}; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+      <span style="font-size:13px; color:#a2361f;">{{ eEmail }}</span>
+    </label>
+  </div>
+  <label style="display:flex; flex-direction:column; gap:6px;">
+    <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Street address</span>
+    <input name="address" type="text" autoComplete="street-address" placeholder="House number and street" onBlur="{{ blur }}" style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid {{ bAddress }}; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+    <span style="font-size:13px; color:#a2361f;">{{ eAddress }}</span>
+  </label>
+  <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px;">
+    <label style="display:flex; flex-direction:column; gap:6px;">
+      <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">City</span>
+      <input name="city" type="text" autoComplete="address-level2" placeholder="Truro" onBlur="{{ blur }}" style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid {{ bCity }}; border-radius:4px; background:#ffffff; color:#1d1f22; min-width:0;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+      <span style="font-size:13px; color:#a2361f;">{{ eCity }}</span>
+    </label>
+    <label style="display:flex; flex-direction:column; gap:6px;">
+      <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Postcode</span>
+      <input name="postcode" type="text" autoComplete="postal-code" placeholder="TR1 1AA" onBlur="{{ blur }}" style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid {{ bPostcode }}; border-radius:4px; background:#ffffff; color:#1d1f22; text-transform:uppercase; min-width:0;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+      <span style="font-size:13px; color:#a2361f;">{{ ePostcode }}</span>
+    </label>
+  </div>
+  <label style="display:flex; flex-direction:column; gap:6px;">
+    <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">What’s the main reason you’re considering converting your garage?</span>
+    <select name="pain" onBlur="{{ blur }}" onChange="{{ blur }}" style="font:inherit; font-size:16px; padding:13px 40px 13px 14px; min-height:48px; border:1px solid {{ bPain }}; border-radius:4px; background:#ffffff url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22%3E%3Cpath d=%22M2 4l4 4 4-4%22 fill=%22none%22 stroke=%22%238a6a36%22 stroke-width=%221.6%22/%3E%3C/svg%3E') no-repeat right 14px center; color:#1d1f22; appearance:none; -webkit-appearance:none;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+      <option value="">Select an option</option>
+      <option value="We need more living space">We need more living space</option>
+      <option value="I need a proper home office">I need a proper home office</option>
+      <option value="We want an extra bedroom or guest room">We want an extra bedroom or guest room</option>
+      <option value="I want a gym, studio or hobby space">I want a gym, studio or hobby space</option>
+      <option value="The garage is currently wasted space">The garage is currently wasted space</option>
+      <option value="We need more room but don’t want to move">We need more room but don’t want to move</option>
+      <option value="Other">Other</option>
+    </select>
+    <span style="font-size:13px; color:#a2361f;">{{ ePain }}</span>
+  </label>
+  <label style="display:flex; flex-direction:column; gap:6px;">
+    <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">What would you most like your garage to become?</span>
+    <select name="dream" onBlur="{{ blur }}" onChange="{{ blur }}" style="font:inherit; font-size:16px; padding:13px 40px 13px 14px; min-height:48px; border:1px solid {{ bDream }}; border-radius:4px; background:#ffffff url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22%3E%3Cpath d=%22M2 4l4 4 4-4%22 fill=%22none%22 stroke=%22%238a6a36%22 stroke-width=%221.6%22/%3E%3C/svg%3E') no-repeat right 14px center; color:#1d1f22; appearance:none; -webkit-appearance:none;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+      <option value="">Select an option</option>
+      <option value="Home office">Home office</option>
+      <option value="Guest bedroom">Guest bedroom</option>
+      <option value="Extra living room">Extra living room</option>
+      <option value="Home gym">Home gym</option>
+      <option value="Playroom">Playroom</option>
+      <option value="Studio or hobby room">Studio or hobby room</option>
+      <option value="Multi-purpose room">Multi-purpose room</option>
+      <option value="Annex-style space">Annex-style space</option>
+      <option value="I’m not sure yet, I’d like ideas">I’m not sure yet, I’d like ideas</option>
+      <option value="Other">Other</option>
+    </select>
+    <span style="font-size:13px; color:#a2361f;">{{ eDream }}</span>
+  </label>
+  <button type="submit" data-arw-btn="" disabled="{{ loading }}" style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; gap:12px; margin-top:4px; font-family:'Work Sans', system-ui, sans-serif; font-size:14.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:18px 22px; min-height:58px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer; text-align:center;" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-hover="background:#a5834d;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #1d1f22; outline-offset:3px;">{{ label }}<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+</form>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:480,&quot;height&quot;:820},&quot;source&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;hero&quot;,&quot;final-cta&quot;,&quot;cta-popup&quot;],&quot;default&quot;:&quot;hero&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { err: {}, loading: false };
+  check(name, val) {
+    const v = (val || '').trim();
+    switch (name) {
+      case 'name': return v ? '' : 'Please enter your name';
+      case 'phone': return v.replace(/\D/g, '').length >= 10 ? '' : 'Please enter a valid mobile number';
+      case 'email': return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '' : 'Please enter a valid email address';
+      case 'address': return v ? '' : 'Please enter your street address';
+      case 'city': return v ? '' : 'Please enter your city or town';
+      case 'postcode': return /^[A-Za-z]{1,2}\d[A-Za-z\d]?\s*\d[A-Za-z]{2}$/.test(v) ? '' : 'Please enter a valid postcode';
+      case 'pain': case 'dream': return v ? '' : 'Please choose an option';
+    }
+    return '';
+  }
+  blur = (e) => {
+    const { name, value } = e.target;
+    const msg = this.check(name, value);
+    if ((this.state.err[name] || '') !== msg) this.setState(s => ({ err: { ...s.err, [name]: msg } }));
+  };
+  submit = (e) => {
+    e.preventDefault();
+    if (this.state.loading) return;
+    const fd = new FormData(e.currentTarget);
+    const err = {};
+    ['name', 'phone', 'email', 'address', 'city', 'postcode', 'pain', 'dream'].forEach(k => { const m = this.check(k, fd.get(k)); if (m) err[k] = m; });
+    if (Object.keys(err).length) { this.setState({ err }); return; }
+    this.setState({ loading: true, err: {} });
+    fd.append('page', location.href);
+    const body = new URLSearchParams(fd).toString();
+    const WEBHOOK = window.WREN_WEBHOOK || 'https://services.leadconnectorhq.com/hooks/umsacBjS6we0WPzRhMZz/webhook-trigger/aa8407d1-af54-4821-aabc-81c00252c08f';
+    if (WEBHOOK) { try { fetch(WEBHOOK, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body }); } catch (x) {} }
+    location.href = window.WREN_THANK_YOU || '/garage-conversion/thank-you';
+  };
+  renderVals() {
+    const e = this.state.err;
+    const out = {};
+    [['Name', 'name'], ['Phone', 'phone'], ['Email', 'email'], ['Address', 'address'], ['City', 'city'], ['Postcode', 'postcode'], ['Pain', 'pain'], ['Dream', 'dream']].forEach(([K, k]) => {
+      out['e' + K] = e[k] || '';
+      out['b' + K] = e[k] ? '#a2361f' : '#d8cfbf';
+    });
+    return {
+      ...out,
+      source: this.props.source ?? 'hero',
+      loading: this.state.loading,
+      label: this.state.loading ? 'Sending…' : 'See What My Garage Could Become',
+      blur: this.blur,
+      submit: this.submit,
+    };
+  }
+}
+</script>
+</body>
+</html>

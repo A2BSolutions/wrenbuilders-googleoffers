@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <title>Turn Your Garage Into A Room You’ll Actually Use | Wren Builders Ltd</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Tracking: GTM container + Meta Pixel base (PageView) go here once IDs are supplied. Do not fire Lead on this page. -->
+  <!-- CRM webhook: GHL inbound webhook set as default in the form submit logic (override with window.WREN_WEBHOOK). -->
+  <style>
+    @keyframes wrenShine{0%,72%{left:-90%}100%{left:140%}}
+    @keyframes wrenKenBurns{from{transform:scale(1) translate3d(0,0,0)}to{transform:scale(1.1) translate3d(-1.5%,-1%,0)}}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:#f7f4ee;color:#1d1f22;-webkit-font-smoothing:antialiased}
+    *{box-sizing:border-box}
+    a{color:#8a6a36}
+    a:hover{color:#1d1f22}
+    img{display:block;max-width:100%}
+    @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+  </style>
+</helmet>
+<div ref="{{ rootRef }}" style="font-family:'Work Sans', system-ui, sans-serif; font-size:17px; line-height:1.65; letter-spacing:.03em; color:#1d1f22; background:#f7f4ee; padding-bottom:{{ stickyPad }};">
+
+  <sc-if value="{{ showTopBar }}" hint-placeholder-val="{{ true }}">
+    <div style="background:#16171a; color:#d9d3c8; font-size:11px; letter-spacing:.1em; text-transform:uppercase;">
+      <div style="max-width:1200px; margin:0 auto; padding:10px clamp(18px,4vw,32px); display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
+        <div style="display:flex; gap:22px; flex-wrap:wrap;">
+          <span style="display:flex; align-items:center; gap:8px;"><span style="width:5px; height:5px; border-radius:50%; background:#b6935a;"></span>Design | Build | Refurb</span>
+          <span style="display:flex; align-items:center; gap:8px;"><span style="width:5px; height:5px; border-radius:50%; background:#b6935a;"></span>For Cornwall Homeowners</span>
+          <span style="display:flex; align-items:center; gap:8px;"><span style="width:5px; height:5px; border-radius:50%; background:#b6935a;"></span>AC Unit Supplied &amp; Installed Included</span>
+        </div>
+        <a href="tel:+441872613608" style="color:#ffffff; text-decoration:none; font-weight:600;">Call 01872 613608</a>
+      </div>
+    </div>
+  </sc-if>
+
+  <nav style="position:sticky; top:0; z-index:50; background:#f7f4ee; border-bottom:1px solid #e2dacb; box-shadow:{{ navShadow }}; transition:box-shadow .2s ease;">
+    <div style="max-width:1200px; margin:0 auto; padding:10px clamp(18px,4vw,32px); display:flex; align-items:center; gap:20px;">
+      <a href="#top" aria-label="Wren Builders Ltd" style="display:block; flex:none;"><img src="assets/wren-logo.svg" alt="Wren Builders Ltd" style="height:52px; width:auto;"></a>
+      <div style="margin-left:auto; display:flex; align-items:center; gap:18px;">
+        <a href="tel:+441872613608" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:#1d1f22; min-height:44px;">
+          <span style="width:42px; height:42px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path></svg>
+          </span>
+          <span style="display:flex; flex-direction:column; line-height:1.2;">
+            <span style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#5a5d63;">Call us</span>
+            <span style="font-size:17px; font-weight:600; white-space:nowrap;">01872 613608</span>
+          </span>
+        </a>
+        <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+          <button type="button" data-arw-btn="" onClick="{{ cta }}" style="display:inline-flex; align-items:center; gap:10px; font-family:'Work Sans', system-ui, sans-serif; font-size:13px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:14px 20px; min-height:48px; border:none; border-radius:4px; background:#1d1f22; color:#f7f4ee; cursor:pointer; transition:background .15s ease;" style-hover="background:#33363b;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #b6935a; outline-offset:3px;">See What My Garage Could Become<svg data-arw="" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+        </sc-if>
+      </div>
+    </div>
+  </nav>
+
+  <header id="top" style="position:relative; z-index:2; background:#16171a; color:#f7f4ee;">
+    <div aria-hidden="true" style="position:absolute; inset:0; overflow:hidden;">
+      <img src="assets/exterior.png" alt="" style="position:absolute; inset:0; width:100%; height:100%; max-width:none; object-fit:cover; object-position:60% 50%; transform-origin:65% 45%; animation:wrenKenBurns 26s ease-in-out infinite alternate;">
+      <div style="position:absolute; inset:0; background:{{ heroOverlay }};"></div>
+      <div style="position:absolute; inset:0; opacity:.07; background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%22160%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%22.85%22 numOctaves=%222%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');"></div>
+    </div>
+    <div style="position:relative; max-width:1200px; margin:0 auto; padding:clamp(28px,5vw,72px) clamp(18px,4vw,32px) clamp(36px,5vw,72px); display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap:clamp(32px,5vw,64px); align-items:center;">
+      <div style="display:flex; flex-direction:column; gap:22px; text-align:{{ heroAlign }}; align-items:{{ heroItems }};">
+        <div data-hero="" style="display:flex; align-items:center; gap:12px; font-size:12.5px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#d2b483;">
+          <span style="width:28px; height:1px; background:#b6935a;"></span>For Cornwall Homeowners
+        </div>
+        <h1 data-hero="" style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(42px,6.4vw,80px); line-height:1.02; letter-spacing:-.005em; text-wrap:balance; text-shadow:0 2px 24px rgba(0,0,0,.35);">Turn Your Garage Into A Room You’ll <span style="color:#d2b483; font-weight:600;">Actually Use</span></h1>
+        <p data-hero="" style="margin:0; font-size:clamp(16px,1.6vw,19px); color:#e4dfd6; max-width:52ch; text-wrap:pretty;">Create a beautifully finished space designed around your home and lifestyle, with an air conditioning unit supplied and installed included for year-round comfort.</p>
+        <div data-hero="" style="display:flex; align-items:center; gap:16px; padding:10px 20px 10px 10px; border:1px solid #b6935a; border-radius:4px; background:rgba(22,23,26,.72); max-width:500px; width:100%; text-align:left; box-shadow:0 18px 40px -26px rgba(0,0,0,.8);">
+          <div style="position:relative; flex:none; width:84px; height:84px; border-radius:2px; overflow:hidden;">
+            <img src="assets/kitchen.png" alt="Wren Builders project" style="width:100%; height:100%; object-fit:cover;">
+            <span style="position:absolute; inset:4px; border:1px solid rgba(247,244,238,.6); border-radius:1px;"></span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:3px; min-width:0;">
+            <span style="font-size:10.5px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#d2b483;">Garage Conversion</span>
+            <span style="font-size:clamp(19px,2.1vw,24px); font-weight:500; line-height:1.15; color:#ffffff;">AC Unit Supplied &amp; Installed Included</span>
+            <span style="font-size:13px; color:#c9c4bb;">Heating &amp; Cooling Built Around Year-Round Comfort</span>
+          </div>
+        </div>
+        <div data-hero="" style="display:flex; flex-wrap:wrap; align-items:center; gap:16px 26px; justify-content:{{ heroItems }}; width:100%;">
+          <button type="button" data-arw-btn="" onClick="{{ cta }}" style="position:relative; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; gap:12px; font-family:'Work Sans', system-ui, sans-serif; font-size:14.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:19px 28px; min-height:58px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer; transition:background .15s ease; width:{{ heroBtnWidth }};" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-hover="background:#a5834d;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #f7f4ee; outline-offset:3px;">See What My Garage Could Become<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+          <a href="tel:+441872613608" style="display:flex; flex-direction:column; line-height:1.25; text-decoration:none; color:#f7f4ee; min-height:44px; justify-content:center;">
+            <span style="font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:#d2b483;">Or call us</span>
+            <span style="font-size:19px; font-weight:600;">01872 613608</span>
+          </a>
+        </div>
+        <ul data-hero="" style="list-style:none; margin:4px 0 0; padding:0; display:flex; flex-direction:column; gap:10px; text-align:left;">
+          <li style="display:flex; gap:12px; align-items:center; font-size:15.5px; color:#e4dfd6;"><span style="width:22px; height:22px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#d2b483" stroke-width="1.8"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span>Turn unused garage space into a finished room</li>
+          <li style="display:flex; gap:12px; align-items:center; font-size:15.5px; color:#e4dfd6;"><span style="width:22px; height:22px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#d2b483" stroke-width="1.8"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span>Create a room comfortable throughout the year</li>
+          <li style="display:flex; gap:12px; align-items:center; font-size:15.5px; color:#e4dfd6;"><span style="width:22px; height:22px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#d2b483" stroke-width="1.8"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span>Receive an AC unit supplied and installed as part of the conversion</li>
+        </ul>
+      </div>
+
+      <div id="hero-form" data-hero="" style="position:relative; margin-bottom:{{ formOverlap }}; background:#f7f4ee; color:#1d1f22; border-radius:4px; border:1px solid #e2dacb; border-top:3px solid #b6935a; padding:clamp(22px,3vw,34px); box-shadow:0 40px 80px -36px rgba(0,0,0,.65), 0 2px 6px rgba(22,23,26,.08);">
+        <div style="font-size:11px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:#8a6a36;">For Cornwall Homeowners</div>
+        <h2 style="margin:8px 0 6px; font-family:'Work Sans', system-ui, sans-serif; font-weight:500; font-size:clamp(26px,2.8vw,32px); line-height:1.12;">See What My Garage Could Become</h2>
+        <p style="margin:0 0 18px; font-size:15px; color:#4f5258;">Air conditioning supplied and installed as part of your conversion.</p>
+        <dc-import name="Wren Offer 2 Lead Form" source="hero" hint-size="100%,700px"></dc-import>
+      </div>
+    </div>
+  </header>
+
+  <section data-rv="" style="background:#f7f4ee; padding:{{ painPadTop }} 0 clamp(64px,8vw,112px);">
+    <div style="max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px); display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 400px), 1fr)); gap:clamp(36px,5vw,64px); align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:20px; position:sticky; top:110px;">
+        <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#8a6a36;"><span style="width:28px; height:1px; background:#b6935a;"></span>For Cornwall Homeowners</div>
+        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance;">More Space. Without Moving Home.</h2>
+        <p style="margin:0; font-size:18px; color:#4f5258; max-width:46ch;">Convert Your Garage Into A Beautiful Year-Round Room With AC Included</p>
+      </div>
+      <ul data-stagger="" style="list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap:14px;">
+        <li style="display:flex; flex-direction:column; gap:16px; padding:22px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">01</span></div>
+          <span style="font-size:16.5px; line-height:1.45;">Have a garage they rarely use</span>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:16px; padding:22px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9H3z"></path><path d="M9.5 20v-6h5v6"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">02</span></div>
+          <span style="font-size:16.5px; line-height:1.45;">Mostly use their garage for storage</span>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:16px; padding:22px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"></rect><path d="M3 10h18M10 10v11"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">03</span></div>
+          <span style="font-size:16.5px; line-height:1.45;">Feel the house is getting cramped</span>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:16px; padding:22px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"></rect><path d="M4 12h16M10 7.5h4M10 16.5h4"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">04</span></div>
+          <span style="font-size:16.5px; line-height:1.45;">Need a dedicated home office</span>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:16px; padding:22px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9h20M4 9v11M20 9v11M3 9l1.5-3h15L21 9"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">05</span></div>
+          <span style="font-size:16.5px; line-height:1.45;">Have thought about moving because they need more room</span>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:16px; padding:22px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">06</span></div>
+          <span style="font-size:16.5px; line-height:1.45;">Do not want the disruption or cost of a major extension</span>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:16px; padding:22px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">07</span></div>
+          <span style="font-size:16.5px; line-height:1.45;">Worry a garage conversion may feel cold or uncomfortable</span>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:16px; padding:22px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14M5 21h14M7 3v3a5 5 0 0 0 10 0V3M7 21v-3a5 5 0 0 1 10 0v3"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">08</span></div>
+          <span style="font-size:16.5px; line-height:1.45;">Want one professional company handling the project</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="offer" data-rv="" style="position:relative; background:#16171a; color:#f7f4ee; padding:clamp(64px,8vw,112px) 0; overflow:hidden;">
+    <div aria-hidden="true" style="position:absolute; inset:0; opacity:.07; pointer-events:none; background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%22160%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%22.85%22 numOctaves=%222%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');"></div>
+    <div style="position:relative; max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px); display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap:clamp(44px,6vw,88px); align-items:center;">
+      <div style="display:flex; flex-direction:column; gap:24px;">
+        <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#d2b483;"><span style="width:28px; height:1px; background:#b6935a;"></span>Year-Round Comfort</div>
+        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance;">A Conversion You Can Actually Use All Year</h2>
+        <ul data-stagger="" style="list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; gap:20px;">
+          <li style="display:flex; gap:16px; align-items:flex-start; font-size:18.5px; line-height:1.45; color:#e4dfd6;"><span style="width:28px; height:28px; margin-top:1px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;"><svg width="13" height="13" viewBox="0 0 12 12" fill="none" stroke="#d2b483" stroke-width="1.6"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span>A garage conversion should feel like part of your home, not like a dressed-up garage.</li>
+          <li style="display:flex; gap:16px; align-items:flex-start; font-size:18.5px; line-height:1.45; color:#e4dfd6;"><span style="width:28px; height:28px; margin-top:1px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;"><svg width="13" height="13" viewBox="0 0 12 12" fill="none" stroke="#d2b483" stroke-width="1.6"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span>That means creating a properly finished space designed around comfort, insulation and everyday use.</li>
+          <li style="display:flex; gap:16px; align-items:flex-start; font-size:18.5px; line-height:1.45; color:#e4dfd6;"><span style="width:28px; height:28px; margin-top:1px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;"><svg width="13" height="13" viewBox="0 0 12 12" fill="none" stroke="#d2b483" stroke-width="1.6"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span>With an air conditioning unit supplied and installed as part of the conversion, your new room can provide both heating and cooling for year-round comfort.</li>
+        </ul>
+      </div>
+      <div style="position:relative; margin:0 16px 16px 0;">
+        <div aria-hidden="true" style="position:absolute; inset:16px -16px -16px 16px; border:1px solid #b6935a; border-radius:4px; pointer-events:none;"></div>
+        <div data-card="" style="position:relative; border:1px solid rgba(182,147,90,.55); border-radius:4px; overflow:hidden; background:#1f2124; box-shadow:0 40px 80px -40px rgba(0,0,0,.8);">
+          <img src="assets/kitchen-open-plan.webp" alt="Wren Builders open-plan kitchen" style="width:100%; aspect-ratio:16/9; object-fit:cover;">
+          <div style="padding:clamp(26px,3vw,40px); display:flex; flex-direction:column; gap:12px; text-align:center; align-items:center;">
+            <span style="font-size:11.5px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:#d2b483;">Garage Conversion</span>
+            <span style="font-family:'Work Sans', system-ui, sans-serif; font-size:clamp(44px,5.4vw,68px); font-weight:500; line-height:1; letter-spacing:-.01em; color:#d2b483; text-shadow:0 0 42px rgba(182,147,90,.45), 0 0 2px rgba(210,180,131,.4); text-wrap:balance;">Year-Round Comfort</span>
+            <span style="font-size:14px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#f7f4ee;">Air Conditioning Unit Supplied &amp; Installed Included</span>
+            <span style="width:48px; height:1px; background:#b6935a; margin:6px 0;"></span>
+            <span style="font-size:15px; color:#c9c4bb;">Exact suitability and permitted use confirmed following survey</span>
+            <button type="button" data-arw-btn="" onClick="{{ cta }}" style="position:relative; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; gap:12px; margin-top:10px; font-family:'Work Sans', system-ui, sans-serif; font-size:14.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:19px 26px; min-height:58px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer; width:100%; transition:background .15s ease;" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-hover="background:#a5834d;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #f7f4ee; outline-offset:3px;">See What My Garage Could Become<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="become" data-rv="" style="background:#ece6dc; padding:clamp(64px,8vw,112px) 0;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px);">
+      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px;">
+        <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#8a6a36;"><span style="width:28px; height:1px; background:#b6935a;"></span>Garage Conversions<span style="width:28px; height:1px; background:#b6935a;"></span></div>
+        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance;">What Could Your Garage Become?</h2>
+      </div>
+      <ul data-stagger="" style="list-style:none; margin:44px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap:14px;">
+        <li style="display:flex; flex-direction:column; gap:14px; padding:26px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1"></rect><path d="M8 20h8M12 16v4"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">01</span></div>
+          <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Home Office</h3>
+          <span style="font-size:16.5px; line-height:1.5; color:#4f5258;">A proper place to work without taking over the kitchen table.</span>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:14px; padding:26px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18V8M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"></path><circle cx="7" cy="11" r="1.6"></circle></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">02</span></div>
+          <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Guest Room</h3>
+          <span style="font-size:16.5px; line-height:1.5; color:#4f5258;">Give friends and family a comfortable place to stay.</span>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:14px; padding:26px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">03</span></div>
+          <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Home Gym</h3>
+          <span style="font-size:16.5px; line-height:1.5; color:#4f5258;">Create your own dedicated training space.</span>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:14px; padding:26px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18v-6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6M4 15h16M6 10V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3M6 18v2M18 18v2"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">04</span></div>
+          <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Extra Living Room</h3>
+          <span style="font-size:16.5px; line-height:1.5; color:#4f5258;">Give the family more room without changing home.</span>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:14px; padding:26px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="12" width="7" height="8" rx="1"></rect><rect x="13" y="12" width="7" height="8" rx="1"></rect><rect x="8.5" y="4" width="7" height="8" rx="1"></rect></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">05</span></div>
+          <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Playroom</h3>
+          <span style="font-size:16.5px; line-height:1.5; color:#4f5258;">Create dedicated space for children while reclaiming the rest of the house.</span>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:14px; padding:26px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"></path><path d="M14 7l3 3"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">06</span></div>
+          <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Studio</h3>
+          <span style="font-size:16.5px; line-height:1.5; color:#4f5258;">Build a room around work, creativity or hobbies.</span>
+        </li>
+      </ul>
+      <div style="margin-top:40px; display:flex; justify-content:center;">
+        <button type="button" data-arw-btn="" onClick="{{ cta }}" style="display:inline-flex; align-items:center; gap:12px; font-family:'Work Sans', system-ui, sans-serif; font-size:14px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:18px 26px; min-height:56px; border:none; border-radius:4px; background:#1d1f22; color:#f7f4ee; cursor:pointer; transition:background .15s ease; max-width:100%;" style-hover="background:#33363b;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #b6935a; outline-offset:3px;">See What’s Possible<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" data-rv="" style="background:#ece6dc; padding:clamp(64px,8vw,112px) 0;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px); display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 400px), 1fr)); gap:clamp(44px,6vw,88px); align-items:center;">
+      <div style="position:relative; margin:0 18px 18px 0;">
+        <div aria-hidden="true" style="position:absolute; inset:18px -18px -18px 18px; border:1px solid #b6935a; border-radius:4px; pointer-events:none;"></div>
+        <div data-card="" style="position:relative; border-radius:4px; overflow:hidden; box-shadow:0 30px 60px -36px rgba(22,23,26,.55);">
+          <img src="assets/builder.webp" alt="A member of the Wren Builders team on site" style="width:100%; aspect-ratio:1/1; object-fit:cover; object-position:30% 20%;">
+          <span style="position:absolute; left:0; bottom:0; padding:12px 18px; background:rgba(22,23,26,.9); color:#d2b483; font-size:12px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; border-top:1px solid #b6935a; border-right:1px solid #b6935a; border-top-right-radius:4px;">Design | Build | Refurb</span>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#8a6a36;"><span style="width:28px; height:1px; background:#b6935a;"></span>Design | Build | Refurb</div>
+        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(32px,4vw,50px); line-height:1.08; text-wrap:balance;">Work with an established Cornwall design and build company</h2>
+        <ul data-stagger="" style="list-style:none; margin:4px 0 0; padding:0; display:flex; flex-direction:column; gap:16px;">
+          <li style="display:flex; gap:14px; align-items:flex-start; font-size:17.5px;"><span style="width:26px; height:26px; margin-top:1px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#8a6a36" stroke-width="1.7"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span>Have one professional team manage the project from concept through completion</li>
+          <li style="display:flex; gap:14px; align-items:flex-start; font-size:17.5px;"><span style="width:26px; height:26px; margin-top:1px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#8a6a36" stroke-width="1.7"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span>Have the conversion professionally designed and completed</li>
+          <li style="display:flex; gap:14px; align-items:flex-start; font-size:17.5px;"><span style="width:26px; height:26px; margin-top:1px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#8a6a36" stroke-width="1.7"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span>Gain extra living space without necessarily moving home</li>
+        </ul>
+        <div style="margin-top:8px;">
+          <button type="button" data-arw-btn="" onClick="{{ cta }}" style="display:inline-flex; align-items:center; gap:12px; font-family:'Work Sans', system-ui, sans-serif; font-size:14px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:18px 26px; min-height:56px; border:none; border-radius:4px; background:#1d1f22; color:#f7f4ee; cursor:pointer; transition:background .15s ease; max-width:100%;" style-hover="background:#33363b;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #b6935a; outline-offset:3px;">Discuss My Garage Conversion<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="process" data-rv="" style="background:#f7f4ee; padding:clamp(64px,8vw,112px) 0;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px);">
+      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px;">
+        <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#8a6a36;"><span style="width:28px; height:1px; background:#b6935a;"></span>How It Works<span style="width:28px; height:1px; background:#b6935a;"></span></div>
+        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance;">Turn wasted space into a professionally designed room</h2>
+      </div>
+      <div style="position:relative; margin-top:52px;">
+        <sc-if value="{{ stepsRow }}" hint-placeholder-val="{{ true }}">
+          <div aria-hidden="true" style="position:absolute; top:28px; left:16.66%; right:16.66%; height:1px; background:#b6935a;"></div>
+        </sc-if>
+        <sc-if value="{{ stepsCol }}" hint-placeholder-val="{{ false }}">
+          <div aria-hidden="true" style="position:absolute; top:28px; bottom:28px; left:28px; width:1px; background:#b6935a;"></div>
+        </sc-if>
+        <div data-stagger="" style="position:relative; display:grid; grid-template-columns:{{ stepCols }}; gap:{{ stepGap }};">
+          <div style="display:flex; flex-direction:{{ stepDir }}; align-items:{{ stepItems }}; gap:20px;">
+            <span style="flex:none; width:56px; height:56px; border-radius:50%; background:#f7f4ee; border:1px solid #b6935a; display:grid; place-items:center; font-size:18px; font-weight:500; color:#8a6a36; box-shadow:0 0 0 8px #f7f4ee;">1</span>
+            <div style="flex:1; width:100%; display:flex; flex-direction:column; gap:12px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; padding:28px 26px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); text-align:{{ stepText }}; align-items:{{ stepItems }}; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>
+              <span style="font-size:11px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#8a6a36;">Enquire</span>
+              <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:23px; font-weight:500; line-height:1.2;">Check If My Garage Is Suitable</h3>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:{{ stepDir }}; align-items:{{ stepItems }}; gap:20px;">
+            <span style="flex:none; width:56px; height:56px; border-radius:50%; background:#f7f4ee; border:1px solid #b6935a; display:grid; place-items:center; font-size:18px; font-weight:500; color:#8a6a36; box-shadow:0 0 0 8px #f7f4ee;">2</span>
+            <div style="flex:1; width:100%; display:flex; flex-direction:column; gap:12px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; padding:28px 26px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); text-align:{{ stepText }}; align-items:{{ stepItems }}; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="1"></rect><path d="M9 4V2.5h6V4M8.5 10h7M8.5 14h7M8.5 18h4"></path></svg>
+              <span style="font-size:11px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#8a6a36;">Design / Survey</span>
+              <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:23px; font-weight:500; line-height:1.2;">Exact suitability and permitted use confirmed following survey</h3>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:{{ stepDir }}; align-items:{{ stepItems }}; gap:20px;">
+            <span style="flex:none; width:56px; height:56px; border-radius:50%; background:#f7f4ee; border:1px solid #b6935a; display:grid; place-items:center; font-size:18px; font-weight:500; color:#8a6a36; box-shadow:0 0 0 8px #f7f4ee;">3</span>
+            <div style="flex:1; width:100%; display:flex; flex-direction:column; gap:12px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; padding:28px 26px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); text-align:{{ stepText }}; align-items:{{ stepItems }}; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1"></rect><circle cx="8.5" cy="9.5" r="2"></circle><circle cx="15.5" cy="9.5" r="2"></circle><circle cx="8.5" cy="15" r="2"></circle><circle cx="15.5" cy="15" r="2"></circle></svg>
+              <span style="font-size:11px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#8a6a36;">AC Unit Supplied &amp; Installed</span>
+              <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:23px; font-weight:500; line-height:1.2;">Professionally designed and completed</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery" data-rv="" style="background:#ece6dc; padding:clamp(64px,8vw,112px) 0;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px);">
+      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px;">
+        <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#8a6a36;"><span style="width:28px; height:1px; background:#b6935a;"></span>Wren Builders Ltd<span style="width:28px; height:1px; background:#b6935a;"></span></div>
+        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06;">Recent Projects</h2>
+      </div>
+      <div data-stagger="" style="margin-top:44px; display:grid; grid-template-columns:{{ galCols }}; grid-auto-rows:{{ galRow }}; gap:14px;">
+        <div data-gi="0" onMouseEnter="{{ galEnter }}" onMouseLeave="{{ galLeave }}" style="position:relative; grid-column:span 2; grid-row:span 2; overflow:hidden; border-radius:4px; background:#16171a; box-shadow:0 10px 30px -24px rgba(22,23,26,.45);">
+          <img src="assets/kitchen.png" alt="Kitchen with breakfast bar" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom0 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
+          <div style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(22,23,26,0) 45%, rgba(22,23,26,.85) 100%); opacity:{{ cap0 }}; transition:opacity .4s ease;"></div>
+          <span style="position:absolute; left:18px; right:18px; bottom:16px; pointer-events:none; color:#f7f4ee; font-size:13px; letter-spacing:.14em; text-transform:uppercase; opacity:{{ cap0 }}; transition:opacity .4s ease;">Kitchen with breakfast bar</span>
+        </div>
+        <div data-gi="1" onMouseEnter="{{ galEnter }}" onMouseLeave="{{ galLeave }}" style="position:relative; overflow:hidden; border-radius:4px; background:#16171a; box-shadow:0 10px 30px -24px rgba(22,23,26,.45);">
+          <img src="assets/kitchen-open-plan.webp" alt="Open-plan kitchen" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom1 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
+          <div style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(22,23,26,0) 35%, rgba(22,23,26,.85) 100%); opacity:{{ cap1 }}; transition:opacity .4s ease;"></div>
+          <span style="position:absolute; left:14px; right:14px; bottom:12px; pointer-events:none; color:#f7f4ee; font-size:12px; letter-spacing:.12em; text-transform:uppercase; opacity:{{ cap1 }}; transition:opacity .4s ease;">Open-plan kitchen</span>
+        </div>
+        <div data-gi="2" onMouseEnter="{{ galEnter }}" onMouseLeave="{{ galLeave }}" style="position:relative; overflow:hidden; border-radius:4px; background:#16171a; box-shadow:0 10px 30px -24px rgba(22,23,26,.45);">
+          <img src="assets/bifold.png" alt="Living space opening onto the garden through bifold doors" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom2 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
+          <div style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(22,23,26,0) 35%, rgba(22,23,26,.85) 100%); opacity:{{ cap2 }}; transition:opacity .4s ease;"></div>
+          <span style="position:absolute; left:14px; right:14px; bottom:12px; pointer-events:none; color:#f7f4ee; font-size:12px; letter-spacing:.12em; text-transform:uppercase; opacity:{{ cap2 }}; transition:opacity .4s ease;">Living space opening onto the garden through bifold doors</span>
+        </div>
+        <div data-gi="3" onMouseEnter="{{ galEnter }}" onMouseLeave="{{ galLeave }}" style="position:relative; overflow:hidden; border-radius:4px; background:#16171a; box-shadow:0 10px 30px -24px rgba(22,23,26,.45);">
+          <img src="assets/exterior.png" alt="Rear extension and garden" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom3 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
+          <div style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(22,23,26,0) 35%, rgba(22,23,26,.85) 100%); opacity:{{ cap3 }}; transition:opacity .4s ease;"></div>
+          <span style="position:absolute; left:14px; right:14px; bottom:12px; pointer-events:none; color:#f7f4ee; font-size:12px; letter-spacing:.12em; text-transform:uppercase; opacity:{{ cap3 }}; transition:opacity .4s ease;">Rear extension and garden</span>
+        </div>
+        <div data-gi="4" onMouseEnter="{{ galEnter }}" onMouseLeave="{{ galLeave }}" style="position:relative; overflow:hidden; border-radius:4px; background:#16171a; box-shadow:0 10px 30px -24px rgba(22,23,26,.45);">
+          <img src="assets/bathroom.png" alt="Shower room with oak door" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom4 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
+          <div style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(22,23,26,0) 35%, rgba(22,23,26,.85) 100%); opacity:{{ cap4 }}; transition:opacity .4s ease;"></div>
+          <span style="position:absolute; left:14px; right:14px; bottom:12px; pointer-events:none; color:#f7f4ee; font-size:12px; letter-spacing:.12em; text-transform:uppercase; opacity:{{ cap4 }}; transition:opacity .4s ease;">Shower room with oak door</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="areas" data-rv="" style="position:relative; background:#16171a; color:#f7f4ee; padding:clamp(64px,8vw,104px) 0; overflow:hidden;">
+    <div aria-hidden="true" style="position:absolute; inset:0; opacity:.07; pointer-events:none; background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%22160%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%22.85%22 numOctaves=%222%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');"></div>
+    <div style="position:relative; max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px); display:flex; flex-direction:column; align-items:center; text-align:center; gap:32px;">
+      <div style="display:flex; align-items:center; gap:12px; font-size:12.5px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#d2b483;"><span style="width:28px; height:1px; background:#b6935a;"></span>For Cornwall Homeowners<span style="width:28px; height:1px; background:#b6935a;"></span></div>
+      <div data-stagger="" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap:14px; width:100%; max-width:960px;">
+        <span style="display:flex; align-items:center; justify-content:center; gap:12px; padding:20px 24px; border:1px solid #b6935a; border-radius:4px; font-size:17px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; background:rgba(182,147,90,.05); transition:background .15s ease;" style-hover="background:rgba(182,147,90,.14);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d2b483" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>Truro</span>
+        <span style="display:flex; align-items:center; justify-content:center; gap:12px; padding:20px 24px; border:1px solid #b6935a; border-radius:4px; font-size:17px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; background:rgba(182,147,90,.05); transition:background .15s ease;" style-hover="background:rgba(182,147,90,.14);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d2b483" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>Falmouth</span>
+        <span style="display:flex; align-items:center; justify-content:center; gap:12px; padding:20px 24px; border:1px solid #b6935a; border-radius:4px; font-size:17px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; background:rgba(182,147,90,.05); transition:background .15s ease;" style-hover="background:rgba(182,147,90,.14);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d2b483" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>Newquay</span>
+        <span style="display:flex; align-items:center; justify-content:center; gap:12px; padding:20px 24px; border:1px solid #b6935a; border-radius:4px; font-size:17px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; background:rgba(182,147,90,.05); transition:background .15s ease;" style-hover="background:rgba(182,147,90,.14);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d2b483" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>St Austell</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="final" data-rv="" style="position:relative; background:#16171a; color:#f7f4ee; padding:clamp(72px,9vw,128px) 0; overflow:hidden;">
+    <div aria-hidden="true" style="position:absolute; inset:0;">
+      <img src="assets/bifold.png" alt="" style="width:100%; height:100%; max-width:none; object-fit:cover;">
+      <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(22,23,26,.92) 0%, rgba(22,23,26,.82) 55%, rgba(22,23,26,.7) 100%);"></div>
+      <div style="position:absolute; inset:0; opacity:.07; background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%22160%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%22.85%22 numOctaves=%222%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');"></div>
+    </div>
+    <div style="position:relative; max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px); display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap:clamp(36px,6vw,72px); align-items:center;">
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#d2b483;"><span style="width:28px; height:1px; background:#b6935a;"></span>For Cornwall Homeowners</div>
+        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance; text-shadow:0 2px 24px rgba(0,0,0,.35);">Your Next Favourite Room Could Already Be Attached To Your House</h2>
+        <p style="margin:0; font-size:18px; color:#e4dfd6; max-width:46ch;">See What Your Garage Could Become With A Professionally Designed Conversion</p>
+        <div style="display:flex; flex-wrap:wrap; gap:10px;">
+          <span style="padding:9px 16px; border:1px solid rgba(182,147,90,.7); border-radius:999px; font-size:12.5px; letter-spacing:.12em; text-transform:uppercase; color:#f7f4ee; background:rgba(22,23,26,.5);">Design | Build | Refurb</span>
+          <span style="padding:9px 16px; border:1px solid rgba(182,147,90,.7); border-radius:999px; font-size:12.5px; letter-spacing:.12em; text-transform:uppercase; color:#f7f4ee; background:rgba(22,23,26,.5);">Air Conditioning Supplied &amp; Installed Included</span>
+        </div>
+        <a href="tel:+441872613608" style="display:flex; flex-direction:column; line-height:1.25; text-decoration:none; color:#f7f4ee; margin-top:6px;">
+          <span style="font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:#d2b483;">Or call us</span>
+          <span style="font-size:22px; font-weight:600;">01872 613608</span>
+        </a>
+      </div>
+      <div id="final-form" data-card="" style="position:relative; background:#f7f4ee; color:#1d1f22; border-radius:4px; border:1px solid #e2dacb; border-top:3px solid #b6935a; padding:clamp(22px,3vw,34px); box-shadow:0 40px 80px -36px rgba(0,0,0,.65), 0 2px 6px rgba(22,23,26,.08);">
+        <h3 style="margin:0 0 6px; font-family:'Work Sans', system-ui, sans-serif; font-weight:500; font-size:clamp(24px,2.8vw,30px); line-height:1.12;">Create My Extra Room</h3>
+        <p style="margin:0 0 18px; font-size:15px; color:#4f5258;">Air conditioning supplied and installed as part of your conversion.</p>
+        <dc-import name="Wren Offer 2 Lead Form" source="final-cta" hint-size="100%,700px"></dc-import>
+      </div>
+    </div>
+  </section>
+
+  <footer style="background:#16171a; color:#c9c4bb; padding:56px 0 28px; font-size:14.5px; border-top:1px solid #2e3034;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px);">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap:36px;">
+        <div><img src="assets/wren-logo-reversed.svg" alt="Wren Builders Ltd" style="height:76px; width:auto;"></div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <span style="font-size:11.5px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#d2b483;">Contact</span>
+          <a href="tel:+441872613608" style="color:#f7f4ee; text-decoration:none; font-size:17px; font-weight:600;">01872 613608</a>
+          <a href="mailto:info@wren-builders.com" style="color:#c9c4bb; text-decoration:none;" style-hover="text-decoration:underline; color:#f7f4ee;">info@wren-builders.com</a>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <span style="font-size:11.5px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#d2b483;">Address</span>
+          <span>Penstraze Business Centre, Penstraze, Truro, Cornwall, TR4 8PN</span>
+        </div>
+      </div>
+      <div style="margin-top:40px; padding-top:20px; border-top:1px solid #2e3034; display:flex; flex-direction:column; gap:10px; font-size:12.5px; color:#a9a49b;">
+        <p style="margin:0;">Air conditioning unit supplied and installed included with garage conversion projects for Cornwall homeowners. The exact suitability and permitted use is confirmed following survey. AC installation completed by an appropriately qualified F-Gas certified engineer.</p>
+        <p style="margin:0;">© 2026 Wren Builders Ltd. Registered in England &amp; Wales, company number 15580800.</p>
+      </div>
+    </div>
+  </footer>
+
+  <sc-if value="{{ showSticky }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:0; right:0; bottom:0; z-index:70; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); background:rgba(22,23,26,.96); border-top:1px solid #2e3034; display:flex; gap:10px;">
+      <a href="tel:+441872613608" aria-label="Call 01872 613608" style="flex:none; width:56px; min-height:52px; border:1px solid #b6935a; border-radius:4px; display:grid; place-items:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d2b483" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path></svg>
+      </a>
+      <button type="button" onClick="{{ cta }}" style="position:relative; overflow:hidden; flex:1; display:flex; align-items:center; justify-content:center; gap:8px; font-family:'Work Sans', system-ui, sans-serif; font-size:13px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; padding:14px 12px; min-height:52px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer;" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-active="transform:translateY(1px);">Create My Extra Room<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position:fixed; inset:0; z-index:100; background:rgba(22,23,26,.72); display:flex; align-items:flex-start; justify-content:center; padding:clamp(12px,4vh,48px) 14px; overflow-y:auto;">
+      <div role="dialog" aria-modal="true" aria-label="See What My Garage Could Become" onClick="{{ stop }}" style="position:relative; background:#f7f4ee; border-radius:4px; border-top:3px solid #b6935a; width:100%; max-width:520px; padding:clamp(22px,4vw,34px); box-shadow:0 40px 90px -30px rgba(0,0,0,.7);">
+        <button type="button" onClick="{{ closeModal }}" aria-label="Close" style="position:absolute; top:10px; right:10px; width:44px; height:44px; border:none; border-radius:50%; background:#ece6dc; color:#1d1f22; font-size:22px; line-height:1; cursor:pointer;" style-hover="background:#e2dacb;">×</button>
+        <div style="font-size:11px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:#8a6a36;">For Cornwall Homeowners</div>
+        <h2 style="margin:8px 44px 6px 0; font-family:'Work Sans', system-ui, sans-serif; font-weight:500; font-size:clamp(26px,4vw,32px); line-height:1.12;">See What My Garage Could Become</h2>
+        <p style="margin:0 0 18px; font-size:15px; color:#4f5258;">Create A Beautifully Finished, Year-Round Living Space With An AC Unit Supplied &amp; Installed Included</p>
+        <dc-import name="Wren Offer 2 Lead Form" source="cta-popup" hint-size="100%,700px"></dc-import>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ exitOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeExit }}" style="position:fixed; inset:0; z-index:110; background:rgba(22,23,26,.72); display:flex; align-items:center; justify-content:center; padding:20px;">
+      <div role="dialog" aria-modal="true" aria-label="See what’s possible" onClick="{{ stop }}" style="position:relative; background:#f7f4ee; border-radius:4px; border-top:3px solid #b6935a; width:100%; max-width:440px; padding:32px 28px 28px; box-shadow:0 40px 90px -30px rgba(0,0,0,.7);">
+        <button type="button" onClick="{{ closeExit }}" aria-label="Close" style="position:absolute; top:10px; right:10px; width:44px; height:44px; border:none; border-radius:50%; background:#ece6dc; color:#1d1f22; font-size:22px; line-height:1; cursor:pointer;" style-hover="background:#e2dacb;">×</button>
+        <div style="font-size:11px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:#8a6a36;">For Cornwall Homeowners</div>
+        <h2 style="margin:8px 44px 8px 0; font-family:'Work Sans', system-ui, sans-serif; font-weight:500; font-size:28px; line-height:1.12;">What Could Your Garage Become?</h2>
+        <p style="margin:0 0 18px; font-size:15px; color:#4f5258;">Transform It Into A Finished Room With Heating &amp; Cooling Built Around Year-Round Comfort</p>
+        <form onSubmit="{{ exitSubmit }}" noValidate="{{ true }}" style="display:flex; flex-direction:column; gap:12px;">
+          <input type="hidden" name="channel" value="meta">
+          <input type="hidden" name="offer" value="garage-conversion-ac-included">
+          <input type="hidden" name="source" value="exit-popup">
+          <label style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Name</span>
+            <input name="name" type="text" autoComplete="name" placeholder="Your full name" style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid #d8cfbf; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+          </label>
+          <label style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Mobile number</span>
+            <input name="phone" type="tel" autoComplete="tel" placeholder="07..." style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid #d8cfbf; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+          </label>
+          <span style="font-size:13px; color:#a2361f;">{{ exitError }}</span>
+          <button type="submit" data-arw-btn="" disabled="{{ exitLoading }}" style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; gap:12px; font-family:'Work Sans', system-ui, sans-serif; font-size:14.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:18px 22px; min-height:56px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer;" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-hover="background:#a5834d;" style-active="transform:translateY(1px);">{{ exitLabel }}<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+        </form>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;ctaBehaviour&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;popup&quot;,&quot;scroll&quot;],&quot;default&quot;:&quot;popup&quot;,&quot;tsType&quot;:&quot;'popup' | 'scroll'&quot;,&quot;section&quot;:&quot;Conversion&quot;},&quot;exitPopup&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Conversion&quot;}}">
+class Component extends DCLogic {
+  state = { w: typeof window !== 'undefined' ? window.innerWidth : 1200, scrolled: false, pastHero: false, modalOpen: false, exitOpen: false, exitError: '', exitLoading: false, gal: -1 };
+  rootRef = React.createRef();
+
+  componentDidMount() {
+    this.onResize = () => this.setState({ w: window.innerWidth });
+    this.onScroll = () => {
+      const y = window.scrollY;
+      const scrolled = y > 40, pastHero = y > 520;
+      if (scrolled !== this.state.scrolled || pastHero !== this.state.pastHero) this.setState({ scrolled, pastHero });
+    };
+    this.onKey = (e) => { if (e.key === 'Escape') this.setState({ modalOpen: false, exitOpen: false }); };
+    this.onLeave = (e) => {
+      if (this.props.exitPopup === false) return;
+      if (window.innerWidth < 900 || e.clientY > 10 || this.state.modalOpen) return;
+      try { if (sessionStorage.getItem('wren_offer2_exit_shown')) return; sessionStorage.setItem('wren_offer2_exit_shown', '1'); } catch (err) {}
+      this.setState({ exitOpen: true });
+    };
+    this.onArw = (e) => {
+      const b = e.target.closest && e.target.closest('[data-arw-btn]');
+      if (!b) return;
+      const a = b.querySelector('[data-arw]');
+      if (a) a.style.transform = e.type === 'mouseover' ? 'translateX(4px)' : '';
+    };
+    window.addEventListener('resize', this.onResize);
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    window.addEventListener('keydown', this.onKey);
+    document.addEventListener('mouseleave', this.onLeave);
+    document.addEventListener('mouseover', this.onArw);
+    document.addEventListener('mouseout', this.onArw);
+    setTimeout(() => this.setupMotion(), 60);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize);
+    window.removeEventListener('scroll', this.onScroll);
+    window.removeEventListener('keydown', this.onKey);
+    document.removeEventListener('mouseleave', this.onLeave);
+    document.removeEventListener('mouseover', this.onArw);
+    document.removeEventListener('mouseout', this.onArw);
+    this.io && this.io.disconnect();
+  }
+  setupMotion() {
+    const root = this.rootRef.current;
+    if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const ease = 'cubic-bezier(.22,.61,.36,1)';
+    const hide = (el, scale) => { el.style.opacity = '0'; el.style.transform = 'translateY(24px)' + (scale ? ' scale(.97)' : ''); };
+    const show = (el, d) => { el.style.transition = `opacity 520ms ${ease} ${d}ms, transform 520ms ${ease} ${d}ms`; el.style.opacity = '1'; el.style.transform = 'none'; setTimeout(() => { el.style.transition = ''; el.style.transform = ''; }, 560 + d); };
+    root.querySelectorAll('[data-hero]').forEach((el, i) => { hide(el); requestAnimationFrame(() => requestAnimationFrame(() => show(el, 80 + i * 70))); });
+    this.io = new IntersectionObserver((entries) => {
+      entries.forEach(en => {
+        if (!en.isIntersecting) return;
+        const sec = en.target; this.io.unobserve(sec);
+        show(sec, 0);
+        sec.querySelectorAll('[data-stagger]').forEach(g => [...g.children].forEach((c, i) => show(c, 120 + Math.min(i, 8) * 70)));
+        sec.querySelectorAll('[data-card]').forEach(c => show(c, 200));
+      });
+    }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+    root.querySelectorAll('[data-rv]').forEach(sec => {
+      if (sec.getBoundingClientRect().top < window.innerHeight * 0.9) return;
+      hide(sec);
+      sec.querySelectorAll('[data-stagger]').forEach(g => [...g.children].forEach(c => hide(c)));
+      sec.querySelectorAll('[data-card]').forEach(c => hide(c, true));
+      this.io.observe(sec);
+    });
+  }
+  cta = () => {
+    if ((this.props.ctaBehaviour ?? 'popup') === 'scroll') {
+      const t = document.getElementById('hero-form');
+      if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth' });
+      return;
+    }
+    this.setState({ modalOpen: true, exitOpen: false });
+  };
+  exitSubmit = (e) => {
+    e.preventDefault();
+    if (this.state.exitLoading) return;
+    const fd = new FormData(e.currentTarget);
+    const name = (fd.get('name') || '').trim(), phone = (fd.get('phone') || '').trim();
+    if (!name || phone.replace(/\D/g, '').length < 10) { this.setState({ exitError: 'Please enter your name and a valid mobile number' }); return; }
+    this.setState({ exitLoading: true, exitError: '' });
+    fd.append('page', location.href);
+    const body = new URLSearchParams(fd).toString();
+    const WEBHOOK = window.WREN_WEBHOOK || 'https://services.leadconnectorhq.com/hooks/umsacBjS6we0WPzRhMZz/webhook-trigger/aa8407d1-af54-4821-aabc-81c00252c08f';
+    if (WEBHOOK) { try { fetch(WEBHOOK, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body }); } catch (err) {} }
+    location.href = window.WREN_THANK_YOU || '/garage-conversion/thank-you';
+  };
+  renderVals() {
+    const w = this.state.w;
+    const mobile = w < 760;
+    const desktop = w >= 900;
+    const twoCol = w >= 1040;
+    const sticky = mobile && this.state.pastHero && !this.state.modalOpen;
+    const g = this.state.gal;
+    const v = {};
+    for (let i = 0; i < 5; i++) { v['cap' + i] = (mobile || g === i) ? 1 : 0; v['zoom' + i] = g === i ? 1.08 : 1; }
+    return {
+      ...v,
+      rootRef: this.rootRef,
+      showTopBar: w >= 1100,
+      isDesktop: desktop,
+      navShadow: this.state.scrolled ? '0 8px 24px -16px rgba(22,23,26,.45)' : 'none',
+      heroOverlay: twoCol
+        ? 'linear-gradient(90deg, rgba(22,23,26,.95) 0%, rgba(22,23,26,.86) 38%, rgba(22,23,26,.45) 68%, rgba(22,23,26,.25) 100%)'
+        : 'linear-gradient(180deg, rgba(22,23,26,.82) 0%, rgba(22,23,26,.9) 100%)',
+      heroAlign: mobile ? 'center' : 'left',
+      heroItems: mobile ? 'center' : 'flex-start',
+      heroBtnWidth: mobile ? '100%' : 'auto',
+      formOverlap: twoCol ? '-96px' : '0px',
+      painPadTop: twoCol ? '200px' : 'clamp(64px,8vw,112px)',
+      stepsRow: !mobile,
+      stepsCol: mobile,
+      stepCols: mobile ? '1fr' : 'repeat(3, minmax(0, 1fr))',
+      stepGap: mobile ? '20px' : '24px',
+      stepDir: mobile ? 'row' : 'column',
+      stepItems: mobile ? 'flex-start' : 'center',
+      stepText: mobile ? 'left' : 'center',
+      galCols: mobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(4, minmax(0, 1fr))',
+      galRow: mobile ? '140px' : 'clamp(170px, 18vw, 250px)',
+      galEnter: (e) => this.setState({ gal: +e.currentTarget.getAttribute('data-gi') }),
+      galLeave: () => this.setState({ gal: -1 }),
+      showSticky: sticky,
+      stickyPad: mobile ? '76px' : '0px',
+      modalOpen: this.state.modalOpen,
+      exitOpen: this.state.exitOpen,
+      exitError: this.state.exitError,
+      exitLoading: this.state.exitLoading,
+      exitLabel: this.state.exitLoading ? 'Sending…' : 'See What’s Possible',
+      cta: this.cta,
+      closeModal: () => this.setState({ modalOpen: false }),
+      closeExit: () => this.setState({ exitOpen: false }),
+      stop: (e) => e.stopPropagation(),
+      exitSubmit: this.exitSubmit,
+    };
+  }
+}
+</script>
+</body>
+</html>
