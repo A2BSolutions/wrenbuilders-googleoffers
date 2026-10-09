@@ -198,6 +198,17 @@ class Component extends DCLogic {
     window.addEventListener('resize', this.onResize);
     document.addEventListener('mouseover', this.onArw);
     document.addEventListener('mouseout', this.onArw);
+    try {
+      const KEY = 'wren_lead_garage', OFFER = 'garage-conversion-ac-included';
+      const lead = JSON.parse(sessionStorage.getItem(KEY) || 'null');
+      const age = lead ? Date.now() - Number(lead.ts) : NaN;
+      if (lead && lead.event_id && lead.offer === OFFER && lead.fired !== true && age >= 0 && age < 30 * 60 * 1000) {
+        const rec = { event_id: lead.event_id, offer: lead.offer, channel: lead.channel, ts: lead.ts, fired: true };
+        sessionStorage.setItem(KEY, JSON.stringify(rec));
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: 'generate_lead', event_id: rec.event_id, offer: rec.offer, channel: rec.channel });
+      }
+    } catch (err) {}
   }
   componentWillUnmount() {
     window.removeEventListener('resize', this.onResize);

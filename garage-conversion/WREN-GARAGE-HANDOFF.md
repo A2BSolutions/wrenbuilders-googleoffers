@@ -43,7 +43,7 @@ Four forms, one webhook. Segment on `offer` + `source`.
 
 Full field names: `name`, `phone`, `email`, `address`, `city`, `postcode`, `pain`, `dream`
 Hidden: `channel=meta`, `offer=garage-conversion-ac-included`, `source=<see table>`
-Appended on submit: `page` (= landing URL)
+Appended on submit: `page` (= landing URL), `event_id` (random UUID, no PII)
 
 `pain` options: We need more living space · I need a proper home office · We want an extra bedroom or guest room · I want a gym, studio or hobby space · The garage is currently wasted space · We need more room but don’t want to move · Other
 
@@ -56,11 +56,12 @@ Validation (full form, on blur + submit): name required · phone ≥10 digits ·
 - Generic "Thank you" greeting.
 - `<meta name="robots" content="noindex">` present.
 
-## Conversion tracking
-None. All design-source conversion events (`generate_lead`, Meta `Lead`, `__wrenOffer2LeadFired`) have been removed. No GTM, GA4, Google Ads or Meta Pixel code is present. Production conversion tracking is to be implemented by Claude Code.
+## Conversion logic (one-time, guarded)
+See the root `README.md` for the shared architecture. Session key: `wren_lead_garage`. GTM fires on Custom Event `generate_lead`.
 
 ## Storage
 - `sessionStorage` key `wren_offer2_exit_shown` (exit popup once per session).
+- `sessionStorage` key `wren_lead_garage`: conversion record `{ event_id, offer, channel, ts, fired }`. No PII.
 - No `localStorage` in page logic.
 
 ## Open items

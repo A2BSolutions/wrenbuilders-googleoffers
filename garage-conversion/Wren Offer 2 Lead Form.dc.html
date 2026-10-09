@@ -109,6 +109,9 @@ class Component extends DCLogic {
     if (Object.keys(err).length) { this.setState({ err }); return; }
     this.setState({ loading: true, err: {} });
     fd.append('page', location.href);
+    const eventId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+    fd.append('event_id', eventId);
+    try { sessionStorage.setItem('wren_lead_garage', JSON.stringify({ event_id: eventId, offer: fd.get('offer'), channel: fd.get('channel'), ts: Date.now(), fired: false })); } catch (err) {}
     const body = new URLSearchParams(fd).toString();
     const WEBHOOK = window.WREN_WEBHOOK || 'https://services.leadconnectorhq.com/hooks/umsacBjS6we0WPzRhMZz/webhook-trigger/aa8407d1-af54-4821-aabc-81c00252c08f';
     if (WEBHOOK) { try { fetch(WEBHOOK, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body }); } catch (x) {} }
