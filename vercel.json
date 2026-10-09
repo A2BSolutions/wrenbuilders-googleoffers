@@ -1,0 +1,12 @@
+{
+  "redirects": [
+    { "source": "/garage-conversion", "destination": "/garage-conversion/", "permanent": false },
+    { "source": "/garage-conversion/thank-you", "destination": "/garage-conversion/thank-you/", "permanent": false }
+  ],
+  "headers": [
+    { "source": "/kitchen/thank-you", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] },
+    { "source": "/kitchen/thank-you/", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] },
+    { "source": "/garage-conversion/thank-you", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] },
+    { "source": "/garage-conversion/thank-you/", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] }
+  ]
+}

@@ -2,10 +2,34 @@
 <html>
 <head>
 <meta charset="utf-8">
+<!-- Google Tag Manager -->
+<script>
+(function(w,d,s,l,i){
+  w[l]=w[l]||[];
+  w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+  var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),
+      dl=l!='dataLayer'?'&l='+l:'';
+  j.async=true;
+  j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+  f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KF4RWHHQ');
+</script>
+<!-- End Google Tag Manager -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="../support.js"></script>
 </head>
 <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript>
+  <iframe
+    src="https://www.googletagmanager.com/ns.html?id=GTM-KF4RWHHQ"
+    height="0"
+    width="0"
+    style="display:none;visibility:hidden">
+  </iframe>
+</noscript>
+<!-- End Google Tag Manager (noscript) -->
 <x-dc>
 <helmet>
   <title>Thank You | Garage Conversion With AC Included | Wren Builders Ltd</title>
@@ -174,6 +198,17 @@ class Component extends DCLogic {
     window.addEventListener('resize', this.onResize);
     document.addEventListener('mouseover', this.onArw);
     document.addEventListener('mouseout', this.onArw);
+    try {
+      const KEY = 'wren_lead_garage', OFFER = 'garage-conversion-ac-included';
+      const lead = JSON.parse(sessionStorage.getItem(KEY) || 'null');
+      const age = lead ? Date.now() - Number(lead.ts) : NaN;
+      if (lead && lead.event_id && lead.offer === OFFER && lead.fired !== true && age >= 0 && age < 30 * 60 * 1000) {
+        const rec = { event_id: lead.event_id, offer: lead.offer, channel: lead.channel, ts: lead.ts, fired: true };
+        sessionStorage.setItem(KEY, JSON.stringify(rec));
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: 'generate_lead', event_id: rec.event_id, offer: rec.offer, channel: rec.channel });
+      }
+    } catch (err) {}
   }
   componentWillUnmount() {
     window.removeEventListener('resize', this.onResize);

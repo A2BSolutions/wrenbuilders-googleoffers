@@ -2,10 +2,34 @@
 <html>
 <head>
 <meta charset="utf-8">
+<!-- Google Tag Manager -->
+<script>
+(function(w,d,s,l,i){
+  w[l]=w[l]||[];
+  w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+  var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),
+      dl=l!='dataLayer'?'&l='+l:'';
+  j.async=true;
+  j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+  f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KF4RWHHQ');
+</script>
+<!-- End Google Tag Manager -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./support.js"></script>
 </head>
 <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript>
+  <iframe
+    src="https://www.googletagmanager.com/ns.html?id=GTM-KF4RWHHQ"
+    height="0"
+    width="0"
+    style="display:none;visibility:hidden">
+  </iframe>
+</noscript>
+<!-- End Google Tag Manager (noscript) -->
 <x-dc>
 <helmet>
   <title>Turn Your Garage Into A Room You’ll Actually Use | Wren Builders Ltd</title>
@@ -521,6 +545,9 @@ class Component extends DCLogic {
     if (!name || phone.replace(/\D/g, '').length < 10) { this.setState({ exitError: 'Please enter your name and a valid mobile number' }); return; }
     this.setState({ exitLoading: true, exitError: '' });
     fd.append('page', location.href);
+    const eventId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+    fd.append('event_id', eventId);
+    try { sessionStorage.setItem('wren_lead_garage', JSON.stringify({ event_id: eventId, offer: fd.get('offer'), channel: fd.get('channel'), ts: Date.now(), fired: false })); } catch (err) {}
     const body = new URLSearchParams(fd).toString();
     const WEBHOOK = window.WREN_WEBHOOK || 'https://services.leadconnectorhq.com/hooks/umsacBjS6we0WPzRhMZz/webhook-trigger/aa8407d1-af54-4821-aabc-81c00252c08f';
     if (WEBHOOK) { try { fetch(WEBHOOK, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body }); } catch (err) {} }
