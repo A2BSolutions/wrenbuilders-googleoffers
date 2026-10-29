@@ -27,3 +27,17 @@ Conversion signal: GTM Custom Event trigger `generate_lead`. Never use a thank-y
 3. Direct visits, refreshes, stale records and other-funnel records push nothing. A new valid submission creates a new `event_id` and fires once.
 
 Use `event_id` as the GA4 / Ads / Meta deduplication ID inside GTM (Data Layer Variable `event_id`).
+
+## Repo ahead of design
+Design exports (Claude Design zips) arrive without the production wiring below. Never copy an export over the repo. Re-apply these after any re-export, or swap only the changed asset.
+
+| # | What the repo keeps | Where | Added |
+|---|---|---|---|
+| 1 | GTM-KF4RWHHQ head snippet and noscript | all 4 pages (kitchen: outer document only) | PR #1, 9 Oct 2026 |
+| 2 | `event_id` on the webhook payload + `wren_lead_kitchen` / `wren_lead_garage` sessionStorage record | kitchen bundled form, garage `index.html` and `Wren Offer 2 Lead Form.dc.html` | PR #1, 9 Oct 2026 |
+| 3 | Guarded `generate_lead` push | both thank-you pages | PR #1, 9 Oct 2026 |
+| 4 | Upright open-plan kitchen photo (old one was upside down). Garage: `assets/kitchen-open-plan.png`, 3 `src` refs. Kitchen: manifest entries `8af60870...` (landing) and `765488af...` (thank-you) now hold the same PNG, keys unchanged. | both funnels | 29 Oct 2026 |
+
+Notes, 29 Oct 2026:
+- The old `garage-conversion/assets/kitchen-open-plan.webp` stays in the repo. `WREN-GARAGE-HANDOFF.md` still names it. No page uses it.
+- For Jester: the kitchen design thread's photo fix is a mirror (flipped top to bottom, not rotated). The garage thread's fix is correct (rotated 180 degrees). Both funnels use the garage version. Swap the kitchen thread's photo for the rotated one before any future export.
