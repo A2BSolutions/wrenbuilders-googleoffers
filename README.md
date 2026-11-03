@@ -38,6 +38,8 @@ Design exports (Claude Design zips) arrive without the production wiring below. 
 | 3 | Guarded `generate_lead` push | both thank-you pages | PR #1, 9 Oct 2026 |
 | 4 | Upright open-plan kitchen photo (old one was upside down). Garage: `assets/kitchen-open-plan.png`, 3 `src` refs. Kitchen: manifest entries `8af60870...` (landing) and `765488af...` (thank-you) now hold the same PNG, keys unchanged. | both funnels | 29 Oct 2026 |
 
+| 5 | Simplified forms: pain and timing (kitchen), pain and dream (garage) removed, fields stacked in one column, one reassurance line under the button. Kitchen: edited inside the bundled "Wren Lead Form" component (manifest entry 8202e945..., re-gzipped). Exit popups unchanged (name + phone). Ported by hand from Jester's design replies, not from an export. | kitchen bundled form, `garage-conversion/Wren Offer 2 Lead Form.dc.html` | 3 Nov 2026 |
+
 Notes, 29 Oct 2026:
 - The old `garage-conversion/assets/kitchen-open-plan.webp` stays in the repo. `WREN-GARAGE-HANDOFF.md` still names it. No page uses it.
 - For Jester: the kitchen design thread's photo fix is a mirror (flipped top to bottom, not rotated). The garage thread's fix is correct (rotated 180 degrees). Both funnels use the garage version. Swap the kitchen thread's photo for the rotated one before any future export.
