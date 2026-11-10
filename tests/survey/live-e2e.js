@@ -22,6 +22,8 @@ const SC = [
   { id: 's9', c: 'kitchen', a: ['A partial refit (doors, worktops)', 'Before Christmas', 'No', 'Yes'], tags: [] },
 ];
 const ONLY = (process.env.ONLY || '').split(',').filter(Boolean);
+// Hosted preview is protected. VERCEL_SHARE is a temporary, deployment-scoped share secret supplied via env only.
+const auth = async (pg) => { if (process.env.VERCEL_SHARE) await pg.goto(`${BASE}/?_vercel_share=${process.env.VERCEL_SHARE}`).catch(() => {}); };
 const who = (s, i) => ({
   full_name: `ZZ Test ${s.id.toUpperCase()} E2E${RUN}`,
   phone: `07700 9007${String(i).padStart(2, '0')}`,
@@ -39,6 +41,7 @@ const who = (s, i) => ({
     const s = SC[i]; const f = who(s, i + 1);
     const ctx = await br.newContext({ viewport: { width: 390, height: 844 } });
     const pg = await ctx.newPage();
+    await auth(pg);
     const rec = { id: s.id, campaign: s.c, answers: s.a, expectedTags: s.tags, contact: f, api: [], consoleErrors: [] };
     pg.on('console', (m) => { if (m.type() === 'error') rec.consoleErrors.push(m.text().slice(0, 160)); });
     pg.on('pageerror', (e) => rec.consoleErrors.push('pageerror ' + e.message.slice(0, 160)));
@@ -73,6 +76,7 @@ const who = (s, i) => ({
     }
     if (s.id === 's1') { // direct visit in a fresh context
       const c2 = await br.newContext(); const p2 = await c2.newPage();
+      await auth(p2);
       await p2.route(/googletagmanager\.com|connect\.facebook\.net|fonts\./, (r) => r.fulfill({ body: '' }));
       await p2.goto(`${BASE}/survey/kitchen-thank-you`); await p2.waitForTimeout(1500);
       rec.leadOnDirectVisit = await p2.evaluate(() => (window.dataLayer || []).filter((e) => e.event === 'wren_survey_lead').length);

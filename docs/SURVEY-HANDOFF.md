@@ -173,5 +173,21 @@ The change is additive. To roll back: revert the merge commit (removes `survey/`
 - Results: 9 scenarios accepted (HTTP 200). GHL readback confirmed contact fields, all answers, attribution, base tags and conditional tags. No opportunities or conversations were created for the contacts checked.
 - Failed delivery: first attempt 502 (no redirect, no Lead), retry with the same `submission_id` returned 200 and produced one contact.
 - Duplicate with the same `submission_id`: same instance returns `ok:true, duplicate:true` and forwards nothing. After a simulated cold start (empty memory) it was forwarded again and GHL re-ran the workflow: same contact id, `dateUpdated` moved, fields and tags unchanged, no duplicate contact or tag.
-- NOT verified: a browser POST to the protected preview deployment (needs an approved deployment-protection bypass).
+
+## 14. Hosted Vercel preview verification (10 Nov 2026)
+
+Run against the real preview deployment of commit `e535294` with a temporary, deployment-scoped, 40-minute shareable link, **revoked afterwards**. Project and Production protection were not changed.
+
+- Preview variables work: the hosted function returned 200 only after GHL answered 2xx (a missing variable returns 503 `NOT_CONFIGURED`).
+- `tests/survey/hosted-checks.js`: 40 of 40. Six routes 200 with `X-Robots-Tag: noindex, nofollow` and a robots meta tag, assets 200, existing funnel routes and headers unchanged, API gates (405, 403 no or foreign Origin, 415, 400 invalid JSON, 400 invalid payload with field names only, 400 offer mismatch, 400 idempotency mismatch, `no-store`). `/survey/<name>/` with a trailing slash returns 404 (the pages use absolute paths, so use the no-slash URLs in ads). `/survey/<name>.html` also works and is noindex.
+- `tests/survey/live-e2e.js` hosted: kitchen and garage, qualified, out of area, low priority, combined tags, and owns property = No. All 200 with the right redirect. Qualified leads fired exactly one `wren_survey_lead` and one Meta `Lead` (`eventID` = `submission_id`); out-of-area fired none; refresh and direct visit fired none. GTM and Meta were stubbed in the browser.
+- GHL readback: all answers, contact fields, attribution (including the hosted page URL) and tags correct; the `submission_id` stored in GHL matched the one sent for all 8; no opportunities or conversations.
+- Hosted duplicate with the same `submission_id` was suppressed (same warm instance).
+- NOT tested on the hosted function: a failed GHL delivery (cannot be simulated without breaking the Preview variable) and a cross-instance duplicate. Both were tested locally.
+
+## 15. GHL behaviour observed (for the workflow owner)
+
+- GHL matches an existing contact by **phone** (fictional test phones repeat across runs). A later submission with the same phone updates the same contact and **overwrites the email, name and survey fields**.
+- Conditional tags are only ever added. A person who first submits outside Cornwall and later inside Cornwall would keep `dq - outside cornwall`. Consider removing the opposite tag in the workflow. UNVERIFIED for real leads.
+- A replayed submission re-runs the workflow on the same contact (fields and tags unchanged, no duplicate contact or tag).
 
