@@ -37,6 +37,7 @@ const fbq = (pg) => pg.evaluate(() => (window.fbq && window.fbq.queue ? window.f
 const dl = (pg, ev) => pg.evaluate((e) => (window.dataLayer || []).filter((x) => x.event === e), ev);
 const mock = (p) => fetch(BASE + '/__mock/' + p).then((r) => r.text());
 const calls = () => fetch(BASE + '/__mock/calls').then((r) => r.json());
+const outgoing = () => fetch(BASE + '/__mock/outgoing').then((r) => r.json()).then((x) => x.n);
 
 async function survey(pg, c, cornwall, { stopAtForm = false, base = BASE, route } = {}) {
   await pg.goto(`${base}${route || '/survey/' + c + '-survey'}`, { waitUntil: 'load' });
@@ -85,12 +86,17 @@ async function survey(pg, c, cornwall, { stopAtForm = false, base = BASE, route 
     await pg.waitForURL(new RegExp(`/survey/${c}-${dest}$`), { timeout: 15000 }).catch(() => {});
     await pg.waitForTimeout(1500);
     check(`${c}/${cw}: lands on ${c}-${dest}`, pg.url().endsWith(`/survey/${c}-${dest}`), pg.url());
-    const cs = await calls();
-    check(`${c}/${cw}: one lead reached the mock receiver at the ${c} path`, cs.length === 1 && cs[0].url === `/hooks/${c}-e2e`, cs.map((x) => x.url));
-    const b = cs[0] && cs[0].body;
-    check(`${c}/${cw}: server-normalised payload (phone, postcode, derived first name)`, b && b.phone === '+447700900123' && b.postal_code === 'TR1 2AB' && b.first_name === 'Test' && b.last_name === 'Person', b);
-    check(`${c}/${cw}: tags are server-derived`, b && JSON.stringify(b.tags) === JSON.stringify(cw === 'No' ? ['DQ - outside Cornwall'] : []), b && b.tags);
-    check(`${c}/${cw}: qualification flags`, b && b.survey_qualified === (cw === 'Yes') && b.survey_dq_outside_cornwall === (cw === 'No'));
+    const cs = await calls(); const out = await outgoing();
+    let bo = null;
+    if (cw === 'Yes') {
+      check(`${c}/Yes: exactly one outgoing request, to the ${c} receiver path`, cs.length === 1 && out === 1 && cs[0].url === `/hooks/${c}-e2e`, { out, urls: cs.map((x) => x.url) });
+      bo = cs[0] && cs[0].body;
+      check(`${c}/Yes: server-normalised payload (phone, postcode, derived first name)`, bo && bo.phone === '+447700900123' && bo.postal_code === 'TR1 2AB' && bo.first_name === 'Test' && bo.last_name === 'Person', bo);
+      check(`${c}/Yes: qualified flags and no DQ tag`, bo && bo.survey_qualified === true && bo.survey_dq_outside_cornwall === false && bo.survey_answer_in_cornwall === 'Yes' && !JSON.stringify(bo.tags).includes('DQ'), bo && bo.tags);
+    } else {
+      check(`${c}/No: DQ causes ZERO outgoing requests (instrumented) and the receiver saw nothing`, cs.length === 0 && out === 0, { out, n: cs.length });
+    }
+    const b = bo;
     const leads = await dl(pg, 'wren_survey_lead'); const q = await fbq(pg);
     if (cw === 'Yes') {
       check(`${c}/Yes: exactly one wren_survey_lead, no PII, event_id = submission_id`, leads.length === 1 && leads[0].event_id === b.survey_submission_id && leads[0].wren_campaign === c && !JSON.stringify(leads[0]).match(/Test|example|7700|Road|TR1/), leads);
@@ -102,12 +108,36 @@ async function survey(pg, c, cornwall, { stopAtForm = false, base = BASE, route 
       check(`${c}/Yes: refresh fires no second wren_survey_lead and no Lead`, (await dl(pg, 'wren_survey_lead')).length === 0 && !(await fbq(pg)).some((a) => a[1] === 'Lead'));
     } else {
       check(`${c}/No: no Lead, no wren_survey_lead, no token`, leads.length === 0 && !q.some((a) => a[1] === 'Lead') && (await pg.evaluate(() => sessionStorage.getItem('wren_conversion'))) === null, { leads, q });
+      await pg.goto(`${BASE}/survey/${c}-thank-you`); await pg.waitForTimeout(1200);
+      check(`${c}/No: visiting the thank-you page after a DQ still fires no Lead`, (await dl(pg, 'wren_survey_lead')).length === 0 && !((await fbq(pg)) || []).some((a) => a[1] === 'Lead'));
     }
     const keys = await pg.evaluate(() => Object.keys(sessionStorage)); const vals = await pg.evaluate(() => JSON.stringify(Object.entries(sessionStorage)));
     check(`${c}/${cw}: no email/phone/address in sessionStorage or URL`, !/example\.com|7700|Test Road|tr1|TR1/i.test(vals.replace('"Test"', '')) && !/example|7700|Road/.test(pg.url()), { keys });
     check(`${c}/${cw}: no console errors (includes the old componentDidUpdate TypeError)`, log.console.length === 0, log.console);
     await ctx.close();
   }
+
+  // 2b. Client interprets the SERVER outcome (stubbed endpoint responses). Fail closed on anything ambiguous.
+  const stub = async (answersCornwall, status, body) => {
+    const { ctx, pg, log } = await mkPage(br);
+    await pg.route('**/api/survey-lead', (r) => r.fulfill({ status, contentType: 'application/json', body: JSON.stringify(body) }));
+    await survey(pg, 'kitchen', answersCornwall); await pg.click('button[type=submit]'); await pg.waitForTimeout(2200);
+    const res = { url: pg.url(), alert: await pg.locator('[role=alert]').count(), leads: (await dl(pg, 'wren_survey_lead')).length, token: await pg.evaluate(() => sessionStorage.getItem('wren_conversion')), metaLead: ((await fbq(pg)) || []).filter((a) => a[1] === 'Lead').length, log };
+    await ctx.close(); return res;
+  };
+  let r2 = await stub('Yes', 200, { ok: true });
+  check('client: ok:true with no outcome is NOT confirmed (no redirect, error shown, no Lead)', r2.url.endsWith('/kitchen-survey') && r2.alert === 1 && r2.leads === 0 && r2.metaLead === 0, r2.url);
+  r2 = await stub('Yes', 200, { ok: true, outcome: 'bogus' });
+  check('client: unknown outcome fails closed', r2.url.endsWith('/kitchen-survey') && r2.alert === 1 && r2.leads === 0);
+  r2 = await stub('Yes', 200, { ok: false, outcome: 'disqualified' });
+  check('client: ok:false is never treated as DQ or success', r2.url.endsWith('/kitchen-survey') && r2.alert === 1 && r2.leads === 0);
+  r2 = await stub('Yes', 409, { ok: false, error: 'IN_PROGRESS' });
+  check('client: 409 IN_PROGRESS shows the retry message, no redirect', r2.url.endsWith('/kitchen-survey') && r2.alert === 1 && r2.leads === 0);
+  r2 = await stub('Yes', 200, { ok: true, outcome: 'disqualified', reason: 'outside_cornwall' });
+  check('client: server says DQ for a "Yes" page answer: server wins, not-in-area, NO Lead, no token', r2.url.endsWith('/survey/kitchen-not-in-area') && r2.leads === 0 && r2.metaLead === 0 && r2.token === null, r2);
+  check('client: that disagreement logs a PII-free warning', r2.log.console.some((m) => /server outcome differs/.test(m) && !/Test|example|7700/.test(m)), r2.log.console);
+  r2 = await stub('No', 200, { ok: true, outcome: 'disqualified', reason: 'outside_cornwall' });
+  check('client: DQ outcome goes to not-in-area, no Lead, no token, no console errors', r2.url.endsWith('/survey/kitchen-not-in-area') && r2.leads === 0 && r2.metaLead === 0 && r2.token === null && r2.log.console.length === 0, r2.log.console);
 
   // 3. Failure, retry with the same submission_id, in-flight lock
   {

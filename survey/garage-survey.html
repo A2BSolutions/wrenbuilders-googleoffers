@@ -447,19 +447,21 @@ class Component extends DCLogic {
       this.inFlight = false;
       this.setState({ sending: false, submitError: "Sorry, we couldn't send your details just now. Please try again, or call us on 01872 613608." });
     };
-    let F, payload, qualified, dest;
+    let F, payload, expectAccepted, routes;
     try {
       F = window.WrenFunnel;
       if (!F) { const x = new Error('wren-funnel.js not loaded'); x.code = 'FUNNEL_SCRIPT_MISSING'; throw x; }
       payload = this.buildPayload(F.getSubmissionId(this.cfg.campaign));
-      qualified = payload.answers.in_cornwall === 'Yes';
-      dest = F.route(this.cfg.campaign, qualified ? 'thankYou' : 'notInArea');
+      expectAccepted = payload.answers.in_cornwall === 'Yes'; // expectation only. The server's outcome decides.
+      routes = { accepted: F.route(this.cfg.campaign, 'thankYou'), disqualified: F.route(this.cfg.campaign, 'notInArea') }; // fail early if a route is missing
     } catch (err) { onFail(err); return; }
-    F.submitLead(payload).then(() => {
-      F.completeSubmission({ campaign: payload.campaign, offer: payload.offer, submission_id: payload.submission_id, qualified });
+    F.submitLead(payload).then((res) => {
+      // Qualification boundary: Cornwall = Yes is forwarded to GHL ('accepted'); Cornwall = No is 'disqualified' and never leaves the server.
+      if ((res.outcome === 'accepted') !== expectAccepted) console.warn('[Wren funnel] server outcome differs from the page answer. Using the server outcome.');
+      F.completeSubmission({ campaign: payload.campaign, offer: payload.offer, submission_id: payload.submission_id, outcome: res.outcome });
       // First name travels in session storage only, never in the URL.
       try { sessionStorage.setItem('wren_first_name', payload.contact.first_name); } catch (err) {}
-      window.location.assign(dest);
+      window.location.assign(routes[res.outcome]);
     }, onFail);
   };
   rvVals() {

@@ -96,7 +96,10 @@
     return u.toString();
   }
 
-  // Resolves only on HTTP 2xx with JSON body { "ok": true }. Anything else rejects.
+  // Resolves only on HTTP 2xx with JSON body { ok:true, outcome:'accepted' | 'disqualified' }. Anything else rejects.
+  //   accepted     = the lead reached GHL (Cornwall = Yes). Thank-you page, conversion allowed.
+  //   disqualified = outside Cornwall. Nothing was sent to GHL. Not-in-area page, NEVER a conversion.
+  // `ok:true` with a missing or unknown outcome is NOT_CONFIRMED (fail closed). The SERVER decides, not the page.
   function submitLead(payload) {
     var url;
     try { url = endpointUrl(); } catch (e) { return Promise.reject(e); }
@@ -111,7 +114,7 @@
     }).then(function (res) {
       return res.json().catch(function () { return null; }).then(function (body) {
         if (!res.ok) throw fail('HTTP_' + res.status, 'Endpoint returned ' + res.status, { body: body });
-        if (!body || body.ok !== true) throw fail('NOT_CONFIRMED', 'Endpoint did not confirm { ok: true }', { body: body });
+        if (!body || body.ok !== true || (body.outcome !== 'accepted' && body.outcome !== 'disqualified')) throw fail('NOT_CONFIRMED', 'Endpoint did not confirm a known outcome', { body: body });
         return body;
       });
     }, function (err) {
@@ -119,11 +122,11 @@
     }).then(function (b) { if (timer) clearTimeout(timer); return b; }, function (e) { if (timer) clearTimeout(timer); throw e; });
   }
 
-  // Call ONLY after submitLead() resolves. Clears the submission id and, for Cornwall = Yes,
-  // leaves a one-time conversion token for the matching thank-you page.
+  // Call ONLY after submitLead() resolves. Clears the submission id. Leaves a one-time conversion token for the matching
+  // thank-you page ONLY when the server's outcome is 'accepted'. A disqualified outcome never creates a token.
   function completeSubmission(info) {
     ss('del', KEY_SUBMISSION_ID + info.campaign);
-    if (info.qualified) {
+    if (info.outcome === 'accepted') {
       ss('set', KEY_CONVERSION, JSON.stringify({
         submission_id: info.submission_id, campaign: info.campaign, offer: info.offer, created_at: Date.now()
       }));

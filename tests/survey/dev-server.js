@@ -23,16 +23,18 @@ async function main() {
   const live = process.env.SURVEY_DEV_LIVE === '1';
   const rx = await startReceiver();
   let failNext = 0;
-  const fetchImpl = async (u, o) => { if (failNext > 0) { failNext--; throw new TypeError('simulated network failure'); } return fetch(u, o); };
+  const outgoing = { n: 0 }; // request instrumentation: EVERY upstream request the endpoint makes (GET /__mock/outgoing)
+  const fetchImpl = async (u, o) => { outgoing.n++; if (failNext > 0) { failNext--; throw new TypeError('simulated network failure'); } return fetch(u, o); };
   const handler = live
     ? createHandler({ env: process.env, fetchImpl }) // default log: whitelisted JSON, no PII
     : createHandler({
       env: { GHL_SURVEY_KITCHEN_WEBHOOK_URL: rx.url('kitchen-e2e'), GHL_SURVEY_GARAGE_WEBHOOK_URL: rx.url('garage-e2e') },
-      forwardTimeoutMs: 1500, ghl: { allowedHosts: ['127.0.0.1'], allowHttp: true }, log: () => {},
+      forwardTimeoutMs: 1500, fetchImpl, ghl: { allowedHosts: ['127.0.0.1'], allowHttp: true }, log: () => {},
     });
   http.createServer((req, res) => {
     const u = new URL(req.url, 'http://x'); const p = u.pathname;
-    if (p === '/__mock/reset') { rx.state.calls.length = 0; rx.state.mode = 'ok'; return res.end('ok'); }
+    if (p === '/__mock/reset') { rx.state.calls.length = 0; rx.state.mode = 'ok'; outgoing.n = 0; failNext = 0; return res.end('ok'); }
+    if (p === '/__mock/outgoing') { res.setHeader('content-type', 'application/json'); return res.end(JSON.stringify({ n: outgoing.n })); }
     if (p === '/__mock/mode') { rx.state.mode = u.searchParams.get('m'); return res.end('ok'); }
     if (p === '/__mock/failnext') { failNext = Number(u.searchParams.get('n') || 1); return res.end('ok'); }
     if (p === '/__mock/calls') { res.setHeader('content-type', 'application/json'); return res.end(JSON.stringify(rx.state.calls)); }

@@ -1,9 +1,12 @@
 'use strict';
 /*
  * POST /api/survey-lead  (same-origin only)
- * Validates a survey submission, derives qualification server-side and forwards it to the campaign's GHL inbound webhook.
- * Returns { ok:true } with HTTP 200 ONLY after GHL answered 2xx (or the same submission_id was already accepted).
- * Any other outcome is non-2xx with ok:false. It fails closed.
+ * Validates a survey submission and applies the qualification boundary:
+ *   in_cornwall = "Yes": forward to the campaign's GHL inbound webhook. { ok:true, outcome:'accepted' } ONLY after GHL answered 2xx
+ *                        (or the same submission_id was already accepted).
+ *   in_cornwall = "No":  { ok:true, outcome:'disqualified', reason:'outside_cornwall' }. NO request to GHL, nothing stored or updated.
+ *   Missing or unexpected in_cornwall: 400 INVALID_PAYLOAD (schema validation), never treated as qualified or DQ.
+ * Any other outcome is non-2xx with ok:false. It fails closed. Clients must read `outcome`, not just `ok`.
  *
  * Env (server side only, never sent to the browser):
  *   GHL_SURVEY_KITCHEN_WEBHOOK_URL   GHL inbound webhook URL for the kitchen workflow
@@ -13,7 +16,7 @@
  * No PII is ever logged. Logs carry the event code, campaign, submission_id (random UUID) and status only.
  */
 
-const { CAMPAIGNS, validatePayload, buildGhlPayload } = require('./_lib/survey-core');
+const { CAMPAIGNS, validatePayload, buildGhlPayload, isQualified } = require('./_lib/survey-core');
 const { createMemoryStore } = require('./_lib/idempotency');
 
 const MAX_BODY_CHARS = 16 * 1024;
@@ -111,19 +114,23 @@ function createHandler(opts = {}) {
       const idem = String(req.headers['idempotency-key'] || '').toLowerCase();
       if (idem !== lead.submission_id) return done(400, { ok: false, error: 'IDEMPOTENCY_MISMATCH' }, 'rejected', Object.assign({ reason: 'idempotency-key' }, base));
 
+      // QUALIFICATION BOUNDARY. Only the validated server-side answer decides. Outside Cornwall: explicit DQ outcome,
+      // no GHL request, no store entry, nothing created or updated anywhere. This runs before the webhook is even read.
+      if (!isQualified(lead.answers)) return done(200, { ok: true, outcome: 'disqualified', reason: 'outside_cornwall' }, 'disqualified', base);
+
       const url = webhookFor(lead.campaign, env, ghl);
       if (!url || !store) return done(503, { ok: false, error: 'NOT_CONFIGURED' }, 'not_configured', base);
 
       const key = lead.campaign + ':' + lead.submission_id;
       const claim = await store.begin(key, now());
-      if (claim.outcome === 'done') return done(200, { ok: true, duplicate: true }, 'duplicate_done', base);
+      if (claim.outcome === 'done') return done(200, { ok: true, outcome: 'accepted', duplicate: true }, 'duplicate_done', base);
       if (claim.outcome === 'in_progress') return done(409, { ok: false, error: 'IN_PROGRESS' }, 'in_progress', base, { 'Retry-After': '2' });
       if (claim.outcome === 'takeover') log('takeover_in_doubt', Object.assign({ attempts: claim.attempts }, base));
 
       const result = await forward(url, buildGhlPayload(lead, new Date(now()).toISOString()), fetchImpl, forwardTimeoutMs);
       if (result.ok) {
         await store.complete(key, claim.token, now());
-        return done(200, { ok: true }, 'accepted', base);
+        return done(200, { ok: true, outcome: 'accepted' }, 'accepted', base);
       }
       await store.release(key, claim.token);
       const status = result.kind === 'UPSTREAM_TIMEOUT' ? 504 : 502;

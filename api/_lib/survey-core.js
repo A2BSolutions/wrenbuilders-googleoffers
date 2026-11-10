@@ -29,7 +29,6 @@ const CAMPAIGNS = {
   },
 };
 
-const TAG_DQ = 'DQ - outside Cornwall';
 const TAG_LOW = 'Low priority';
 
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -174,15 +173,21 @@ function validatePayload(body) {
   };
 }
 
+/**
+ * Qualification boundary. A lead is qualified ONLY when the validated answer is exactly "Yes".
+ * Positive match on purpose: anything else (including a value that somehow got past validation) is DQ, never qualified.
+ * Out-of-area submissions are never sent to GHL (see api/survey-lead.js).
+ */
+function isQualified(answers) {
+  return !!answers && answers.in_cornwall === 'Yes';
+}
+
 /** Qualification is derived ONLY from validated answers, never from client-sent tags. */
 function qualify(campaign, answers) {
-  const tags = [];
-  const outside = answers.in_cornwall === 'No';
+  const qualified = isQualified(answers);
   const low = campaign === 'kitchen' && answers.fitting_timeframe === 'Just looking for now';
-  if (outside) tags.push(TAG_DQ);
-  if (low) tags.push(TAG_LOW);
-  // owns_property has no business rule: recorded only.
-  return { tags, dq_outside_cornwall: outside, low_priority: low, qualified: !outside };
+  // owns_property has no business rule: recorded only. DQ leads are not forwarded, so there is no DQ tag.
+  return { tags: low ? [TAG_LOW] : [], dq_outside_cornwall: !qualified, low_priority: low, qualified };
 }
 
 /**
@@ -191,6 +196,8 @@ function qualify(campaign, answers) {
  */
 function buildGhlPayload(v, receivedAtIso) {
   const q = qualify(v.campaign, v.answers);
+  // Last line of defence: a DQ lead must never be turned into a GHL payload.
+  if (!q.qualified) throw new Error('DQ_NOT_FORWARDABLE');
   const p = {
     first_name: v.contact.first_name,
     last_name: v.contact.last_name,
@@ -226,4 +233,4 @@ function buildGhlPayload(v, receivedAtIso) {
   return p;
 }
 
-module.exports = { CAMPAIGNS, TAG_DQ, TAG_LOW, validatePayload, qualify, buildGhlPayload, normalisePhone, normalisePostcode };
+module.exports = { CAMPAIGNS, TAG_LOW, validatePayload, isQualified, qualify, buildGhlPayload, normalisePhone, normalisePostcode };

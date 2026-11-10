@@ -1,7 +1,8 @@
 # Wren Builders replacement survey funnels: technical handoff
 
 Two replacement Meta survey funnels (Kitchen, Garage). Not a third offer. The live `/kitchen` and `/garage-conversion` funnels are untouched.
-Status: built and tested locally against a MOCK receiver. Nothing here proves GHL persistence. No GHL webhook exists yet.
+Status: built, tested locally and on a hosted Vercel preview, and verified against the real GHL workflows (sections 13 to 16).
+**Qualification boundary (16): only Cornwall = Yes is sent to GHL. Cornwall = No gets an explicit DQ outcome and creates or updates nothing. Earlier sections that describe DQ leads being forwarded, tagged or stored are SUPERSEDED by section 16.**
 Docs and tests are excluded from deployments by `.vercelignore` (`docs`, `tests`).
 
 ## 1. Routes
@@ -64,8 +65,9 @@ Server checks, in order: method, same-origin (`Origin`, else `Referer`), content
 
 | Status | Body | Meaning |
 |---|---|---|
-| 200 | `{ok:true}` | GHL returned 2xx |
-| 200 | `{ok:true,duplicate:true}` | same submission already accepted, not forwarded again |
+| 200 | `{ok:true,outcome:'accepted'}` | Cornwall = Yes. GHL returned 2xx |
+| 200 | `{ok:true,outcome:'accepted',duplicate:true}` | same submission already accepted, not forwarded again |
+| 200 | `{ok:true,outcome:'disqualified',reason:'outside_cornwall'}` | Cornwall = No. **No request to GHL, nothing stored.** Not a conversion |
 | 400 | `{ok:false,error:'INVALID_PAYLOAD',fields:[names only]}` / `INVALID_JSON` / `IDEMPOTENCY_MISMATCH` | rejected |
 | 403 / 405 / 413 / 415 | `FORBIDDEN_ORIGIN` / `METHOD_NOT_ALLOWED` / `PAYLOAD_TOO_LARGE` / `UNSUPPORTED_MEDIA_TYPE` | rejected |
 | 409 | `IN_PROGRESS` + `Retry-After: 2` | same submission is being processed |
@@ -74,7 +76,7 @@ Server checks, in order: method, same-origin (`Origin`, else `Referer`), content
 | 500 | `INTERNAL` | unexpected |
 
 `ok:true` means GHL accepted the webhook request. A GHL inbound webhook answers 200 on receipt even if the workflow later fails. So persistence still has to be checked inside GHL.
-Qualification (server-derived only): `in_cornwall = No` gives tag `DQ - outside Cornwall`. Kitchen `fitting_timeframe = Just looking for now` gives `Low priority`. Both can apply. `owns_property = No` has no rule (recorded only). Tag names come from the export handoff; confirm they match the five tags created in GHL.
+Qualification (server-derived only, see 16): only `in_cornwall = Yes` is forwarded. Kitchen `fitting_timeframe = Just looking for now` adds tag `Low priority`. `owns_property = No` has no rule (recorded only).
 Logs contain only: event code, campaign, `submission_id` (random UUID), status, duration, failure kind. No bodies, headers, URLs or error text.
 
 ### GHL payload (flat JSON sent to the inbound webhook)
@@ -191,3 +193,36 @@ Run against the real preview deployment of commit `e535294` with a temporary, de
 - Conditional tags are only ever added. A person who first submits outside Cornwall and later inside Cornwall would keep `dq - outside cornwall`. Consider removing the opposite tag in the workflow. UNVERIFIED for real leads.
 - A replayed submission re-runs the workflow on the same contact (fields and tags unchanged, no duplicate contact or tag).
 
+## 16. Qualification boundary (business requirement, 10 Nov 2026) - supersedes earlier DQ behaviour
+
+Confirmed by the team: Cornwall = Yes goes to GHL and the existing lead process. Cornwall = No goes to the not-in-area page and **must not create or update any GHL record**. No Lead conversion for out-of-area submissions.
+
+**Server (`api/survey-lead.js`, `api/_lib/survey-core.js`)**
+- The whole submission is validated first (unchanged). `answers.in_cornwall` must be exactly `"Yes"` or `"No"`; anything else (missing, `null`, wrong case, spaces, arrays, objects, booleans) is 400 `INVALID_PAYLOAD` and is never treated as qualified or DQ.
+- Then `isQualified(answers)` is a **positive match** on `"Yes"`. If not qualified, the endpoint returns `200 {ok:true, outcome:'disqualified', reason:'outside_cornwall'}` **before** the webhook is read, the idempotency store is touched, or any request is made. DQ works even if the webhook variable is missing.
+- Defence in depth: `buildGhlPayload()` throws `DQ_NOT_FORWARDABLE` for a DQ lead, so a coding mistake cannot send one.
+- The GHL payload keeps `survey_qualified` (now always `true`) and `survey_dq_outside_cornwall` (always `false`) so existing mappings still work. The `DQ - outside Cornwall` tag is never sent. `tags` is `["Low priority"]` or `[]`.
+- Logs for DQ: event `disqualified`, campaign, `submission_id`, status, duration. No personal data. Vercel logs are the only record of DQ volume.
+- DQ is deterministic and never claims an idempotency id, so retries return the same response and a later qualified submission with the same id is forwarded normally.
+
+**Client (`survey/wren-funnel.js`, both survey pages)**
+- `submitLead` resolves only for `ok:true` with `outcome` of `accepted` or `disqualified`. `ok:true` with no or an unknown outcome is `NOT_CONFIRMED` (error shown, no redirect).
+- The server's outcome decides the route and the conversion, not the page's own answer check. If they disagree the page logs a PII-free warning and follows the server.
+- `completeSubmission` writes the one-time conversion token **only** for `accepted`. A DQ never creates a token, so `wren_survey_lead` and Meta `Lead` cannot fire, including after visiting the thank-you page.
+
+**Tests**
+- 32 unit and API tests (mutation-checked): zero outgoing requests and zero store calls for DQ; DQ with the identity of an existing contact; retries and duplicates; 21 invalid or unexpected Cornwall values; DQ-looking requests that fail other gates; no PII in logs.
+- 131 browser checks plus 20 screenshots identical to the original export (0 differing pixels).
+- `tests/survey/live-boundary.js` against the real GHL webhooks (local endpoint code, fictional contacts): 3 qualified submissions produced exactly 3 outgoing requests and 3 contacts; 4 DQ submissions (2 new identities, 2 using the identity of existing contacts) produced 0 outgoing requests (counted by request instrumentation), created no contact, and left the existing contacts' `dateUpdated` and fields unchanged. No opportunities.
+- NOT yet re-run on a hosted Vercel preview after this change.
+
+**Effects and open points**
+- Out-of-area people leave no CRM trace. The privacy policy copy should say their details are not stored.
+- The earlier concern about stale DQ tags no longer applies to new data. Old test contacts that carry `dq - outside cornwall` remain until deleted.
+- A DQ person still types and submits their details. The server validates and discards them.
+
+**For Codex (GHL side, no workflow change was made by this repo)**
+1. The survey workflows no longer receive DQ leads. Any branch keyed on `survey_dq_outside_cornwall = true` or the tag `DQ - outside Cornwall` is dead and can be left or removed. Do not remove the `Low priority` branch.
+2. Existing test contacts created before this change are still in GHL (including `s2`, `s4`, `s6`-style contacts with the DQ tag). Delete them with the other `ZZ Test` contacts (`zz-survey-e2e-*`, `zz-survey-boundary-*`).
+3. Re-confirm from workflow execution logs that a qualified lead still triggers the established SMS opener and internal notification, and that no existing production workflow ran.
+4. Idempotency is still best-effort (in-memory), so a duplicate qualified submission can re-run the workflow. Add the `survey_submission_id` guard before any side effect.
