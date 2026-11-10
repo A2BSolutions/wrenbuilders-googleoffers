@@ -437,8 +437,8 @@
   </sc-if>
 
   <sc-if value="{{ exitOpen }}" hint-placeholder-val="{{ false }}">
-    <div onClick="{{ closeExit }}" style="position:fixed; inset:0; z-index:110; background:rgba(22,23,26,.72); display:flex; align-items:center; justify-content:center; padding:20px;">
-      <div role="dialog" aria-modal="true" aria-label="See what’s possible" onClick="{{ stop }}" style="position:relative; background:#f7f4ee; border-radius:4px; border-top:3px solid #b6935a; width:100%; max-width:440px; padding:32px 28px 28px; box-shadow:0 40px 90px -30px rgba(0,0,0,.7);">
+    <div onClick="{{ closeExit }}" style="position:fixed; inset:0; z-index:110; background:rgba(22,23,26,.72); display:flex; justify-content:center; padding:20px; overflow-y:auto;">
+      <div role="dialog" aria-modal="true" aria-label="See what’s possible" onClick="{{ stop }}" style="position:relative; background:#f7f4ee; border-radius:4px; border-top:3px solid #b6935a; width:100%; max-width:440px; margin:auto; padding:32px 28px 28px; box-shadow:0 40px 90px -30px rgba(0,0,0,.7);">
         <button type="button" onClick="{{ closeExit }}" aria-label="Close" style="position:absolute; top:10px; right:10px; width:44px; height:44px; border:none; border-radius:50%; background:#ece6dc; color:#1d1f22; font-size:22px; line-height:1; cursor:pointer;" style-hover="background:#e2dacb;">×</button>
         <div style="font-size:11px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:#8a6a36;">For Cornwall Homeowners</div>
         <h2 style="margin:8px 44px 8px 0; font-family:'Work Sans', system-ui, sans-serif; font-weight:500; font-size:28px; line-height:1.12;">What Could Your Garage Become?</h2>
@@ -448,14 +448,30 @@
           <input type="hidden" name="offer" value="garage-conversion-ac-included">
           <input type="hidden" name="source" value="exit-popup">
           <label style="display:flex; flex-direction:column; gap:6px;">
-            <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Name</span>
+            <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Full name</span>
             <input name="name" type="text" autoComplete="name" placeholder="Your full name" style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid #d8cfbf; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
           </label>
           <label style="display:flex; flex-direction:column; gap:6px;">
             <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Mobile number</span>
             <input name="phone" type="tel" autoComplete="tel" placeholder="07..." style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid #d8cfbf; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
           </label>
-          <span style="font-size:13px; color:#a2361f;">{{ exitError }}</span>
+          <label style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Email</span>
+            <input name="email" type="email" autoComplete="email" placeholder="you@email.com" style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid #d8cfbf; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+          </label>
+          <label style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Street address</span>
+            <input name="address" type="text" autoComplete="street-address" placeholder="House number and street" style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid #d8cfbf; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+          </label>
+          <label style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">City</span>
+            <input name="city" type="text" autoComplete="address-level2" placeholder="Truro" style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid #d8cfbf; border-radius:4px; background:#ffffff; color:#1d1f22; min-width:0;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+          </label>
+          <label style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Postcode</span>
+            <input name="postcode" type="text" autoComplete="postal-code" placeholder="TR1 1AA" style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid #d8cfbf; border-radius:4px; background:#ffffff; color:#1d1f22; text-transform:uppercase; min-width:0;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+          </label>
+          <span role="alert" style="font-size:13px; color:#a2361f;">{{ exitError }}</span>
           <button type="submit" data-arw-btn="" disabled="{{ exitLoading }}" style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; gap:12px; font-family:'Work Sans', system-ui, sans-serif; font-size:14.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:18px 22px; min-height:56px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer;" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-hover="background:#a5834d;" style-active="transform:translateY(1px);">{{ exitLabel }}<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
         </form>
       </div>
@@ -537,21 +553,53 @@ class Component extends DCLogic {
     }
     this.setState({ modalOpen: true, exitOpen: false });
   };
+  exitBusy = false;
+  exitEventId = null;
+  exitCheck(n, v) {
+    v = (v || '').trim();
+    switch (n) {
+      case 'name': return v ? '' : 'Please enter your name';
+      case 'phone': return v.replace(/\D/g, '').length >= 10 ? '' : 'Please enter a valid mobile number';
+      case 'email': return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '' : 'Please enter a valid email address';
+      case 'address': return v ? '' : 'Please enter your street address';
+      case 'city': return v ? '' : 'Please enter your city or town';
+      case 'postcode': return /^[A-Za-z]{1,2}\d[A-Za-z\d]?\s*\d[A-Za-z]{2}$/.test(v) ? '' : 'Please enter a valid postcode';
+    }
+    return '';
+  }
   exitSubmit = (e) => {
     e.preventDefault();
-    if (this.state.exitLoading) return;
-    const fd = new FormData(e.currentTarget);
-    const name = (fd.get('name') || '').trim(), phone = (fd.get('phone') || '').trim();
-    if (!name || phone.replace(/\D/g, '').length < 10) { this.setState({ exitError: 'Please enter your name and a valid mobile number' }); return; }
+    if (this.exitBusy) return;
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const keys = ['name', 'phone', 'email', 'address', 'city', 'postcode'];
+    for (const k of keys) {
+      const m = this.exitCheck(k, fd.get(k));
+      if (m) { this.setState({ exitError: m }); const el = form.querySelector('[name="' + k + '"]'); if (el) el.focus(); return; }
+    }
+    this.exitBusy = true;
     this.setState({ exitLoading: true, exitError: '' });
     fd.append('page', location.href);
-    const eventId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+    if (!this.exitEventId) this.exitEventId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+    const eventId = this.exitEventId;
     fd.append('event_id', eventId);
-    try { sessionStorage.setItem('wren_lead_garage', JSON.stringify({ event_id: eventId, offer: fd.get('offer'), channel: fd.get('channel'), ts: Date.now(), fired: false })); } catch (err) {}
     const body = new URLSearchParams(fd).toString();
     const WEBHOOK = window.WREN_WEBHOOK || 'https://services.leadconnectorhq.com/hooks/umsacBjS6we0WPzRhMZz/webhook-trigger/aa8407d1-af54-4821-aabc-81c00252c08f';
-    if (WEBHOOK) { try { fetch(WEBHOOK, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body }); } catch (err) {} }
-    location.href = window.WREN_THANK_YOU || '/garage-conversion/thank-you';
+    const offer = fd.get('offer'), channel = fd.get('channel');
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 15000);
+    fetch(WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body, signal: ctl.signal })
+      .then((r) => {
+        clearTimeout(timer);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        try { sessionStorage.setItem('wren_lead_garage', JSON.stringify({ event_id: eventId, offer, channel, ts: Date.now(), fired: false })); } catch (err) {}
+        location.href = window.WREN_THANK_YOU || '/garage-conversion/thank-you';
+      })
+      .catch(() => {
+        clearTimeout(timer);
+        this.exitBusy = false;
+        this.setState({ exitLoading: false, exitError: 'Sorry, we could not send your details. Please check your connection and try again.' });
+      });
   };
   renderVals() {
     const w = this.state.w;

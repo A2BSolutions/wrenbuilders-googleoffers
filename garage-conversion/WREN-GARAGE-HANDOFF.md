@@ -2,6 +2,8 @@
 
 > Integration note: GTM `GTM-KF4RWHHQ` is now installed on both garage pages, and `vercel.json` redirects the no-slash routes to the slash form so relative paths resolve. See the root `README.md`.
 
+> Update 10 Nov 2026: every form (exit popup included) now has six fields only: name, phone, email, address, city, postcode. `pain`/`dream` and the name+phone exit form below are historic. Submit uses CORS `fetch` (no `no-cors`, no `keepalive`), 15s timeout, redirects only on HTTP 2xx. See root `README.md`.
+
 Design-only handoff for a shared multi-funnel repo. Everything lives in its own folder `garage-conversion/`. No root `index.html`, no root assets, no `vercel.json`.
 
 ## About the files

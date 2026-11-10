@@ -1,5 +1,7 @@
 # Wren Builders – Kitchen Offer Funnel (isolated, shared-repo)
 
+> Update 10 Nov 2026: every form (exit popup included) now has six fields only: name, phone, email, address, city, postcode. `pain`/`timing` and the name+phone exit form below are historic. Submit uses CORS `fetch` (no `no-cors`, no `keepalive`), 15s timeout, redirects only on HTTP 2xx. See root `README.md`.
+
 All files are scoped to /kitchen/. No root-level files. No vercel.json.
 
 /kitchen/

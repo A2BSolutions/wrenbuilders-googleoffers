@@ -12,7 +12,7 @@
   <input type="hidden" name="offer" value="garage-conversion-ac-included">
   <input type="hidden" name="source" value="{{ source }}">
   <label style="display:flex; flex-direction:column; gap:6px;">
-    <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Name</span>
+    <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Full name</span>
     <input name="name" type="text" autoComplete="name" placeholder="Your full name" onBlur="{{ blur }}" style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid {{ bName }}; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
     <span style="font-size:13px; color:#a2361f;">{{ eName }}</span>
   </label>
@@ -45,13 +45,16 @@
       <span style="font-size:13px; color:#a2361f;">{{ ePostcode }}</span>
     </label>
   </div>
+  <sc-if value="{{ sendErr }}" hint-placeholder-val="{{ false }}"><p role="alert" style="margin:0; padding:10px 12px; border-radius:4px; background:#fbeae6; border:1px solid #a2361f; font-size:14px; line-height:1.4; color:#a2361f;">{{ sendErr }}</p></sc-if>
   <button type="submit" data-arw-btn="" disabled="{{ loading }}" style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; gap:12px; margin-top:4px; font-family:'Work Sans', system-ui, sans-serif; font-size:14.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:18px 22px; min-height:58px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer; text-align:center;" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-hover="background:#a5834d;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #1d1f22; outline-offset:3px;">{{ label }}<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
   <p style="margin:0; font-size:13px; line-height:1.45; color:#4f5258; text-align:center;">No obligation. We’ll call to talk through your garage and answer any questions.</p>
 </form>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:480,&quot;height&quot;:820},&quot;source&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;hero&quot;,&quot;final-cta&quot;,&quot;cta-popup&quot;],&quot;default&quot;:&quot;hero&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 class Component extends DCLogic {
-  state = { err: {}, loading: false };
+  state = { err: {}, loading: false, sendErr: '' };
+  busy = false;
+  eventId = null;
   check(name, val) {
     const v = (val || '').trim();
     switch (name) {
@@ -71,20 +74,34 @@ class Component extends DCLogic {
   };
   submit = (e) => {
     e.preventDefault();
-    if (this.state.loading) return;
+    if (this.busy) return;
     const fd = new FormData(e.currentTarget);
     const err = {};
     ['name', 'phone', 'email', 'address', 'city', 'postcode'].forEach(k => { const m = this.check(k, fd.get(k)); if (m) err[k] = m; });
     if (Object.keys(err).length) { this.setState({ err }); return; }
-    this.setState({ loading: true, err: {} });
+    this.busy = true;
+    this.setState({ loading: true, err: {}, sendErr: '' });
     fd.append('page', location.href);
-    const eventId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+    if (!this.eventId) this.eventId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+    const eventId = this.eventId;
     fd.append('event_id', eventId);
-    try { sessionStorage.setItem('wren_lead_garage', JSON.stringify({ event_id: eventId, offer: fd.get('offer'), channel: fd.get('channel'), ts: Date.now(), fired: false })); } catch (err) {}
     const body = new URLSearchParams(fd).toString();
     const WEBHOOK = window.WREN_WEBHOOK || 'https://services.leadconnectorhq.com/hooks/umsacBjS6we0WPzRhMZz/webhook-trigger/aa8407d1-af54-4821-aabc-81c00252c08f';
-    if (WEBHOOK) { try { fetch(WEBHOOK, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body }); } catch (x) {} }
-    location.href = window.WREN_THANK_YOU || '/garage-conversion/thank-you';
+    const offer = fd.get('offer'), channel = fd.get('channel');
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 15000);
+    fetch(WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body, signal: ctl.signal })
+      .then((r) => {
+        clearTimeout(timer);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        try { sessionStorage.setItem('wren_lead_garage', JSON.stringify({ event_id: eventId, offer, channel, ts: Date.now(), fired: false })); } catch (err) {}
+        location.href = window.WREN_THANK_YOU || '/garage-conversion/thank-you';
+      })
+      .catch(() => {
+        clearTimeout(timer);
+        this.busy = false;
+        this.setState({ loading: false, sendErr: 'Sorry, we could not send your details. Please check your connection and try again.' });
+      });
   };
   renderVals() {
     const e = this.state.err;
@@ -97,6 +114,7 @@ class Component extends DCLogic {
       ...out,
       source: this.props.source ?? 'hero',
       loading: this.state.loading,
+      sendErr: this.state.sendErr,
       label: this.state.loading ? 'Sending…' : 'See What My Garage Could Become',
       blur: this.blur,
       submit: this.submit,
