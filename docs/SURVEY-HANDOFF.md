@@ -226,3 +226,16 @@ Confirmed by the team: Cornwall = Yes goes to GHL and the existing lead process.
 2. Existing test contacts created before this change are still in GHL (including `s2`, `s4`, `s6`-style contacts with the DQ tag). Delete them with the other `ZZ Test` contacts (`zz-survey-e2e-*`, `zz-survey-boundary-*`).
 3. Re-confirm from workflow execution logs that a qualified lead still triggers the established SMS opener and internal notification, and that no existing production workflow ran.
 4. Idempotency is still best-effort (in-memory), so a duplicate qualified submission can re-run the workflow. Add the `survey_submission_id` guard before any side effect.
+
+## 17. Hosted preview verification of the qualification boundary (10 Nov 2026, commit `cdce22e`)
+
+Run against the real preview deployment with a temporary, deployment-scoped, 40-minute share link, **revoked afterwards** (it now redirects to Vercel login). Project and Production protection were not changed. Fictional data only (`ZZ Test`, `07700 9009NN`, UTM medium `controlled-test`).
+
+- `tests/survey/hosted-checks.js`: 44 of 44. Six routes 200 with `X-Robots-Tag: noindex, nofollow` and robots meta; assets 200; existing funnel routes and noindex headers unchanged; API gates; 18 invalid or missing Cornwall variants all 400 `INVALID_PAYLOAD` (never accepted or disqualified); valid Cornwall = No returns `200 {ok:true,outcome:'disqualified',reason:'outside_cornwall'}`, repeated tries identical.
+- `tests/survey/hosted-boundary.js` (browser, hosted function, GTM and Meta stubbed): 7 of 7.
+  - Cornwall Yes (kitchen, garage, kitchen low priority): response `outcome:'accepted'`, thank-you page, exactly one `wren_survey_lead` and one Meta `Lead`, none after refresh.
+  - Cornwall No (kitchen, garage, and kitchen and garage reusing the identity of existing contacts): response `outcome:'disqualified'`, not-in-area page, zero `wren_survey_lead`, zero Meta `Lead`, no token, and nothing fires after visiting the thank-you page.
+- GHL readback: the 3 qualified submissions created contacts with correct fields, answers, UTMs, hosted page URL, `submission_id` and tags (`low priority` on the low-priority one, no DQ tag). The DQ identities created no contact (checked by email and phone). The two existing contacts are unchanged: `dateUpdated`, `submission_id`, answers and UTM fields match their baselines. No opportunities.
+- **Limitation, zero GHL requests:** the hosted function's outgoing requests cannot be counted from outside, so it is not instrumented. The evidence is (1) the function's runtime logs for the 7 submissions show 3 `accepted` and 4 `disqualified` events, each matching the submission id seen by the browser, with no `forward_failed` and no `accepted` for any DQ id (a forward always logs one of those), (2) DQ log durations of 0 to 1 ms, and (3) GHL readback showing no contact created or updated. The exact-zero counter is proven locally (section 16).
+- The first hosted run used `RUN` unexported, so its contacts are named `ZZ Test h1..h3 Hundefined`, emails `zz-survey-hosted-undefined-h1..h3@example.com`. The script now refuses to run without `RUN`.
+
