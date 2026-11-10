@@ -82,11 +82,15 @@ Logs contain only: event code, campaign, `submission_id` (random UUID), status, 
 `first_name, last_name, full_name, phone (+447...), email, address1, city, postal_code, lead_source, survey_campaign, survey_offer, survey_submission_id, survey_submission_timestamp (client), survey_received_at (server), survey_page_url, survey_utm_source|medium|campaign|content|term, survey_fbclid, survey_qualified, survey_dq_outside_cornwall, survey_low_priority, survey_priority, tags[], tags_csv, survey_answer_<key> for each of the 4 answers, survey_kitchen_type or survey_garage_type`.
 Booleans and tags are both sent so a workflow can branch on a flag and add its static tag.
 
-### Field mapping (PROPOSED, nothing applied)
+### Field mapping (VERIFIED by GHL readback, 10 Nov 2026)
 
-Existing new fields (verified present, read-only): `survey__kitchen_type`, `survey__garage_type`, `survey_submission_id`, `survey_campaign`, `survey_offer`, `survey_page_url`, `survey_utm_source|medium|campaign|content|term`, `survey_fbclid`, `survey_submission_timestamp`.
-There is no new field for `fitting_timeframe`, `conversion_use`, `owns_property`, `in_cornwall`, nor for `fbp`/`fbc`/`referrer`.
-Candidate reuse: `fb_offer1_fittingtime`, `fb_offer1_ownproperty`, `fb_offer1_cornwall`, `fb_offer2_property`, `google_o2_q2`. These belong to the older funnels and may feed their workflows or reports. **Inspect workflow dependencies before mapping to them.** Safer option: create four dedicated survey fields instead. Decision needed.
+The two survey workflows write dedicated survey fields. No field belonging to the older funnels is used.
+`survey_campaign`, `survey_offer`, `survey_submission_id`, `survey_submission_timestamp`, `survey_page_url`, `survey_utm_source|medium|campaign|content|term`, `survey_fbclid`, `survey__kitchen_type`, `survey__garage_type`, plus:
+Kitchen: `survey_kitchen_fitting_timeframe`, `survey_kitchen_owns_property`, `survey_kitchen_in_cornwall`.
+Garage: `survey_garage_conversion_use`, `survey_garage_owns_property`, `survey_garage_in_cornwall`.
+Not stored in GHL: `fbp`, `fbc`, `referrer` (not forwarded).
+Contact fields: name split into first and last, `+447...` phone, address, city, postcode, source `Meta`, country `GB`.
+GHL adds base tags `meta lead`, `survey funnel` and `offer 1: kitchen + £1k upgrade` or `offer 2: garage conversion + free ac upgrade`. Conditional tags `DQ - outside Cornwall` and `Low priority` are stored lower-cased by GHL.
 
 ## 5. Idempotency
 
@@ -161,3 +165,13 @@ Not fixed (design approval needed): tablet CTA gap at 760 to 899 px, accessibili
 ## 12. Rollback
 
 The change is additive. To roll back: revert the merge commit (removes `survey/`, `api/`, the six rewrites and one header rule), or in Vercel promote the previous production deployment. Existing funnels are unaffected either way. To stop leads without a rollback, remove the two webhook env vars: the endpoint then fails closed with 503.
+
+## 13. Preview environment and controlled live verification (10 Nov 2026)
+
+- Vercel: `GHL_SURVEY_KITCHEN_WEBHOOK_URL` and `GHL_SURVEY_GARAGE_WEBHOOK_URL` are set as **sensitive**, **Preview only**, scoped to branch `claude/modest-cori-ozevju`. Production has no survey variables. Values are never in the repo, in client code or in logs. To widen to all previews or to set Production later, do it in Vercel project settings or with `create_project_env`.
+- Controlled test: `tests/survey/live-e2e.js` drives the real endpoint code against the real GHL webhooks from a local dev server (`SURVEY_DEV_LIVE=1`, webhook URLs in that process's environment only). GTM and Meta are stubbed so test traffic never reaches real analytics. Test contacts are `zz-survey-e2e-<run>-sN@example.com`, phones `07700 9007NN`, UTM medium `controlled-test`. Delete them in GHL by that email prefix or the `survey funnel` tag plus the name `ZZ Test`.
+- Results: 9 scenarios accepted (HTTP 200). GHL readback confirmed contact fields, all answers, attribution, base tags and conditional tags. No opportunities or conversations were created for the contacts checked.
+- Failed delivery: first attempt 502 (no redirect, no Lead), retry with the same `submission_id` returned 200 and produced one contact.
+- Duplicate with the same `submission_id`: same instance returns `ok:true, duplicate:true` and forwards nothing. After a simulated cold start (empty memory) it was forwarded again and GHL re-ran the workflow: same contact id, `dateUpdated` moved, fields and tags unchanged, no duplicate contact or tag.
+- NOT verified: a browser POST to the protected preview deployment (needs an approved deployment-protection bypass).
+

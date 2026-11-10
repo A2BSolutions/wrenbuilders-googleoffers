@@ -18,15 +18,23 @@ const toRe = (src) => new RegExp('^' + src.split('(.*)').map((x) => x.replace(/[
 
 async function main() {
   const port = Number(process.argv[2] || 8766);
+  // SURVEY_DEV_LIVE=1: use the REAL webhook env vars (GHL_SURVEY_*_WEBHOOK_URL) and the production URL rules. Controlled tests only.
+  // /__mock/failnext?n=1 makes the next n upstream deliveries fail with a network error (to test failure and safe retry).
+  const live = process.env.SURVEY_DEV_LIVE === '1';
   const rx = await startReceiver();
-  const handler = createHandler({
-    env: { GHL_SURVEY_KITCHEN_WEBHOOK_URL: rx.url('kitchen-e2e'), GHL_SURVEY_GARAGE_WEBHOOK_URL: rx.url('garage-e2e') },
-    forwardTimeoutMs: 1500, ghl: { allowedHosts: ['127.0.0.1'], allowHttp: true }, log: () => {},
-  });
+  let failNext = 0;
+  const fetchImpl = async (u, o) => { if (failNext > 0) { failNext--; throw new TypeError('simulated network failure'); } return fetch(u, o); };
+  const handler = live
+    ? createHandler({ env: process.env, fetchImpl }) // default log: whitelisted JSON, no PII
+    : createHandler({
+      env: { GHL_SURVEY_KITCHEN_WEBHOOK_URL: rx.url('kitchen-e2e'), GHL_SURVEY_GARAGE_WEBHOOK_URL: rx.url('garage-e2e') },
+      forwardTimeoutMs: 1500, ghl: { allowedHosts: ['127.0.0.1'], allowHttp: true }, log: () => {},
+    });
   http.createServer((req, res) => {
     const u = new URL(req.url, 'http://x'); const p = u.pathname;
     if (p === '/__mock/reset') { rx.state.calls.length = 0; rx.state.mode = 'ok'; return res.end('ok'); }
     if (p === '/__mock/mode') { rx.state.mode = u.searchParams.get('m'); return res.end('ok'); }
+    if (p === '/__mock/failnext') { failNext = Number(u.searchParams.get('n') || 1); return res.end('ok'); }
     if (p === '/__mock/calls') { res.setHeader('content-type', 'application/json'); return res.end(JSON.stringify(rx.state.calls)); }
     if (p === '/api/survey-lead') {
       let raw = ''; req.on('data', (c) => (raw += c)); req.on('end', () => {
