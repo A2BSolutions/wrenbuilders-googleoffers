@@ -39,6 +39,7 @@ Design exports (Claude Design zips) arrive without the production wiring below. 
 | 4 | Upright open-plan kitchen photo (old one was upside down). Garage: `assets/kitchen-open-plan.png`, 3 `src` refs. Kitchen: manifest entries `8af60870...` (landing) and `765488af...` (thank-you) now hold the same PNG, keys unchanged. | both funnels | 29 Oct 2026 |
 
 | 5 | Simplified forms: pain and timing (kitchen), pain and dream (garage) removed, fields stacked in one column, one reassurance line under the button. Kitchen: edited inside the bundled "Wren Lead Form" component (manifest entry 8202e945..., re-gzipped). Exit popups unchanged (name + phone). Ported by hand from Jester's design replies, not from an export. | kitchen bundled form, `garage-conversion/Wren Offer 2 Lead Form.dc.html` | 3 Nov 2026 |
+| 6 | Six-field forms on every placement, exit popups included: Full name, Mobile number, Email, Street address, City, Postcode. Submit now waits for the webhook response (CORS mode, no `keepalive`, 15s timeout) and redirects only on HTTP 2xx. On failure it shows an inline error, keeps the values and allows a manual retry. No automatic retry. Double submits are blocked. The conversion record is written only after a 2xx. | kitchen bundled form + template (exit popup), `garage-conversion/Wren Offer 2 Lead Form.dc.html`, `garage-conversion/index.html` (exit popup) | 10 Nov 2026 |
 
 Notes, 29 Oct 2026:
 - The old `garage-conversion/assets/kitchen-open-plan.webp` stays in the repo. `WREN-GARAGE-HANDOFF.md` still names it. No page uses it.
