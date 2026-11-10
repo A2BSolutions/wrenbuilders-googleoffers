@@ -7,6 +7,9 @@ Static funnels deployed on Vercel. Each funnel lives in its own folder. There is
 | Kitchen | `/kitchen` | `/kitchen/thank-you` | `kitchen/WREN-KITCHEN-HANDOFF.md` |
 | Garage Conversion | `/garage-conversion/` | `/garage-conversion/thank-you/` | `garage-conversion/WREN-GARAGE-HANDOFF.md` |
 
+## Survey funnels (replacement Meta surveys)
+Kitchen and Garage replacement surveys live under `/survey/` with a same-origin endpoint at `/api/survey-lead`. They are separate from the two funnels above and add only rewrites and one header rule to `vercel.json`. Routes: `/survey/{kitchen,garage}-{survey,thank-you,not-in-area}`. All six are noindex. Full detail, config, tests, rollback and open items: `docs/SURVEY-HANDOFF.md`. They use their own event, `wren_survey_lead`, not `generate_lead`.
+
 ## Routing (`vercel.json`)
 - Garage pages use relative paths (`./support.js`, `assets/`, `Wren Offer 2 Lead Form.dc.html`, `../support.js`). They only resolve with a trailing slash, so `/garage-conversion` and `/garage-conversion/thank-you` redirect (307) to the slash form. Query strings (UTMs, gclid, fbclid) are kept.
 - Kitchen pages are self-contained bundles and work with or without the slash.

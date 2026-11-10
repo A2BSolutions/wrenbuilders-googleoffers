@@ -3,10 +3,19 @@
     { "source": "/garage-conversion", "destination": "/garage-conversion/", "permanent": false },
     { "source": "/garage-conversion/thank-you", "destination": "/garage-conversion/thank-you/", "permanent": false }
   ],
+  "rewrites": [
+    { "source": "/survey/kitchen-survey", "destination": "/survey/kitchen-survey.html" },
+    { "source": "/survey/kitchen-thank-you", "destination": "/survey/kitchen-thank-you.html" },
+    { "source": "/survey/kitchen-not-in-area", "destination": "/survey/kitchen-not-in-area.html" },
+    { "source": "/survey/garage-survey", "destination": "/survey/garage-survey.html" },
+    { "source": "/survey/garage-thank-you", "destination": "/survey/garage-thank-you.html" },
+    { "source": "/survey/garage-not-in-area", "destination": "/survey/garage-not-in-area.html" }
+  ],
   "headers": [
     { "source": "/kitchen/thank-you", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] },
     { "source": "/kitchen/thank-you/", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] },
     { "source": "/garage-conversion/thank-you", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] },
-    { "source": "/garage-conversion/thank-you/", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] }
+    { "source": "/garage-conversion/thank-you/", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] },
+    { "source": "/survey/(.*)", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] }
   ]
 }
