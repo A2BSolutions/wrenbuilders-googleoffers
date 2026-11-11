@@ -24,6 +24,11 @@ const good = () => ({ schema_version: '1.0', submission_id: 'aaaaaaaa-bbbb-4ccc-
     check(`hosted route /survey/${r}: X-Robots-Tag noindex, nofollow`, /noindex, nofollow/.test(x.headers()['x-robots-tag'] || ''), x.headers()['x-robots-tag']);
     check(`hosted route /survey/${r}: meta noindex + GTM-KF4RWHHQ + absolute asset paths`, /name="robots" content="noindex, nofollow"/.test(t) && t.includes('GTM-KF4RWHHQ') && !/src="assets\//.test(t));
   }
+  { // standalone Privacy Notice: GET only, loads no scripts or tracking
+    const x = await get('/survey/privacy'); const t = await x.text();
+    check('hosted route /survey/privacy: 200 with noindex header and meta', x.status() === 200 && /noindex, nofollow/.test(x.headers()['x-robots-tag'] || '') && /name="robots" content="noindex, nofollow"/.test(t), [x.status(), x.headers()['x-robots-tag']]);
+    check('hosted route /survey/privacy: no scripts, no GTM, no Pixel, no survey runtime', !/<script/i.test(t) && !/GTM-|googletagmanager|fbq|fbevents|connect\.facebook|wren-funnel|support\.js/i.test(t));
+  }
   for (const f of ['/survey/vendor/react.production.min.js', '/survey/vendor/react-dom.production.min.js', '/survey/wren-funnel.js', '/survey/support.js', '/survey/assets/kitchen-hero.webp']) { const x = await get(f); check(`hosted asset ${f}: 200`, x.status() === 200, x.status()); }
   const ts = await get('/survey/kitchen-survey/'); console.log('INFO trailing-slash /survey/kitchen-survey/ ->', ts.status());
   const dot = await get('/survey/kitchen-survey.html'); console.log('INFO /survey/kitchen-survey.html ->', dot.status(), dot.headers()['x-robots-tag'] || '');

@@ -9,7 +9,8 @@
     { "source": "/survey/kitchen-not-in-area", "destination": "/survey/kitchen-not-in-area.html" },
     { "source": "/survey/garage-survey", "destination": "/survey/garage-survey.html" },
     { "source": "/survey/garage-thank-you", "destination": "/survey/garage-thank-you.html" },
-    { "source": "/survey/garage-not-in-area", "destination": "/survey/garage-not-in-area.html" }
+    { "source": "/survey/garage-not-in-area", "destination": "/survey/garage-not-in-area.html" },
+    { "source": "/survey/privacy", "destination": "/survey/privacy.html" }
   ],
   "headers": [
     { "source": "/kitchen/thank-you", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] },

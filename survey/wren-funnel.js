@@ -26,9 +26,10 @@
       kitchen: { thankYou: '/survey/kitchen-thank-you', notInArea: '/survey/kitchen-not-in-area' }
     },
 
-    // INTEGRATION POINT: privacy policy. Leave url null until the client supplies the real URL.
-    // When set, the survey forms show a "Privacy policy" link under the button. No legal wording is added here.
-    privacy: { url: null },
+    // Survey-specific Privacy Notice (standalone page, no scripts or tracking, never part of the conversion flow).
+    // The link shows under the submit button on both survey pages and opens in a new tab so answers are kept.
+    // Set url to null to hide the link. The notice content is a DRAFT until docs/SURVEY-PRIVACY-NOTICE-APPROVAL.md is signed off.
+    privacy: { url: '/survey/privacy' },
 
     tracking: {
       // true  = this file is the ONLY owner of Meta Pixel 1135200792433711: it loads it, fires PageView, and fires

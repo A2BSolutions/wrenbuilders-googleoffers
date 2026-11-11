@@ -215,14 +215,45 @@ async function survey(pg, c, cornwall, { stopAtForm = false, base = BASE, route 
     await ctx.close();
   }
 
-  // 6. Privacy integration point: hidden by default, link when configured
+  // 6. Privacy Notice link + accurate microcopy on both surveys (default config shows the link; null hides it)
   for (const c of ['kitchen', 'garage']) {
     let { ctx, pg } = await mkPage(br); await survey(pg, c, 'Yes', { stopAtForm: true });
-    check(`${c}: no privacy link while CONFIG.privacy.url is null`, (await pg.locator('a:has-text("Privacy policy")').count()) === 0); await ctx.close();
-    ({ ctx, pg } = await mkPage(br, { funnelPatch: (t) => t.replace('privacy: { url: null }', "privacy: { url: 'https://example.invalid/privacy-test' }") }));
+    const a0 = pg.locator('a:has-text("Privacy Notice")');
+    const txt = await pg.locator('body').innerText();
+    check(`${c}: Privacy Notice link shows under the submit button and opens /survey/privacy in a new tab`, (await a0.count()) === 1 && (await a0.getAttribute('href')) === '/survey/privacy' && (await a0.getAttribute('target')) === '_blank' && /noopener/.test(await a0.getAttribute('rel')));
+    check(`${c}: accurate draft microcopy replaces the old line`, /We use your details to respond to your enquiry/.test(txt) && /keep enquiries from outside Cornwall/.test(txt) && !/No spam/.test(txt) && !/only use your details to send your quote/.test(txt), txt.match(/We (use|.ll only use) your details[^.]*\./));
+    const box = await a0.boundingBox(); const btn = await pg.locator('button[type=submit]').boundingBox();
+    check(`${c}: link sits beneath the submit button`, box && btn && box.y > btn.y + btn.height - 1, { box, btn });
+    await ctx.close();
+    ({ ctx, pg } = await mkPage(br, { funnelPatch: (t) => t.replace("privacy: { url: '/survey/privacy' }", 'privacy: { url: null }') }));
     await survey(pg, c, 'Yes', { stopAtForm: true });
-    const a = pg.locator('a:has-text("Privacy policy")');
-    check(`${c}: privacy link renders when URL is configured`, (await a.count()) === 1 && (await a.getAttribute('href')) === 'https://example.invalid/privacy-test' && (await a.getAttribute('target')) === '_blank' && /noopener/.test(await a.getAttribute('rel')));
+    check(`${c}: no Privacy Notice link when CONFIG.privacy.url is null`, (await pg.locator('a:has-text("Privacy Notice")').count()) === 0); await ctx.close();
+  }
+
+  // 6b. The privacy page is standalone: no scripts, no tracking, outside the conversion flow
+  {
+    const { ctx, pg, log } = await mkPage(br);
+    const res = await pg.goto(`${BASE}/survey/privacy`, { waitUntil: 'load' }); await pg.waitForTimeout(1500);
+    const html = await (await fetch(`${BASE}/survey/privacy`)).text();
+    check('privacy: route 200 via the rewrite', res.status() === 200, res.status());
+    check('privacy: X-Robots-Tag noindex, nofollow header and robots meta', /noindex, nofollow/.test(res.headers()['x-robots-tag'] || '') && /name="robots" content="noindex, nofollow"/.test(html));
+    check('privacy: no <script> tag at all, no GTM, no Pixel, no survey runtime', !/<script/i.test(html) && !/GTM-|googletagmanager|fbq|fbevents|connect\.facebook|wren-funnel|support\.js/i.test(html));
+    check('privacy: zero third-party requests (no GTM, no Meta, no fonts, no unpkg)', Object.keys(log.hosts).every((h) => h === 'localhost:8766') && log.gtmReq === 0 && log.fbReq === 0, log.hosts);
+    check('privacy: no dataLayer, no fbq, no events', (await pg.evaluate(() => [typeof window.dataLayer, typeof window.fbq, typeof window.WrenFunnel])).join() === 'undefined,undefined,undefined');
+    check('privacy: no console errors', log.console.length === 0, log.console);
+    check('privacy: DRAFT banner present and approval markers visible (page is not final)', /data-draft="true"/.test(html) && /\[\[APPROVAL NEEDED/.test(html));
+    check('privacy: covers collection, purposes, DQ retention, SMS follow-up, processors, retention, rights, contact', ['What we collect', 'How we use your details', 'Property outside Cornwall', 'still keep your enquiry', 'call or text you', 'Who we share it with', 'GoHighLevel', 'How long we keep it', 'Your rights', 'Contact us about your data', 'ico.org.uk'].every((k) => html.includes(k)));
+    await ctx.close();
+  }
+  { // viewing the notice never touches the conversion flow: a pending token stays unconsumed, nothing fires
+    const { ctx, pg } = await mkPage(br);
+    await pg.goto(`${BASE}/survey/kitchen-survey`); await pg.waitForTimeout(800);
+    await pg.evaluate(() => sessionStorage.setItem('wren_conversion', JSON.stringify({ submission_id: 'p-1', campaign: 'kitchen', offer: '1000-appliance-upgrade', created_at: Date.now() })));
+    const p2 = await ctx.newPage(); let dlSeen = null, reqs = [];
+    p2.on('request', (r) => reqs.push(r.url()));
+    await p2.goto(`${BASE}/survey/privacy`); await p2.waitForTimeout(1200);
+    dlSeen = await p2.evaluate(() => typeof window.dataLayer);
+    check('privacy: opening it in the same session fires nothing and leaves a pending conversion token untouched', dlSeen === 'undefined' && !!(await pg.evaluate(() => sessionStorage.getItem('wren_conversion'))) && !reqs.some((u) => /facebook|googletagmanager|api\/survey-lead/.test(u)), reqs);
     await ctx.close();
   }
 

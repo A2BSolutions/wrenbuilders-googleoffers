@@ -284,3 +284,7 @@ The two branch-scoped, Sensitive, Preview-only variables (`GHL_SURVEY_KITCHEN_WE
 - Sales effects: no opportunity, no conversation or SMS, and no Leads Master sheet row for any test contact (sheet baseline taken before and re-read after). The internal notification could not be checked directly; a mailbox search for the test identities found nothing.
 - Not verifiable here: GHL execution logs and workflow definitions (the workflow API is not enabled for this location), and real delivery of Meta and GTM events (stubbed).
 
+## 20. Survey Privacy Notice (DRAFT, 11 Nov 2026)
+
+A standalone notice at `/survey/privacy` covers the Kitchen and Garage surveys, including that outside-Cornwall enquiries are kept in GHL and that Cornwall enquiries may be called or texted. It has no scripts and no tracking, so viewing it fires nothing and does not touch the conversion flow. Both surveys now show accurate microcopy and a "Privacy Notice" link under the submit button (opens in a new tab). The content is a **draft with 12 open approval items** and a visible draft banner. `node tests/survey/privacy-approval.js` is a release gate and fails until they are resolved. Details and the approval list: `docs/SURVEY-PRIVACY-NOTICE-APPROVAL.md`.
+
