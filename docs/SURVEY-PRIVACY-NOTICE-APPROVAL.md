@@ -33,13 +33,34 @@ Also confirm the footer details are right for privacy requests: company number 1
 | Statement in the notice | Evidence |
 |---|---|
 | Fields collected: name, mobile, email, address, city, postcode, four answers, campaign data, Facebook click ID, page URL, time | Server payload code and GHL readback |
-| Outside-Cornwall enquiries are stored in GHL with tag `DQ - outside Cornwall` | Hosted test on the v2 receivers, 11 Nov |
-| Only Cornwall enquiries get team email, lead-sheet row, opportunity and SMS opener | Codex's published v2 workflow state. I cannot read GHL workflows (API 403), so this is Codex's evidence, not mine |
+| **VERIFIED, no approval needed.** Outside-Cornwall enquiries: GHL contact created or updated, all answers and attribution stored, campaign tags kept, tag `DQ - outside Cornwall` applied. No opportunity, no Leads Master row, no internal notification, no Harry SMS | Business confirmed 11 Nov. Matches Codex's published GHL workflow config. Hosted v2 test read back the contact and tag |
+| Only Cornwall enquiries get team email, lead-sheet row, opportunity and SMS opener | Business-confirmed and Codex's published workflow state. I cannot read GHL workflows (API 403), so my own check covers the contact and tag only |
 | Meta `Lead` fires only for Cornwall enquiries, with no contact details or answers | `survey/wren-funnel.js`, browser tests |
 | Survey service logs hold no names, phones, emails, addresses or answers | Unit tests on log output |
 | GTM (Google tags) and the Meta Pixel load on survey pages. The notice page loads neither | Container fetch, browser tests (zero third-party requests on the notice) |
 | Some providers process data in the US | Provider locations. The safeguards are open (group 3) |
 | The not-in-area page now says the details were kept, links the notice, and gives no retention period | Browser tests, section 6c |
+
+## B2. Confirmed DQ wording (now in the notice, section 3)
+
+> **Property outside Cornwall.** We still create or update a record for you in our customer system. It holds your contact details, your survey answers, where you came from, and a label showing the property is outside our area. We do not create a sales opportunity, add it to our lead sheet, notify our sales team or send you a sales text.
+
+This describes what happens. It does not say why it is kept (marker 4), the lawful basis, or for how long. Those stay open.
+Tag spelling: the code sends `DQ - outside Cornwall`. GHL stores tags in lower case, so this is the same tag as `dq - outside cornwall`. Codex to confirm no workflow filter is case-sensitive.
+
+## C0. What actually blocks release
+
+Release is blocked by these only. All are privacy or consent decisions, not DQ behaviour:
+1. Lawful basis for each use, and the purpose for keeping outside-Cornwall enquiries.
+2. Retention periods (both).
+3. SMS follow-up consent and stop-text route.
+4. Cookie consent for GTM and the Meta Pixel.
+5. Controller confirmation, ICO number and privacy contact.
+6. Providers list and transfer safeguards.
+7. Approved date and final sign-off of the notice and microcopy.
+8. Approval of campaign copy claims (see `docs/SURVEY-CAMPAIGN-COPY.md`).
+
+Not blockers: DQ workflow behaviour (verified), rights wording (follows from item 1), footer details.
 
 ## C. Decisions that genuinely need Wren input, and why they cannot be guessed
 
