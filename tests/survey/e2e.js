@@ -245,6 +245,21 @@ async function survey(pg, c, cornwall, { stopAtForm = false, base = BASE, route 
     check('privacy: covers collection, purposes, DQ retention, SMS follow-up, processors, retention, rights, contact', ['What we collect', 'How we use your details', 'Property outside Cornwall', 'still keep your enquiry', 'call or text you', 'Who we share it with', 'GoHighLevel', 'How long we keep it', 'Your rights', 'Contact us about your data', 'ico.org.uk'].every((k) => html.includes(k)));
     await ctx.close();
   }
+  // 6c. Not-in-area pages: discreet Privacy Notice link and concise retention disclosure (no retention period is stated)
+  for (const c of ['kitchen', 'garage']) {
+    const { ctx, pg, log } = await mkPage(br);
+    await pg.goto(`${BASE}/survey/${c}-not-in-area`, { waitUntil: 'load' }); await pg.waitForTimeout(1800);
+    const link = pg.locator('a:has-text("Privacy Notice")'); const body = await pg.locator('body').innerText();
+    check(`${c}-not-in-area: Privacy Notice link to /survey/privacy (new tab)`, (await link.count()) === 1 && (await link.getAttribute('href')) === '/survey/privacy' && (await link.getAttribute('target')) === '_blank' && /noopener/.test(await link.getAttribute('rel')));
+    check(`${c}-not-in-area: concise retention disclosure, no invented retention period`, /We've kept the details you gave us in our customer system, but we won't use them for sales follow-up/.test(body) && /explains how long we keep them and your rights/.test(body) && !/\b\d+\s*(days?|weeks?|months?|years?)\b/i.test(body.split('Privacy Notice')[0].slice(-400)));
+    check(`${c}-not-in-area: still fires only PageView (no Lead, no wren_survey_lead)`, ((await fbq(pg)) || []).filter((a) => a[1] === 'Lead').length === 0 && (await dl(pg, 'wren_survey_lead')).length === 0 && log.console.length === 0, log.console);
+    const priv = await pg.context().newPage(); const r = await priv.goto(`${BASE}/survey/privacy`); check(`${c}-not-in-area: the linked notice loads (200)`, r.status() === 200);
+    await ctx.close();
+  }
+  for (const c of ['kitchen', 'garage']) { // the thank-you pages are unchanged: no privacy additions
+    const t = await (await fetch(`${BASE}/survey/${c}-thank-you`)).text();
+    check(`${c}-thank-you: unchanged (no privacy text added)`, !/survey\/privacy/.test(t) && !/kept the details/.test(t));
+  }
   { // viewing the notice never touches the conversion flow: a pending token stays unconsumed, nothing fires
     const { ctx, pg } = await mkPage(br);
     await pg.goto(`${BASE}/survey/kitchen-survey`); await pg.waitForTimeout(800);
