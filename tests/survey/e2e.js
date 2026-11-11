@@ -242,7 +242,7 @@ async function survey(pg, c, cornwall, { stopAtForm = false, base = BASE, route 
     check('privacy: no dataLayer, no fbq, no events', (await pg.evaluate(() => [typeof window.dataLayer, typeof window.fbq, typeof window.WrenFunnel])).join() === 'undefined,undefined,undefined');
     check('privacy: no console errors', log.console.length === 0, log.console);
     check('privacy: DRAFT banner present and approval markers visible (page is not final)', /data-draft="true"/.test(html) && /\[\[APPROVAL NEEDED/.test(html));
-    check('privacy: covers collection, purposes, DQ retention, SMS follow-up, processors, retention, rights, contact', ['What we collect', 'How we use your details', 'Property outside Cornwall', 'still keep your enquiry', 'call or text you', 'Who we share it with', 'GoHighLevel', 'How long we keep it', 'Your rights', 'Contact us about your data', 'ico.org.uk'].every((k) => html.includes(k)));
+    check('privacy: covers collection, purposes, DQ retention, SMS follow-up, processors, retention, rights, contact', ['What we collect', 'How we use your details', 'Property outside Cornwall', 'still create or update a record', 'do not create a sales opportunity', 'call or text you', 'Who we share it with', 'GoHighLevel', 'How long we keep it', 'Your rights', 'Contact us about your data', 'ico.org.uk'].every((k) => html.includes(k)));
     await ctx.close();
   }
   // 6c. Not-in-area pages: discreet Privacy Notice link and concise retention disclosure (no retention period is stated)
