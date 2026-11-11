@@ -82,7 +82,7 @@ function evaluate(f) {
     if (!items.length) problems.push('release register has no items');
     const ids = new Set();
     for (const it of items) {
-      if (!it.id || ids.has(it.id) || typeof it.blocking !== 'boolean' || !['pending', 'confirmed'].includes(it.status)) { problems.push(`register item "${it.id}" is malformed`); continue; }
+      if (!it.id || ids.has(it.id) || typeof it.blocking !== 'boolean' || !['factual', 'compliance', 'technical'].includes(it.type) || !['pending', 'confirmed'].includes(it.status)) { problems.push(`register item "${it.id}" is malformed`); continue; }
       ids.add(it.id);
       const done = it.status === 'confirmed';
       if (done && (!it.confirmed_by || !/^\d{4}-\d{2}-\d{2}$/.test(it.confirmed_on || ''))) problems.push(`register item "${it.id}" is marked confirmed without confirmed_by and confirmed_on`);
@@ -98,7 +98,7 @@ module.exports = { evaluate, loadFiles, PAGES };
 if (require.main === module) {
   const r = evaluate(loadFiles());
   if (r.problems.length) { console.log('A. BUILD PROBLEMS (fix in code or content):'); r.problems.forEach((p) => console.log(' - ' + p)); }
-  if (r.pending.length) { console.log('B. OUTSTANDING BUSINESS APPROVALS (blocking):'); r.pending.forEach((p, i) => console.log(` ${i + 1}. [${p.id}] ${p.title}`)); }
+  if (r.pending.length) { console.log('B. OUTSTANDING BUSINESS APPROVALS (blocking):'); r.pending.forEach((p, i) => console.log(` ${i + 1}. [${p.type}] [${p.id}] ${p.title}`)); }
   if (r.notes.length) { console.log('Recommended, not blocking:'); r.notes.forEach((p) => console.log(` - [${p.id}] ${p.title}`)); }
   if (r.problems.length || r.pending.length) { console.log(`\nRELEASE GATE: BLOCKED (${r.problems.length} build problem(s), ${r.pending.length} approval(s) outstanding).`); process.exit(1); }
   console.log('RELEASE GATE: PASS (notice complete, consent wiring verified, all blocking approvals confirmed).');

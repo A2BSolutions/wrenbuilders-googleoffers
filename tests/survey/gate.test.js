@@ -13,6 +13,15 @@ test('fully confirmed register and clean build passes', () => {
   const r = evaluate(confirmAll(clone()));
   assert.deepStrictEqual(r.problems, []); assert.strictEqual(r.pending.length, 0);
 });
+test('every item has a type and the 7 blocking items split into 4 factual and 3 compliance', () => {
+  const r = evaluate(loadFiles());
+  assert.strictEqual(r.pending.filter((i) => i.type === 'factual').length, 4);
+  assert.strictEqual(r.pending.filter((i) => i.type === 'compliance').length, 3);
+});
+test('an item without a valid type is rejected', () => {
+  const f = clone(); const r = JSON.parse(f.register); delete r.items[0].type; f.register = JSON.stringify(r);
+  assert.ok(evaluate(f).problems.some((p) => /malformed/.test(p)));
+});
 test('a confirmation without who and when is rejected', () => {
   const f = clone(); const r = JSON.parse(f.register); r.items.forEach((i) => { i.status = 'confirmed'; }); f.register = JSON.stringify(r);
   assert.ok(evaluate(f).problems.some((p) => /without confirmed_by/.test(p)));

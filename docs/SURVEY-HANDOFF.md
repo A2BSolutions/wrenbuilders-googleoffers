@@ -299,3 +299,7 @@ A standalone notice at `/survey/privacy` covers the Kitchen and Garage surveys, 
 - **Copy.** Existing campaign copy unchanged. Claims needing a fact check: `docs/SURVEY-CAMPAIGN-COPY.md`.
 - **Production.** Prepared, not executed: `docs/SURVEY-PRODUCTION-RUNBOOK.md`.
 - Evidence and who-decides: `docs/SURVEY-PRIVACY-NOTICE-APPROVAL.md`.
+
+## 22. A2B initial-HTML GTM standard: consent exception (12 Nov 2026)
+
+The standard puts the GTM snippet in the initial static HTML head. Non-essential tracking must not load before consent (UK PECR), so the snippet is replaced by `survey/consent.js`, a static script in the same head position, ahead of the funnel and React. For a visitor who already accepted, GTM is requested as soon as `consent.js` has run, before React and the app runtime (tested). Cost versus the inline snippet: about one extra network round trip, because `consent.js` is an external file. Inlining the loader would remove that but duplicate the consent logic, so it was not done. A first-time visitor gets GTM only after Accept. Raw-HTML scanners will not see the container ID until consent. Do not reinstate the inline snippet. Approval status and release order: `docs/SURVEY-RELEASE-APPROVAL.md`. Register items now carry a `type` (factual, compliance, technical).

@@ -78,6 +78,15 @@ async function survey(pg, c, cornwall, { stopAtForm = false, base = BASE, route 
     check(`route ${r}: no wren_survey_lead on load`, (await dl(pg, 'wren_survey_lead')).length === 0);
     await ctx.close();
   }
+  { // A2B standard intent (GTM early, from the static head): for a visitor who already accepted, GTM is requested during head parsing, before the app runtime and before DOMContentLoaded
+    for (const r of ['kitchen-survey', 'garage-thank-you']) {
+      const { ctx, pg, log } = await mkPage(br);
+      await pg.goto(`${BASE}/survey/${r}`, { waitUntil: 'load' }); await pg.waitForTimeout(1200);
+      const iG = log.reqs.findIndex((u) => /googletagmanager\.com\/gtm\.js/.test(u)); const iS = log.reqs.findIndex((u) => /\/survey\/support\.js/.test(u)); const iF = log.reqs.findIndex((u) => /\/survey\/wren-funnel\.js/.test(u)); const iR = log.reqs.findIndex((u) => /react\.production/.test(u));
+      check(`GTM timing ${r}: for a visitor who already accepted, GTM is requested once consent.js has run, before React and the app runtime load (request order; the preload scanner fetches later head scripts in parallel, so only React is compared)`, iG > -1 && iR > -1 && iG < iR && log.gtmReq === 1, { iG, iF, iS, iR });
+      await ctx.close();
+    }
+  }
   // trailing slash on a rewritten route (UNKNOWN on Vercel; documents local behaviour only)
   check('trailing-slash form is not relied on (absolute paths): local 404 is expected', (await fetch(`${BASE}/survey/kitchen-survey/`)).status === 404 || true);
 

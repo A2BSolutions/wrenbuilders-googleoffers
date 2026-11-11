@@ -1,5 +1,7 @@
 # Survey funnels: Production runbook (PREPARED, NOT EXECUTED)
 
+The short approval version, with the exact release order, rollback target and owner, is `docs/SURVEY-RELEASE-APPROVAL.md`. This file keeps the detail.
+
 Nothing here has been run. Every step marked **APPROVAL** needs an explicit yes from Wren Builders. Do not merge, deploy, set Production variables or change Meta URLs before the release gate passes.
 
 ## 1. Current state (read-only checks, 12 Nov 2026)
@@ -65,6 +67,8 @@ Use a number the business controls. **Outside Cornwall first** (No): expect the 
 Watch Vercel runtime logs for `accepted`, `accepted_dq`, `duplicate_done` and any `rejected` or upstream error lines (the logs hold no personal data). Compare GHL contacts and opportunities to the log counts. Expect lower Meta PageView and Google measurement volumes than before, because tracking now only runs for visitors who accept. The published GTM container has no trigger for `wren_survey_lead`, so Google Ads form-fill conversions are not set up for the surveys. That is unchanged and not part of this release.
 
 ## 8. Rollback
+
+Target: deployment `dpl_8N23gbjGZcQtxS2YhdcqM7QTn5Yg` (`main` commit `28e92ed`). Owner and details: `docs/SURVEY-RELEASE-APPROVAL.md` section 7.
 
 1. Point Meta ad URLs back to the legacy `/kitchen` and `/garage-conversion` pages (they are untouched).
 2. Roll back the Production deployment in Vercel (Deployments, previous deployment, Promote), or revert the merge.
