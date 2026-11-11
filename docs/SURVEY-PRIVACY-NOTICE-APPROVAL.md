@@ -1,94 +1,69 @@
-# Survey Privacy Notice: business approval checklist
+# Survey privacy, consent and release approvals
 
-Status: **DRAFT. Not approved. Do not release to Production.**
-Page: `/survey/privacy` (`survey/privacy.html`). Standalone, noindex, no scripts, no tracking. The WordPress policy (https://wren-builders.com/privacy-policy/) is not edited and is linked from the notice.
-This is a drafting aid, not legal advice. Nothing has been invented to fill the open items. The notice itself still carries all 12 `[[APPROVAL NEEDED: ...]]` markers. They stay until a real answer replaces them.
+Status (12 Nov 2026): the notice, consent gate and release gate are built. **Release is blocked only by 7 business confirmations** in `docs/survey-release-register.json`. Nothing here is legal advice. Where the business has not decided something, the notice states a standard UK position, says so here, and a named approval is required.
 
-## A. What Wren Builders must decide (12 items, 3 groups)
+## 1. What changed on the business's two decisions
 
-Tick each when the answer is in. The marker number is the order in which it appears in the notice.
+1. **Standard UK practice.** The notice now states lawful bases, retention criteria and consent rules in the way ICO guidance expects for a small UK business. These are **adopted, not approved or documented**. Approval item `notice_signoff` covers them.
+2. **Keep the existing creative.** No campaign wording or offer name was changed. The business's instruction is treated as approval to keep the creative, not proof that claims are true. Claims needing a fact check are in `docs/SURVEY-CAMPAIGN-COPY.md` and approval item `offer_claims_true`.
 
-### 1. Privacy governance, retention and lawful bases
-- [ ] Date of the approved version (marker 1, header)
-- [ ] Purpose for keeping outside-Cornwall enquiries (marker 4, section 3)
-- [ ] Lawful basis for each use in section 3 (marker 5, section 4). Left blank on purpose
-- [ ] Retention period, Cornwall enquiries (marker 8, section 7)
-- [ ] Retention period, outside-Cornwall enquiries (marker 9, section 7)
-- [ ] Which privacy rights apply to which lawful basis (marker 11, section 9)
+## 2. Verified operational facts (the notice relies on these)
 
-### 2. SMS follow-up, cookies and tracking
-- [ ] Wording for call and text contact, how people stop texts, how text consent is obtained (marker 3, section 3)
-- [ ] How consent to non-essential cookies is obtained, and whether a cookie notice is needed (marker 10, section 8)
-
-### 3. Business identity, contact details and service providers
-- [ ] Confirm Wren Builders Ltd is the data controller. Give the ICO number if there is one (marker 2, section 1)
-- [ ] Other providers to list: managing agency, text-message provider, team-email provider (marker 6, section 5)
-- [ ] Safeguards for providers outside the UK (marker 7, section 6)
-- [ ] Contact for privacy requests: email, and a named person or role if wanted (marker 12, section 10)
-
-Also confirm the footer details are right for privacy requests: company number 15580800, Penstraze Business Centre, Penstraze, Truro, Cornwall, TR4 8PN, 01872 613608, info@wren-builders.com. They are copied from the survey footer.
-
-## B. Already supported by system evidence (no decision needed, re-check if the system changes)
-
-| Statement in the notice | Evidence |
+| Fact | Evidence |
 |---|---|
-| Fields collected: name, mobile, email, address, city, postcode, four answers, campaign data, Facebook click ID, page URL, time | Server payload code and GHL readback |
-| **VERIFIED, no approval needed.** Outside-Cornwall enquiries: GHL contact created or updated, all answers and attribution stored, campaign tags kept, tag `DQ - outside Cornwall` applied. No opportunity, no Leads Master row, no internal notification, no Harry SMS | Business confirmed 11 Nov. Matches Codex's published GHL workflow config. Hosted v2 test read back the contact and tag |
-| Only Cornwall enquiries get team email, lead-sheet row, opportunity and SMS opener | Business-confirmed and Codex's published workflow state. I cannot read GHL workflows (API 403), so my own check covers the contact and tag only |
-| Meta `Lead` fires only for Cornwall enquiries, with no contact details or answers | `survey/wren-funnel.js`, browser tests |
+| **VERIFIED.** Outside-Cornwall enquiry: GHL contact created or updated, all answers and attribution stored, campaign tags kept, tag `DQ - outside Cornwall`. No opportunity, no Leads Master row, no internal notification, no Harry SMS | Business confirmed 11 Nov. Matches Codex's published GHL workflow state. Hosted v2 test read back the contact and tag. (GHL stores tags in lower case: `dq - outside cornwall`) |
+| Cornwall enquiry: team email, lead-sheet row, opportunity, Harry's first SMS | Codex's published workflow state. I cannot read GHL workflows (API 403) |
+| Fields collected: name, mobile, email, street, city, postcode, four answers, campaign data, Facebook click ID, page URL, time | Server payload code, GHL readback |
+| `fbp`, `fbc` and referrer are validated then dropped. They never reach GHL | `api/_lib/survey-core.js`, unit tests |
 | Survey service logs hold no names, phones, emails, addresses or answers | Unit tests on log output |
-| GTM (Google tags) and the Meta Pixel load on survey pages. The notice page loads neither | Container fetch, browser tests (zero third-party requests on the notice) |
-| Some providers process data in the US | Provider locations. The safeguards are open (group 3) |
-| The not-in-area page now says the details were kept, links the notice, and gives no retention period | Browser tests, section 6c |
+| Meta `Lead` fires only for Cornwall enquiries, with offer and campaign names, no contact details or answers, and **only after the visitor accepts optional cookies** | `survey/wren-funnel.js`, browser tests |
+| Before Accept, no request goes to Google or Meta from any survey page (GTM, Pixel, preconnect, noscript iframe and Google Fonts all removed or gated; Work Sans is self-hosted) | Browser tests: zero third-party requests on all 6 pages and the notice |
+| Company number 15580800, Penstraze Business Centre, Penstraze, Truro, Cornwall, TR4 8PN, 01872 613608, info@wren-builders.com | Footer already published on the survey pages |
+| Hosting is Vercel, customer system is GoHighLevel, lead sheet is Google Sheets, ads tools are Google and Meta | System configuration |
 
-## B2. Confirmed DQ wording (now in the notice, section 3)
+## 3. Lawful bases considered (stated in the notice, not yet documented by the business)
 
-> **Property outside Cornwall.** We still create or update a record for you in our customer system. It holds your contact details, your survey answers, where you came from, and a label showing the property is outside our area. We do not create a sales opportunity, add it to our lead sheet, notify our sales team or send you a sales text.
+| Use | Basis stated | Why it fits, and the weak point |
+|---|---|---|
+| Quote, call or text for a Cornwall enquiry | Art 6(1)(b), steps at the person's request before a contract. Fallback 6(1)(f) | The person asked for a quote. Weak point: texts must stay a reply to the enquiry. Marketing needs separate consent |
+| Keeping an outside-Cornwall record | Art 6(1)(f) legitimate interests | A note of the enquiry, dealing with a return contact, advert measurement. Weak point: a legitimate interests assessment has not been written (`lia_and_records`, recommended). The purposes need business confirmation (`retention_and_dq_purpose`) |
+| Optional Google and Meta tools | Consent (also the PECR permission for storing or reading on the device) | Built: nothing loads before Accept |
 
-This describes what happens. It does not say why it is kept (marker 4), the lawful basis, or for how long. Those stay open.
-Tag spelling: the code sends `DQ - outside Cornwall`. GHL stores tags in lower case, so this is the same tag as `dq - outside cornwall`. Codex to confirm no workflow filter is case-sensitive.
+## 4. Harry's SMS (assessed, unchanged)
 
-## C0. What actually blocks release
+Treated as a reply to an enquiry the person submitted, not as consent to unrelated marketing. No marketing opt-in box was added, because no marketing message is part of this flow. The notice says marketing texts or emails would need separate permission. Still needed: the business confirms the first text is a reply only, that stop requests are honoured, and that no marketing follows without permission (`sms_and_calls`).
 
-Release is blocked by these only. All are privacy or consent decisions, not DQ behaviour:
-1. Lawful basis for each use, and the purpose for keeping outside-Cornwall enquiries.
-2. Retention periods (both).
-3. SMS follow-up consent and stop-text route.
-4. Cookie consent for GTM and the Meta Pixel.
-5. Controller confirmation, ICO number and privacy contact.
-6. Providers list and transfer safeguards.
-7. Approved date and final sign-off of the notice and microcopy.
-8. Approval of campaign copy claims (see `docs/SURVEY-CAMPAIGN-COPY.md`).
+## 5. Consent mechanism (built)
 
-Not blockers: DQ workflow behaviour (verified), rights wording (follows from item 1), footer details.
+- `survey/consent.js`, first-party, loaded first on all six pages. Banner with equal-weight Accept and Reject. Choice kept 12 months, then asked again. Storage blocked means no tracking.
+- Accept: loads GTM-KF4RWHHQ, then the funnel starts the Meta Pixel and PageView.
+- Reject or no choice: nothing loads. The enquiry still works and is still sent to GHL.
+- **Qualified-lead conversion after consent.** The one-time conversion token is kept until the visitor decides. Accept: one `wren_survey_lead` and one Meta `Lead`, same event id as the submission, then the token is consumed. Reject: token dropped. Direct visits, refreshes and other campaigns still fire nothing.
+- Withdraw or change the choice on `/survey/privacy` (section 8). Rejecting removes `_fbp`, `_fbc`, `_ga*`, `_gid` and `_gcl_*` cookies on this site, and later pages load nothing optional.
+- `consent.js` missing: the funnel fails closed, with no tracking.
+- Assessed as essential and not gated: the stored choice, and session storage that carries answers and campaign details between steps (no third party, cleared when the tab closes). Weak point: campaign details in session storage are arguably attribution rather than strictly necessary. They are only sent when the person submits, and the notice discloses them. Adviser may confirm.
 
-## C. Decisions that genuinely need Wren input, and why they cannot be guessed
+## 6. Not published, deliberately
 
-- **Lawful basis, purpose, retention, rights.** These are legal choices. Evidence shows what the system does, not what the law allows or what you intend.
-- **SMS consent and stop-text route.** The system sends an SMS opener. No consent box exists. Whether that is enough is for your adviser. A checkbox would change the form, so it is not added.
-- **Cookie consent.** GTM and the Pixel load with no banner. This notice does not fix that. Weak point: until it is decided, the cookie section cannot be finalised.
-- **Controller, ICO number, privacy contact.** Only the business knows these.
-- **Other providers and transfer safeguards.** The system shows GHL, Google Sheets, Vercel, Meta and Google. Other processors (agency, SMS, email) are not visible from the code.
+- No ICO registration number (`ico_fee`: the business confirms fee status).
+- No fixed retention period (criteria only; a number and deletion routine are recommended, `retention_number`).
+- No named agency or SMS carrier (`providers_complete`).
+- No named transfer mechanism (`transfer_safeguards`).
 
-## D. Microcopy under the submit button (both surveys)
+## 7. Who does what
 
-> We use your details to respond to your enquiry. If your property is in Cornwall, we may call or text you about your project. We also keep enquiries from outside Cornwall, without sales follow-up.
-> [Privacy Notice] (new tab, `/survey/privacy`)
+**Wren Builders must confirm (blocking, in the register):** `notice_signoff`, `sms_and_calls`, `providers_complete`, `transfer_safeguards`, `retention_and_dq_purpose`, `ico_fee`, `offer_claims_true`. To confirm, set `status` to `confirmed` and fill `confirmed_by` and `confirmed_on`.
 
-Needs approval as final wording. It replaces "We'll only use your details to send your quote. No spam.", which was no longer accurate.
+**Recommended, not blocking:** `retention_number`, `lia_and_records`, `firewall_rate_limit`, `test_contacts_cleanup`.
 
-## E. Release gate (unchanged)
+**Claude Code has done:** the notice, consent gate, funnel gating, self-hosted fonts, the release gate (structured, with tests that fail if a tracker or placeholder returns), the Production runbook, and all local tests.
 
-1. Replace each marker with approved text (delete the highlight span, keep the sentence).
-2. Remove the `data-draft="true"` banner and update the header comment.
-3. Run `node tests/survey/privacy-approval.js`. It must print PASS. It currently exits 1 (12 markers and the banner).
-4. The gate also fails if the survey config loses `privacy.url`, or if either not-in-area page loses its notice link or retention line.
-5. Re-run local suites. After release, run `tests/survey/hosted-checks.js` (GET only).
+**Claude Code cannot do:** confirm any approval, change GHL workflows, set Production variables, deploy, or switch Meta URLs without explicit approval.
 
-## F. Files changed
+## 8. Release gate
 
-- `survey/privacy.html` (new), `vercel.json` (one rewrite `/survey/privacy`)
-- `survey/wren-funnel.js`: `privacy.url` set. `null` hides the survey link.
-- `survey/kitchen-survey.html`, `survey/garage-survey.html`: microcopy and link label
-- `survey/kitchen-not-in-area.html`, `survey/garage-not-in-area.html`: one paragraph with the notice link. No retention period stated
-- `tests/survey/e2e.js`, `tests/survey/hosted-checks.js`, `tests/survey/privacy-approval.js`
+`node tests/survey/privacy-approval.js` exits 0 only when (A) the notice is complete and accurate against the code, no third-party tool can load before consent, and the notice is linked where details are collected or kept, and (B) every blocking register item is confirmed with a name and date. It prints build problems and outstanding approvals separately. `tests/survey/gate.test.js` proves it catches 18 regressions.
+
+## 9. Files
+
+`survey/privacy.html`, `survey/consent.js`, `survey/wren-funnel.js`, the six survey pages (GTM snippet, noscript, preconnects and Google Fonts link removed), `survey/vendor/work-sans.css` and `survey/vendor/fonts/*.woff2`, `docs/survey-release-register.json`, `tests/survey/privacy-approval.js`, `tests/survey/gate.test.js`, `tests/survey/e2e.js`, `tests/survey/hosted-checks.js`.

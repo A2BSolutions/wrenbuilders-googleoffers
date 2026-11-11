@@ -6,6 +6,7 @@
  *   1. CONFIG.submitEndpoint  - same-origin server endpoint. Null on purpose: submissions FAIL VISIBLY until set.
  *   2. CONFIG.routes          - thank-you / not-in-area destinations per campaign.
  *   3. CONFIG.tracking        - inline Meta Pixel switch. Set inlineMetaPixel:false once GTM-KF4RWHHQ owns the Pixel.
+ *   4. consent.js (loaded first) - GTM and the Meta Pixel start ONLY after the visitor clicks Accept. Do not load either elsewhere.
  * No secrets, API keys or GHL credentials belong in this file. GHL webhooks are called server-side only.
  */
 (function () {
@@ -28,7 +29,7 @@
 
     // Survey-specific Privacy Notice (standalone page, no scripts or tracking, never part of the conversion flow).
     // The link shows under the submit button on both survey pages and opens in a new tab so answers are kept.
-    // Set url to null to hide the link. The notice content is a DRAFT until docs/SURVEY-PRIVACY-NOTICE-APPROVAL.md is signed off.
+    // Set url to null to hide the link. Release is gated by tests/survey/privacy-approval.js and docs/survey-release-register.json.
     privacy: { url: '/survey/privacy' },
 
     tracking: {
@@ -160,15 +161,13 @@
     window.fbq('track', 'PageView');
   }
 
-  // Thank-you pages only. Fires Lead once per successful, qualified submission for THIS campaign.
-  // A refresh, direct visit or other-campaign token fires nothing.
-  function onThankYou(campaign) {
+  function fireLead() {
     var raw = ss('get', KEY_CONVERSION);
     if (!raw) return;
     var t = null;
     try { t = JSON.parse(raw); } catch (e) {}
-    if (!t || t.campaign !== campaign || !t.submission_id) return;
-    ss('del', KEY_CONVERSION);
+    ss('del', KEY_CONVERSION); // one-time: removed before anything is sent
+    if (!t || !t.submission_id) return;
     if (Date.now() - (t.created_at || 0) > CONFIG.tracking.conversionMaxAgeMs) return;
     window.dataLayer.push({
       event: 'wren_survey_lead',
@@ -182,6 +181,27 @@
     }
   }
 
+  // Thank-you pages only. Fires Lead once per successful, qualified submission for THIS campaign, and only with consent.
+  //   consent granted -> fire now.   consent denied -> drop the token, fire nothing.
+  //   no choice yet   -> keep the token and fire once, only if the visitor accepts on this page (or drop it on Reject).
+  // A refresh, direct visit or other-campaign token fires nothing. Without consent.js the page fails closed (no tracking).
+  var waiting = false;
+  function onThankYou(campaign) {
+    var raw = ss('get', KEY_CONVERSION);
+    if (!raw) return;
+    var t = null;
+    try { t = JSON.parse(raw); } catch (e) {}
+    if (!t || t.campaign !== campaign || !t.submission_id) return;
+    var C = window.WrenConsent;
+    var st = C ? C.state() : 'denied';
+    if (st === 'denied') { ss('del', KEY_CONVERSION); return; }
+    if (st === 'granted') { fireLead(); return; }
+    if (waiting) return;
+    waiting = true;
+    C.onGrant(fireLead);
+    C.onDeny(function () { ss('del', KEY_CONVERSION); });
+  }
+
   window.WrenFunnel = {
     config: CONFIG,
     getSubmissionId: getSubmissionId,
@@ -192,7 +212,8 @@
     onThankYou: onThankYou
   };
 
-  loadPixel();
+  // Optional tracking starts only after the visitor accepts (consent.js). No consent.js, or no consent, means no Pixel.
+  if (window.WrenConsent) window.WrenConsent.onGrant(loadPixel);
 
   // Command queue: pages push ['thankYou', campaign] whether or not this file has loaded yet.
   var queued = window.WrenFunnelQueue || [];

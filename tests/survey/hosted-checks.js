@@ -22,12 +22,12 @@ const good = () => ({ schema_version: '1.0', submission_id: 'aaaaaaaa-bbbb-4ccc-
     const x = await get('/survey/' + r); const t = await x.text();
     check(`hosted route /survey/${r}: 200`, x.status() === 200, x.status());
     check(`hosted route /survey/${r}: X-Robots-Tag noindex, nofollow`, /noindex, nofollow/.test(x.headers()['x-robots-tag'] || ''), x.headers()['x-robots-tag']);
-    check(`hosted route /survey/${r}: meta noindex + GTM-KF4RWHHQ + absolute asset paths`, /name="robots" content="noindex, nofollow"/.test(t) && t.includes('GTM-KF4RWHHQ') && !/src="assets\//.test(t));
+    check(`hosted route /survey/${r}: meta noindex + consent gate (no GTM or Meta in the HTML) + absolute asset paths`, /name="robots" content="noindex, nofollow"/.test(t) && t.includes('/survey/consent.js') && !/googletagmanager|connect\.facebook|GTM-KF4RWHHQ|fonts\.g/.test(t) && !/src="assets\//.test(t));
   }
   { // standalone Privacy Notice: GET only, loads no scripts or tracking
     const x = await get('/survey/privacy'); const t = await x.text();
     check('hosted route /survey/privacy: 200 with noindex header and meta', x.status() === 200 && /noindex, nofollow/.test(x.headers()['x-robots-tag'] || '') && /name="robots" content="noindex, nofollow"/.test(t), [x.status(), x.headers()['x-robots-tag']]);
-    check('hosted route /survey/privacy: no scripts, no GTM, no Pixel, no survey runtime', !/<script/i.test(t) && !/GTM-|googletagmanager|fbq|fbevents|connect\.facebook|wren-funnel|support\.js/i.test(t));
+    check('hosted route /survey/privacy: only the first-party consent.js (manage mode), no GTM, no Pixel, no survey runtime', (t.match(/<script\b[^>]*>/gi) || []).length === 1 && /data-mode="manage"/.test(t) && !/GTM-|googletagmanager|fbq|fbevents|connect\.facebook|wren-funnel|support\.js/i.test(t));
   }
   for (const f of ['/survey/vendor/react.production.min.js', '/survey/vendor/react-dom.production.min.js', '/survey/wren-funnel.js', '/survey/support.js', '/survey/assets/kitchen-hero.webp']) { const x = await get(f); check(`hosted asset ${f}: 200`, x.status() === 200, x.status()); }
   const ts = await get('/survey/kitchen-survey/'); console.log('INFO trailing-slash /survey/kitchen-survey/ ->', ts.status());

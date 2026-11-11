@@ -16,7 +16,7 @@ const check = (name, ok, detail) => { results.push({ name, ok: !!ok, detail }); 
 const ANS = { kitchen: ['A full new kitchen', 'Before Christmas', 'Yes'], garage: ['Home office', 'Attached to the house', 'Yes'] };
 const FILL = { full_name: 'Test Person', phone: '07700 900123', email: 'test@example.com', street_address: '1 Test Road', city: 'Truro', postcode: 'tr1 2ab' };
 
-async function mkPage(br, { viewport = { width: 390, height: 844 }, base = BASE, reduced = false, fbqPreexisting = false, funnelPatch } = {}) {
+async function mkPage(br, { viewport = { width: 390, height: 844 }, base = BASE, reduced = false, fbqPreexisting = false, funnelPatch, consent = 'granted', blockStorage = false } = {}) {
   const ctx = await br.newContext({ viewport, reducedMotion: reduced ? 'reduce' : 'no-preference' });
   const pg = await ctx.newPage();
   const log = { console: [], hosts: {}, reqs: [], gtmReq: 0, fbReq: 0 };
@@ -29,6 +29,10 @@ async function mkPage(br, { viewport = { width: 390, height: 844 }, base = BASE,
   // Any unpkg request is counted in log.hosts (the new pages must make none). The ORIGINAL export needs React from unpkg to render
   // for the layout comparison, so serve the identical, SRI-verified files from the vendor folder instead of the network.
   await pg.route(/unpkg\.com/, (r) => { const u = r.request().url(); const f = u.includes('react-dom') ? 'react-dom.production.min.js' : u.includes('react@') ? 'react.production.min.js' : null; f ? r.fulfill({ contentType: 'text/javascript', path: path.join(__dirname, '..', '..', 'survey', 'vendor', f) }) : r.abort(); });
+  // Consent is seeded once per browser context (not on every navigation) so tests can click Accept/Reject and reload.
+  // 'granted' is the default so the existing funnel tests exercise the post-consent behaviour. 'none' = a first-time visitor.
+  if (consent !== 'none') await pg.addInitScript((v) => { try { if (!localStorage.getItem('__seeded')) { localStorage.setItem('__seeded', '1'); localStorage.setItem('wren_consent_v1', JSON.stringify({ v, t: Date.now() })); } } catch (e) {} }, consent);
+  if (blockStorage) await pg.addInitScript(() => { const boom = () => { throw new Error('storage blocked'); }; try { Object.defineProperty(window, 'localStorage', { get: boom }); } catch (e) {} });
   if (funnelPatch) await pg.route('**/wren-funnel.js', async (r) => { const res = await r.fetch(); r.fulfill({ response: res, body: funnelPatch(await res.text()) }); });
   if (fbqPreexisting) await pg.addInitScript(() => { const q = []; window.fbq = function () { q.push([].slice.call(arguments)); }; window.fbq.queue = q; window.fbq.preexisting = true; });
   return { ctx, pg, log };
@@ -61,9 +65,10 @@ async function survey(pg, c, cornwall, { stopAtForm = false, base = BASE, route 
     check(`route ${r}: meta robots noindex`, await pg.evaluate(() => [...document.querySelectorAll('meta[name=robots]')].some((m) => /noindex/.test(m.content))));
     const html = await (await fetch(`${BASE}/survey/${r}`)).text();
     const head = html.slice(0, html.indexOf('</head>')); const bodyStart = html.slice(html.indexOf('<body>'), html.indexOf('<body>') + 600);
-    check(`route ${r}: GTM head snippet in static outer HTML, after charset`, head.indexOf('GTM-KF4RWHHQ') > head.indexOf('charset') && head.indexOf('GTM-KF4RWHHQ') < head.indexOf('viewport'));
-    check(`route ${r}: GTM noscript straight after <body>`, bodyStart.includes('googletagmanager.com/ns.html?id=GTM-KF4RWHHQ'));
-    check(`route ${r}: exactly one GTM container request`, log.gtmReq === 1, log.gtmReq);
+    check(`route ${r}: consent gate in the static head after charset and before the funnel script; no GTM or Meta host anywhere in the HTML`, head.indexOf('/survey/consent.js') > head.indexOf('charset') && head.indexOf('/survey/consent.js') < head.indexOf('/survey/wren-funnel.js') && !/googletagmanager|connect\.facebook|GTM-KF4RWHHQ|fonts\.g(oogleapis|static)/.test(html));
+    check(`route ${r}: no GTM noscript iframe (it would load Google with no consent)`, !/<iframe/i.test(bodyStart) && !/ns\.html/.test(html));
+    check(`route ${r}: after Accept, exactly one GTM container request`, log.gtmReq === 1, log.gtmReq);
+    check(`route ${r}: fonts are self-hosted (no Google Fonts request)`, !Object.keys(log.hosts).some((h) => /^fonts\.g(oogleapis|static)\.com$/.test(h)), log.hosts);
     check(`route ${r}: no unpkg request, React and ReactDOM self-hosted, Babel never requested`, !log.hosts['unpkg.com'] && !log.reqs.some((u) => /babel/i.test(u)) && log.reqs.some((u) => u.includes('/survey/vendor/react-dom.production.min.js')) && log.reqs.some((u) => u.includes('/survey/vendor/react.production.min.js')), log.hosts);
     check(`route ${r}: page rendered content`, (await pg.locator('body').innerText()).length > 200);
     const q = await fbq(pg);
@@ -237,12 +242,12 @@ async function survey(pg, c, cornwall, { stopAtForm = false, base = BASE, route 
     const html = await (await fetch(`${BASE}/survey/privacy`)).text();
     check('privacy: route 200 via the rewrite', res.status() === 200, res.status());
     check('privacy: X-Robots-Tag noindex, nofollow header and robots meta', /noindex, nofollow/.test(res.headers()['x-robots-tag'] || '') && /name="robots" content="noindex, nofollow"/.test(html));
-    check('privacy: no <script> tag at all, no GTM, no Pixel, no survey runtime', !/<script/i.test(html) && !/GTM-|googletagmanager|fbq|fbevents|connect\.facebook|wren-funnel|support\.js/i.test(html));
-    check('privacy: zero third-party requests (no GTM, no Meta, no fonts, no unpkg)', Object.keys(log.hosts).every((h) => h === 'localhost:8766') && log.gtmReq === 0 && log.fbReq === 0, log.hosts);
-    check('privacy: no dataLayer, no fbq, no events', (await pg.evaluate(() => [typeof window.dataLayer, typeof window.fbq, typeof window.WrenFunnel])).join() === 'undefined,undefined,undefined');
+    check('privacy: only script is first-party consent.js in manage mode; no GTM, no Pixel, no survey runtime', (html.match(/<script\b[^>]*>/gi) || []).length === 1 && /src="\/survey\/consent\.js" data-mode="manage"/.test(html) && !/GTM-|googletagmanager|fbq|fbevents|connect\.facebook|wren-funnel|support\.js/i.test(html));
+    check('privacy: zero third-party requests EVEN WHEN consent is already granted (no GTM, no Meta, no fonts, no unpkg)', Object.keys(log.hosts).every((h) => h === 'localhost:8766') && log.gtmReq === 0 && log.fbReq === 0, log.hosts);
+    check('privacy: no dataLayer, no fbq, no funnel runtime, no events', (await pg.evaluate(() => [typeof window.dataLayer, typeof window.fbq, typeof window.WrenFunnel])).join() === 'undefined,undefined,undefined');
     check('privacy: no console errors', log.console.length === 0, log.console);
-    check('privacy: DRAFT banner present and approval markers visible (page is not final)', /data-draft="true"/.test(html) && /\[\[APPROVAL NEEDED/.test(html));
-    check('privacy: covers collection, purposes, DQ retention, SMS follow-up, processors, retention, rights, contact', ['What we collect', 'How we use your details', 'Property outside Cornwall', 'still create or update a record', 'do not create a sales opportunity', 'call or text you', 'Who we share it with', 'GoHighLevel', 'How long we keep it', 'Your rights', 'Contact us about your data', 'ico.org.uk'].every((k) => html.includes(k)));
+    check('privacy: no draft banner and no approval placeholders (content is complete; business sign-off is tracked in the release register)', !/data-draft|\[\[APPROVAL/.test(html));
+    check('privacy: covers collection, purposes, DQ retention, SMS follow-up, processors, retention, rights, contact', ['What we collect', 'How and why we use your details', 'Enquiry from a property outside Cornwall', 'Lawful basis', 'Calls and texts', 'still create or update a record', 'do not create a sales opportunity', 'call or text you', 'Who we share it with', 'GoHighLevel', 'How long we keep it', 'Your rights', 'Contact us about your data', 'ico.org.uk'].every((k) => html.includes(k)));
     await ctx.close();
   }
   // 6c. Not-in-area pages: discreet Privacy Notice link and concise retention disclosure (no retention period is stated)
@@ -269,6 +274,130 @@ async function survey(pg, c, cornwall, { stopAtForm = false, base = BASE, route 
     await p2.goto(`${BASE}/survey/privacy`); await p2.waitForTimeout(1200);
     dlSeen = await p2.evaluate(() => typeof window.dataLayer);
     check('privacy: opening it in the same session fires nothing and leaves a pending conversion token untouched', dlSeen === 'undefined' && !!(await pg.evaluate(() => sessionStorage.getItem('wren_conversion'))) && !reqs.some((u) => /facebook|googletagmanager|api\/survey-lead/.test(u)), reqs);
+    await ctx.close();
+  }
+
+  // 6d. CONSENT: nothing from Google or Meta before Accept; Reject and no-choice load nothing; Lead only after consent
+  const bannerOf = (pg) => pg.locator('[data-wren-consent=banner]');
+  const storedChoice = (pg) => pg.evaluate(() => { try { const o = JSON.parse(localStorage.getItem('wren_consent_v1') || 'null'); return o && o.v; } catch (e) { return 'err'; } });
+  const thirdParty = (log) => Object.keys(log.hosts).filter((h) => h !== 'localhost:8766');
+  const hideBannerOnSurvey = (pg) => pg.addInitScript(() => { document.addEventListener('DOMContentLoaded', () => { if (/-survey$/.test(location.pathname)) { const s = document.createElement('style'); s.textContent = '[data-wren-consent=banner]{display:none!important}'; document.head.appendChild(s); } }); });
+  for (const r of ROUTES) { // first-time visitor: nothing third-party on any survey page
+    const { ctx, pg, log } = await mkPage(br, { consent: 'none' });
+    await pg.goto(`${BASE}/survey/${r}`, { waitUntil: 'load' }); await pg.waitForTimeout(1800);
+    check(`consent/${r}: first visit makes zero requests to Google, Meta or any third party, and defines no fbq`, thirdParty(log).length === 0 && log.gtmReq === 0 && log.fbReq === 0 && (await pg.evaluate(() => typeof window.fbq)) === 'undefined', log.hosts);
+    check(`consent/${r}: first visit starts no GTM (no gtm.js event) and shows the banner`, !(await pg.evaluate(() => (window.dataLayer || []).some((e) => e.event === 'gtm.js'))) && (await bannerOf(pg).count()) === 1);
+    check(`consent/${r}: no console errors`, log.console.length === 0, log.console);
+    await ctx.close();
+  }
+  { // banner content, equal prominence, then Accept
+    const { ctx, pg, log } = await mkPage(br, { consent: 'none' });
+    await pg.goto(`${BASE}/survey/kitchen-survey`, { waitUntil: 'load' }); await pg.waitForTimeout(1200);
+    const acc = pg.getByRole('button', { name: 'Accept', exact: true }); const rej = pg.getByRole('button', { name: 'Reject', exact: true });
+    const [ba, br2] = [await acc.boundingBox(), await rej.boundingBox()];
+    const sty = async (l) => l.evaluate((e) => { const c = getComputedStyle(e); return [c.backgroundColor, c.color, c.fontWeight, c.fontSize, c.borderTopWidth, c.borderTopColor].join('|'); });
+    check('consent: Accept and Reject are both present, the same size and the same style (equal prominence)', ba && br2 && Math.abs(ba.width - br2.width) < 1 && Math.abs(ba.height - br2.height) < 1 && (await sty(acc)) === (await sty(rej)) && ba.height >= 44, { ba, br2 });
+    check('consent: banner links the Privacy Notice cookie section and explains Google and Meta are optional', (await bannerOf(pg).locator('a[href="/survey/privacy#cookies"]').count()) === 1 && /optional cookies from Google and Meta/.test(await bannerOf(pg).innerText()) && /stay off unless you accept/.test(await bannerOf(pg).innerText()));
+    check('consent: banner is a labelled region and does not cover more than a third of a phone screen', (await bannerOf(pg).getAttribute('role')) === 'region' && ((await bannerOf(pg).boundingBox()).height < 844 / 3));
+    await acc.click(); await pg.waitForTimeout(1200);
+    const q = await fbq(pg);
+    check('consent/Accept: GTM requested once, Meta script once, init once, PageView once, banner gone, choice stored', log.gtmReq === 1 && log.fbReq === 1 && q && q.filter((a) => a[0] === 'init').length === 1 && q.filter((a) => a[1] === 'PageView').length === 1 && (await bannerOf(pg).count()) === 0 && (await storedChoice(pg)) === 'granted', { g: log.gtmReq, f: log.fbReq, q });
+    check('consent/Accept: GTM start event pushed exactly once', (await pg.evaluate(() => (window.dataLayer || []).filter((e) => e.event === 'gtm.js').length)) === 1);
+    await pg.reload({ waitUntil: 'load' }); await pg.waitForTimeout(1500);
+    const q2 = await fbq(pg);
+    check('consent/Accept: remembered on reload (no banner), GTM and Pixel load once each, PageView once', (await bannerOf(pg).count()) === 0 && log.gtmReq === 2 && q2 && q2.filter((a) => a[1] === 'PageView').length === 1, { g: log.gtmReq });
+    check('consent/Accept: no console errors', log.console.length === 0, log.console);
+    await ctx.close();
+  }
+  { // Reject: nothing loads, now or after reload
+    const { ctx, pg, log } = await mkPage(br, { consent: 'none' });
+    await pg.goto(`${BASE}/survey/garage-survey`, { waitUntil: 'load' }); await pg.waitForTimeout(1000);
+    await pg.getByRole('button', { name: 'Reject', exact: true }).click(); await pg.waitForTimeout(800);
+    check('consent/Reject: no GTM, no Meta, no fbq, banner gone, choice stored', thirdParty(log).length === 0 && log.gtmReq === 0 && log.fbReq === 0 && (await pg.evaluate(() => typeof window.fbq)) === 'undefined' && (await bannerOf(pg).count()) === 0 && (await storedChoice(pg)) === 'denied', log.hosts);
+    await pg.reload({ waitUntil: 'load' }); await pg.waitForTimeout(1200);
+    check('consent/Reject: remembered on reload (no banner) and still nothing third-party', (await bannerOf(pg).count()) === 0 && thirdParty(log).length === 0 && log.gtmReq === 0 && log.fbReq === 0);
+    await ctx.close();
+  }
+  for (const [c, cw] of [['kitchen', 'Yes'], ['garage', 'Yes'], ['kitchen', 'No']]) { // rejected visitor still gets full service, and no tracking
+    await mock('reset');
+    const { ctx, pg, log } = await mkPage(br, { consent: 'denied' });
+    await survey(pg, c, cw); await pg.click('button[type=submit]');
+    const dest = cw === 'Yes' ? 'thank-you' : 'not-in-area';
+    await pg.waitForURL(new RegExp(`/survey/${c}-${dest}$`), { timeout: 15000 }).catch(() => {}); await pg.waitForTimeout(1500);
+    const cs = await calls();
+    check(`consent/Reject ${c}/${cw}: the enquiry is still sent to GHL once and the right page shows`, pg.url().endsWith(`/survey/${c}-${dest}`) && cs.length === 1 && cs[0].url === `/hooks/${c}-e2e`, { url: pg.url(), n: cs.length });
+    check(`consent/Reject ${c}/${cw}: no Lead, no wren_survey_lead, no Pixel, no Google, token removed`, (await dl(pg, 'wren_survey_lead')).length === 0 && (await pg.evaluate(() => typeof window.fbq)) === 'undefined' && thirdParty(log).length === 0 && (await pg.evaluate(() => sessionStorage.getItem('wren_conversion'))) === null, log.hosts);
+    check(`consent/Reject ${c}/${cw}: payload carries no Facebook cookie ids (none exist without consent)`, cs[0] && cs[0].body && !JSON.stringify(cs[0].body).match(/fb\.1\./));
+    await ctx.close();
+  }
+  { // Accept AFTER submitting: Lead is held, then fires exactly once with the same event id
+    await mock('reset');
+    const { ctx, pg, log } = await mkPage(br, { consent: 'none' });
+    await hideBannerOnSurvey(pg);
+    await survey(pg, 'kitchen', 'Yes'); await pg.click('button[type=submit]');
+    await pg.waitForURL(/\/survey\/kitchen-thank-you$/, { timeout: 15000 }).catch(() => {}); await pg.waitForTimeout(1500);
+    const sid = (await calls())[0].body.survey_submission_id;
+    check('consent/late Accept: on the thank-you page with no choice, nothing loads and no Lead fires yet, token is held', pg.url().endsWith('/survey/kitchen-thank-you') && (await bannerOf(pg).count()) === 1 && thirdParty(log).length === 0 && (await dl(pg, 'wren_survey_lead')).length === 0 && !!(await pg.evaluate(() => sessionStorage.getItem('wren_conversion'))), log.hosts);
+    await pg.getByRole('button', { name: 'Accept', exact: true }).click(); await pg.waitForTimeout(1200);
+    const q = await fbq(pg); const leads = await dl(pg, 'wren_survey_lead');
+    const lead = q.filter((a) => a[0] === 'track' && a[1] === 'Lead');
+    check('consent/late Accept: exactly one wren_survey_lead and one Meta Lead, event id = submission id, Lead after init and PageView', leads.length === 1 && leads[0].event_id === sid && lead.length === 1 && lead[0][3].eventID === sid && q.findIndex((a) => a[0] === 'init') < q.findIndex((a) => a[1] === 'PageView') && q.findIndex((a) => a[1] === 'PageView') < q.findIndex((a) => a[1] === 'Lead'), { q, leads });
+    check('consent/late Accept: token consumed, no PII in the event', (await pg.evaluate(() => sessionStorage.getItem('wren_conversion'))) === null && !JSON.stringify(leads).match(/Test|example|7700|Road|TR1/));
+    await pg.reload({ waitUntil: 'load' }); await pg.waitForTimeout(1500);
+    check('consent/late Accept: refresh fires no second Lead', (await dl(pg, 'wren_survey_lead')).length === 0 && !((await fbq(pg)) || []).some((a) => a[1] === 'Lead'));
+    await ctx.close();
+  }
+  { // Reject AFTER submitting: token dropped, never fires later
+    await mock('reset');
+    const { ctx, pg, log } = await mkPage(br, { consent: 'none' });
+    await hideBannerOnSurvey(pg);
+    await survey(pg, 'garage', 'Yes'); await pg.click('button[type=submit]');
+    await pg.waitForURL(/\/survey\/garage-thank-you$/, { timeout: 15000 }).catch(() => {}); await pg.waitForTimeout(1500);
+    await pg.getByRole('button', { name: 'Reject', exact: true }).click(); await pg.waitForTimeout(800);
+    check('consent/late Reject: no Lead, no wren_survey_lead, token dropped, nothing third-party', (await dl(pg, 'wren_survey_lead')).length === 0 && (await pg.evaluate(() => sessionStorage.getItem('wren_conversion'))) === null && thirdParty(log).length === 0 && log.fbReq === 0, log.hosts);
+    await pg.goto(`${BASE}/survey/garage-thank-you`, { waitUntil: 'load' }); await pg.waitForTimeout(1000);
+    check('consent/late Reject: revisiting the thank-you page still fires nothing', (await dl(pg, 'wren_survey_lead')).length === 0 && log.gtmReq === 0 && log.fbReq === 0);
+    await ctx.close();
+  }
+  { // Withdrawing and changing the choice from the privacy page
+    const { ctx, pg, log } = await mkPage(br);
+    await ctx.addCookies([{ name: '_fbp', value: 'fb.1.1.1', url: BASE }, { name: '_ga', value: 'GA1.1.1.1', url: BASE }, { name: 'keep_me', value: '1', url: BASE }]);
+    await pg.goto(`${BASE}/survey/privacy`, { waitUntil: 'load' }); await pg.waitForTimeout(900);
+    const st = () => pg.locator('#wren-cookie-settings .wc-status').innerText();
+    check('consent/privacy page: shows the current choice (on) with Accept and Reject controls and loads nothing third-party', (await st()) === 'Optional cookies: on' && (await pg.getByRole('button', { name: 'Reject optional cookies' }).count()) === 1 && thirdParty(log).length === 0 && log.gtmReq === 0 && log.fbReq === 0, log.hosts);
+    await pg.getByRole('button', { name: 'Reject optional cookies' }).click(); await pg.waitForTimeout(500);
+    const names = (await ctx.cookies()).map((c) => c.name);
+    check('consent/withdraw: choice becomes denied, status updates, optional cookies on this site are removed, other cookies untouched', (await storedChoice(pg)) === 'denied' && (await st()) === 'Optional cookies: off' && !names.includes('_fbp') && !names.includes('_ga') && names.includes('keep_me'), names);
+    await pg.goto(`${BASE}/survey/kitchen-survey`, { waitUntil: 'load' }); await pg.waitForTimeout(1500);
+    check('consent/withdraw: later survey pages load no GTM or Meta and show no banner', log.gtmReq === 0 && log.fbReq === 0 && (await bannerOf(pg).count()) === 0 && (await pg.evaluate(() => typeof window.fbq)) === 'undefined');
+    await pg.goto(`${BASE}/survey/privacy`, { waitUntil: 'load' }); await pg.getByRole('button', { name: 'Accept optional cookies' }).click(); await pg.waitForTimeout(600);
+    check('consent/privacy page: accepting there loads nothing on the notice itself', (await storedChoice(pg)) === 'granted' && log.gtmReq === 0 && log.fbReq === 0 && (await pg.evaluate(() => typeof window.fbq)) === 'undefined');
+    await pg.goto(`${BASE}/survey/kitchen-survey`, { waitUntil: 'load' }); await pg.waitForTimeout(1500);
+    check('consent/privacy page: the accepted choice then applies on the survey (GTM once, Meta once)', log.gtmReq === 1 && log.fbReq === 1);
+    await ctx.close();
+  }
+  for (const [label, seed] of [['older than 12 months', (n) => ({ v: 'granted', t: n - 400 * 864e5 })], ['dated in the future', (n) => ({ v: 'granted', t: n + 5 * 864e5 })], ['unknown value', (n) => ({ v: 'yes', t: n })], ['not JSON', () => 'granted']]) {
+    const { ctx, pg, log } = await mkPage(br, { consent: 'none' });
+    await pg.addInitScript(([lab, which]) => { const n = Date.now(); const o = which === 'a' ? { v: 'granted', t: n - 400 * 864e5 } : which === 'b' ? { v: 'granted', t: n + 5 * 864e5 } : which === 'c' ? { v: 'yes', t: n } : null; localStorage.setItem('wren_consent_v1', o ? JSON.stringify(o) : 'granted'); }, [label, { 'older than 12 months': 'a', 'dated in the future': 'b', 'unknown value': 'c', 'not JSON': 'd' }[label]]);
+    await pg.goto(`${BASE}/survey/kitchen-survey`, { waitUntil: 'load' }); await pg.waitForTimeout(1200);
+    check(`consent/stored choice ${label}: treated as no choice (banner shows, nothing third-party)`, (await bannerOf(pg).count()) === 1 && thirdParty(log).length === 0 && log.gtmReq === 0 && log.fbReq === 0, log.hosts);
+    await ctx.close();
+  }
+  { // storage blocked: fails closed, Accept works for this page only, no errors
+    const { ctx, pg, log } = await mkPage(br, { consent: 'none', blockStorage: true });
+    await pg.goto(`${BASE}/survey/kitchen-survey`, { waitUntil: 'load' }); await pg.waitForTimeout(1200);
+    check('consent/storage blocked: page works, banner shows, nothing third-party', (await bannerOf(pg).count()) === 1 && thirdParty(log).length === 0 && log.gtmReq === 0);
+    await pg.getByRole('button', { name: 'Accept', exact: true }).click(); await pg.waitForTimeout(1000);
+    check('consent/storage blocked: Accept still works for this page, with no console errors', log.gtmReq === 1 && log.fbReq === 1 && log.console.length === 0, log.console);
+    await ctx.close();
+  }
+  { // consent.js unavailable: the funnel fails closed (no tracking) and still works
+    await mock('reset');
+    const { ctx, pg, log } = await mkPage(br, { consent: 'granted' });
+    await pg.route('**/consent.js', (r) => r.abort());
+    await survey(pg, 'kitchen', 'Yes'); await pg.click('button[type=submit]');
+    await pg.waitForURL(/\/survey\/kitchen-thank-you$/, { timeout: 15000 }).catch(() => {}); await pg.waitForTimeout(1500);
+    check('consent/consent.js blocked: enquiry still submitted, but no GTM, no Pixel, no Lead (fails closed)', pg.url().endsWith('/survey/kitchen-thank-you') && (await calls()).length === 1 && log.gtmReq === 0 && log.fbReq === 0 && (await dl(pg, 'wren_survey_lead')).length === 0);
     await ctx.close();
   }
 
