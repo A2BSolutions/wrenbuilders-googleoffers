@@ -51,6 +51,15 @@ test('changing the notice email away from the confirmed contact is caught', () =
   const f = confirmAll(clone()); f.privacy = f.privacy.split('mailto:info@wren-builders.com').join('mailto:other@example.com');
   assert.ok(evaluate(f).problems.length > 0);
 });
+test('historical decisions are recorded as facts, never as approvals', () => {
+  const r = JSON.parse(loadFiles().register); const ids = r.recorded_facts.map((x) => x.id);
+  for (const id of ['garage_hero_ai_approved', 'kitchen_book_this_month_approved', 'provisional_copy', 'design_handoff_integration', 'live_ads_read_only_check']) assert.ok(ids.includes(id), id);
+  const hero = r.recorded_facts.find((x) => x.id === 'garage_hero_ai_approved');
+  assert.ok(/A2B/.test(hero.statement) && /NOT by the client/.test(hero.limits));
+  assert.ok(!r.items.some((i) => /photo|hero/i.test(i.id)), 'a real garage photo must not be a launch item');
+  assert.ok(!JSON.stringify(r.items).match(/book-by|book by date/i), 'no fixed Kitchen book-by date requirement');
+  assert.strictEqual(evaluate(loadFiles()).pending.length, 8);
+});
 test('non-blocking items never block', () => {
   const f = confirmAll(clone()); const r = JSON.parse(f.register); r.items.filter((i) => !i.blocking).forEach((i) => { i.status = 'pending'; i.confirmed_by = ''; i.confirmed_on = ''; }); f.register = JSON.stringify(r);
   const e = evaluate(f); assert.strictEqual(e.pending.length, 0); assert.deepStrictEqual(e.problems, []);
@@ -74,6 +83,8 @@ const mutations = {
   'not-in-area link removed': (f) => { f.pages['garage-not-in-area'] = f.pages['garage-not-in-area'].replace('href="/survey/privacy"', 'href="#"'); },
   'survey link switched off': (f) => { f.funnel = f.funnel.replace("privacy: { url: '/survey/privacy' }", 'privacy: { url: null }'); },
   'notice drops the privacy-request email': (f) => { f.privacy = f.privacy.replace('For any privacy request or question', 'For general questions'); },
+  'a .dc.html redirect target returns': (f) => { f.funnel = f.funnel.replace("thankYou: '/survey/kitchen-thank-you'", "thankYou: '/survey/Wren Thank You.dc.html'"); },
+  'a placeholder webhook override returns': (f) => { f.pages['garage-survey'] += "<script>window.WREN_WEBHOOK = 'x'</script>"; },
   'register unreadable': (f) => { f.register = '{not json'; }
 };
 for (const [name, mut] of Object.entries(mutations)) {

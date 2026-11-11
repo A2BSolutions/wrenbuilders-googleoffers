@@ -68,6 +68,10 @@ function evaluate(f) {
   if (!/var st = C \? C\.state\(\) : 'denied'/.test(f.funnel)) problems.push('wren-funnel.js must fail closed when consent.js is missing');
   if (!/privacy:\s*\{\s*url:\s*'\/survey\/privacy'\s*\}/.test(f.funnel)) problems.push("survey Privacy Notice link is not enabled (wren-funnel.js privacy.url must be '/survey/privacy')");
 
+  // ---- A3b. Export placeholders are gone: no .dc.html target, no placeholder webhook or redirect override, no x-import ----
+  PAGES.forEach((p) => { if (/\.dc\.html|WREN_WEBHOOK|WREN_THANK_YOU|<x-import/.test(f.pages[p])) problems.push(`${p}: still references a .dc.html file, a placeholder webhook or redirect override, or an x-import`); });
+  if (/\.dc\.html|WREN_WEBHOOK|WREN_THANK_YOU/.test(f.funnel)) problems.push('wren-funnel.js still references a .dc.html file or a placeholder webhook or redirect override');
+
   // ---- A4. Notice reachable where details are collected or kept ----
   for (const c of ['kitchen', 'garage']) {
     const na = f.pages[`${c}-not-in-area`];
@@ -95,7 +99,7 @@ function evaluate(f) {
   if (reg && !cc) problems.push('register has no privacy_contact_selected item');
   else if (cc && cc.status === 'confirmed' && !new RegExp(`mailto:${cc.value.replace(/[.]/g, '\\.')}"`).test(section(html, 10))) problems.push(`notice section 10 does not use the confirmed privacy contact ${cc.value}`);
   const facts = reg && Array.isArray(reg.recorded_facts) ? reg.recorded_facts : [];
-  for (const x of facts) if (!x.id || !['verified_by_codex', 'confirmed_by_user', 'unknown'].includes(x.status) || !x.statement || !x.provenance) problems.push(`recorded fact "${x.id}" is malformed`);
+  for (const x of facts) if (!x.id || !['verified_by_codex', 'confirmed_by_user', 'verified_in_repo', 'checked_readonly', 'unknown'].includes(x.status) || !x.statement || !x.provenance) problems.push(`recorded fact "${x.id}" is malformed`);
   // A fact that is UNKNOWN must have a blocking approval item, so unknowns can never be skipped.
   if (reg && facts.some((x) => x.id === 'mailbox_monitoring' && x.status === 'unknown') && !(reg.items || []).some((i) => i.id === 'privacy_mailbox_monitored' && i.blocking)) problems.push('mailbox monitoring is UNKNOWN but has no blocking approval item');
   return { problems, pending, notes, facts };

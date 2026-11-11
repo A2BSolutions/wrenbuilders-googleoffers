@@ -2,6 +2,8 @@
 
 Decision (11 Nov 2026): **keep the existing Kitchen and Garage creative and offer names.** Nothing on the pages was changed. This is approval to keep the wording. It is not proof that any claim below is true. Each needs a fact check before ads go live. Release register item: `offer_claims_true` (blocking).
 
+**Update 11 Nov (historical decisions):** the Garage AI hero image was approved by A2B (not by the client, and a real photo is optional, not a blocker). The Kitchen line "Book this month to secure your upgrade" was approved by A2B and needs no replacement book-by date. Reassurance copy, error messages, button labels, page titles and review labels were approved provisionally pending final sign-off.
+
 **Update 11 Nov:** Wren confirmed the Kitchen £1,000 appliance upgrade and Garage free AC campaigns are running separately, and that the creative stays unless a specific claim is disproven. That settles that the offers exist. It does not attest the cap of 3, "reserved", "this month", response time, fixed-quote, review or timing wording. Those stay in the table below until Wren attests them.
 
 ## A. Claims that need a fact check
@@ -12,7 +14,7 @@ Decision (11 Nov 2026): **keep the existing Kitchen and Garage creative and offe
 | 2 | Garage survey, step 5 | "We're only taking on 3 garage conversions this month, so places are limited." | True capacity claim. Must match the line above and reality |
 | 3 | Garage thank-you | "Your free AC unit is reserved." | Reserved for every enquirer, including those Harry cannot call back or who book next month? |
 | 4 | Kitchen survey | "plus your £1,000 free appliance upgrade" | Offer terms and conditions, who qualifies, any end date |
-| 5 | Kitchen thank-you | "Your £1,000 free appliance upgrade is reserved." "Book this month to secure your upgrade." | Same as 3. "This month" is date-sensitive |
+| 5 | Kitchen thank-you | "Your £1,000 free appliance upgrade is reserved." "Book this month to secure your upgrade." | Same as 3. The "Book this month" line is A2B-approved and needs no fixed date. It must be honoured for people who book that month |
 | 6 | Both thank-you pages | "reach out within a few hours" (twice) | Can the team keep this, including evenings and weekends? |
 | 7 | Both thank-you pages | "A clear, fixed quote with no hidden costs." "Free home visit." | True for every job? |
 | 8 | Both thank-you pages | "We'll call you from 01872 613608." | Is that the number the team calls from? Harry's SMS number may differ |
@@ -34,7 +36,7 @@ Not applied. Use only the lines for claims that fail the check.
 |---|---|
 | Garage cap and deadline | "Ask us about the free AC unit offer." |
 | "Reserved" | "We'll go through the offer when we speak." |
-| Kitchen "Book this month" | Remove the line, or state the real end date |
+| Kitchen "Book this month" | A2B-approved, no date needed. Only if the upgrade stops being honoured: remove the line |
 | "Few hours" | "A member of the team will be in touch soon." |
 | Before Christmas | "Tell us your timing and we'll plan around it." |
 | Review ages | Replace with the review month and year from Google, or remove the age |

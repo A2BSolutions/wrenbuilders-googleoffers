@@ -15,6 +15,11 @@ Branch `claude/modest-cori-ozevju`, commit below. Updated 11 Nov 2026. **Nothing
 | Harry's first SMS is an enquiry response, not separate marketing | Stated by Wren in the release session |
 | The Kitchen £1,000 appliance upgrade and Garage free AC campaigns are running separately. Creative stays unless a claim is disproven | Stated by Wren in the release session |
 | Outside-Cornwall enquiries are stored and tagged with no sales actions | Business confirmed, Codex's published workflow, hosted v2 test |
+| The Garage AI hero image is approved for launch. A real client photograph is optional, **not a blocker**. It was approved by A2B, **not by the client**, and must not be called client-approved | Stated by Wren. The repo holds no claim that the client approved it |
+| Kitchen "Book this month to secure your upgrade" was approved by A2B. **No replacement book-by date is needed** | Stated by Wren |
+| Reassurance copy, error messages, button labels, page titles and review labels were approved **provisionally**, pending final sign-off | Stated by Wren. Final sign-off is F5 |
+| The original `.dc.html` redirects were export placeholders and are gone. Webhook and tracking handover is implemented | Repo check, enforced by the release gate. No `.dc.html`, `WREN_WEBHOOK`, `WREN_THANK_YOU` or `x-import` in any survey file |
+| 7 Garage "Free AC" ads are ACTIVE in the Wren ad account. No Kitchen ads are ACTIVE. Ad text could not be read through the API | Read-only Meta check, nothing changed. See F5 |
 | **Routine monitoring of `info@wren-builders.com` is UNKNOWN** | Codex could not verify it. Still open as F4 below |
 
 ## 2. Wren must confirm facts (5)
@@ -27,7 +32,7 @@ Only the business knows these. Answer yes, or say what is different.
 | F2 | `providers_complete` | The only people who handle these details for us are GoHighLevel, Google Sheets, Vercel, the agency and IT providers who manage our systems, and Google and Meta (after consent). No other SMS carrier, email or CRM tool |
 | F3 | `ico_fee` | The ICO data protection fee is paid, or Wren is exempt. (No number is published) |
 | F4 | `privacy_mailbox_monitored` | `info@wren-builders.com` is read routinely and someone answers privacy requests within one month. Also say who handles replies sent to the automation sender `hello@email.wren-builders.online` |
-| F5 | `offer_claims_true` | The remaining claims in section 4 are true on the day the ads go live |
+| F5 | `offer_claims_true` | Sign off the provisional copy, and confirm the remaining claims in section 4 are true on the day the ads go live. Also read the live ad text in Ads Manager and confirm no ad carries an expired date. The API could not show it |
 
 ## 3. Wren (or its adviser) must approve compliance positions (3)
 
@@ -39,16 +44,16 @@ These were adopted from standard UK practice on Wren's instruction. They are **n
 | C2 | `retention_and_dq_purpose` | Retention by criteria, not a fixed period. Purposes for outside-Cornwall records: a note of the enquiry, dealing with a return contact, advert measurement. Records are deleted when no longer needed or on request |
 | C3 | `transfer_safeguards` | Each non-UK provider (GoHighLevel, Vercel, Google, Meta) has a valid UK transfer mechanism, such as UK-US data bridge certification or standard contract terms with the UK Addendum. The notice does not name them |
 
-Recommended, not blocking: set a fixed retention period and a deletion routine; write down the legitimate interests assessment; add a Vercel rate limit on `/api/survey-lead`; Codex removes the Preview test contacts.
+Recommended, not blocking: review or remove "Before Christmas" after 25 Dec 2026; set a fixed retention period and a deletion routine; write down the legitimate interests assessment; add a Vercel rate limit on `/api/survey-lead`; Codex removes the Preview test contacts.
 
-## 4. Claims Wren must attest are accurate on launch day (F5)
+## 4. Provisional copy to sign off, and claims to attest on launch day (F5)
 
 That the two offers exist and the creative stays is already recorded (section 1a). The exact text below still needs a Y or N and the evidence, because a running campaign does not prove the cap, "reserved", timing or review wording. Any N: use the fallback in `docs/SURVEY-CAMPAIGN-COPY.md`.
 
 | Where | Exact claim |
 |---|---|
 | Kitchen survey | "Answer a few quick questions and we'll be in touch with your quote, plus your £1,000 free appliance upgrade." |
-| Kitchen thank-you | "Your £1,000 free appliance upgrade is reserved." and "Book this month to secure your upgrade." |
+| Kitchen thank-you | "Your £1,000 free appliance upgrade is reserved." and "Book this month to secure your upgrade." (A2B-approved. No fixed date is needed. The upgrade must be honoured for anyone who books that month) |
 | Kitchen step 2 | Option "Before Christmas" and "Book soon to get fitted before Christmas." (today is 11 Nov: about six weeks) |
 | Garage survey | "Free AC unit included when you book this month, limited to 3 homeowners." |
 | Garage step 5 | "We're only taking on 3 garage conversions this month, so places are limited." |
@@ -61,6 +66,7 @@ That the two offers exist and the creative stays is already recorded (section 1a
 
 - **Tracking and consent.** Nothing from Google or Meta loads before Accept on any survey, thank-you or not-in-area page, or on the notice. Accept loads GTM-KF4RWHHQ and the Meta Pixel. After Accept, a qualified lead fires one `wren_survey_lead` and one Meta `Lead`, once. Late Accept on the thank-you page still fires it once. Reject drops it. The enquiry always reaches GHL regardless of choice.
 - **A2B initial-HTML GTM standard: documented exception.** The standard puts the GTM snippet in the initial static HTML head. UK PECR forbids that for non-essential tracking before consent. So the GTM snippet is replaced by `consent.js`, a static script in the same head position (first script, before the funnel and React). A visitor who already accepted gets GTM requested as soon as `consent.js` has downloaded and run, which is before React and the app load. The one difference from the inline standard is about one extra network round trip, because `consent.js` is an external file. A first-time visitor gets GTM only after Accept. A test proves GTM is requested before the app runtime. Tag Assistant and crawlers that read raw HTML will not see the container until consent is given. This is a deliberate, compliant exception, not a defect.
+- **Runtime.** The survey pages still use `survey/support.js`, the Design Component runtime. It is byte-identical to the one in `/garage-conversion`, self-hosted, and its `.dc.html`, unpkg and Babel code paths are dormant (tests prove zero such requests). The export placeholders are gone. Replacing the runtime would be a redesign and is not planned.
 - **Gate and tests.** 24 gate tests, 33 unit and API tests and the full browser suite pass. The release gate exits 1 only for the 8 pending approvals above. No build problems.
 - **Known limit.** A missing Production variable returns `503 NOT_CONFIGURED`, but only after the payload validates. That cannot be tested without a valid submission, so check the variable names in Vercel and use the one authorised live test.
 
