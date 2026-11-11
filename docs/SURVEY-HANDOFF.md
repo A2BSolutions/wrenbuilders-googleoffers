@@ -290,16 +290,22 @@ A standalone notice at `/survey/privacy` covers the Kitchen and Garage surveys, 
 
 **11 Nov update (DQ confirmed).** Business confirmed outside-Cornwall handling: contact created or updated, answers and attribution stored, campaign tags kept, `DQ - outside Cornwall` applied, no opportunity, no Leads Master row, no internal notification, no Harry SMS. Treated as VERIFIED. Notice section 3 now describes it. Unapproved campaign claims (deadline, scarcity, response time) and conservative replacements are in `docs/SURVEY-CAMPAIGN-COPY.md`; not applied.
 
-## 21. Consent, final notice and release gate (12 Nov 2026)
+## 21. Consent, final notice and release gate (11 Nov 2026)
 
 - **Consent.** `survey/consent.js` (first-party, loaded first on all six pages) gates GTM-KF4RWHHQ and the Meta Pixel. Accept and Reject look the same. Nothing from Google or Meta is requested before Accept: the GTM head snippet, GTM noscript iframe and Meta preconnect were removed from the pages, and Google Fonts is replaced by self-hosted Work Sans (`survey/vendor/work-sans.css`, same font files, no visual change). The funnel starts the Pixel only through `WrenConsent.onGrant`, and fails closed if `consent.js` is missing. Choice lasts 12 months. Storage blocked means no tracking.
 - **Conversion after consent.** The one-time token is held on the thank-you page until the visitor chooses. Accept fires one `wren_survey_lead` and one Meta `Lead` with the submission id. Reject drops it. DQ outcomes still never create a token.
 - **Notice.** `/survey/privacy` is final text from verified facts: lawful bases stated, retention criteria (no invented period), verified company details, no ICO number. Its only script is `consent.js` in `data-mode="manage"`, which cannot load trackers. It hosts the change-your-choice controls.
-- **Release gate.** `tests/survey/privacy-approval.js` now checks content completeness and consent wiring (build problems) separately from `docs/survey-release-register.json` (7 blocking business approvals). It exits 1 until the business confirms them. `tests/survey/gate.test.js` proves it catches 18 regressions.
+- **Release gate.** `tests/survey/privacy-approval.js` now checks content completeness and consent wiring (build problems) separately from `docs/survey-release-register.json` (8 blocking business approvals). It exits 1 until the business confirms them. `tests/survey/gate.test.js` proves it catches 18 regressions.
 - **Copy.** Existing campaign copy unchanged. Claims needing a fact check: `docs/SURVEY-CAMPAIGN-COPY.md`.
 - **Production.** Prepared, not executed: `docs/SURVEY-PRODUCTION-RUNBOOK.md`.
 - Evidence and who-decides: `docs/SURVEY-PRIVACY-NOTICE-APPROVAL.md`.
 
-## 22. A2B initial-HTML GTM standard: consent exception (12 Nov 2026)
+## 22. A2B initial-HTML GTM standard: consent exception (11 Nov 2026)
 
 The standard puts the GTM snippet in the initial static HTML head. Non-essential tracking must not load before consent (UK PECR), so the snippet is replaced by `survey/consent.js`, a static script in the same head position, ahead of the funnel and React. For a visitor who already accepted, GTM is requested as soon as `consent.js` has run, before React and the app runtime (tested). Cost versus the inline snippet: about one extra network round trip, because `consent.js` is an external file. Inlining the loader would remove that but duplicate the consent logic, so it was not done. A first-time visitor gets GTM only after Accept. Raw-HTML scanners will not see the container ID until consent. Do not reinstate the inline snippet. Approval status and release order: `docs/SURVEY-RELEASE-APPROVAL.md`. Register items now carry a `type` (factual, compliance, technical).
+
+## 23. Privacy contact provenance and recorded facts (11 Nov 2026)
+
+The notice names `info@wren-builders.com` for privacy requests. Codex verified it in GHL Location Settings, Business Profile and Harry Wren's user record, and an earlier internal notification to it was opened. **Routine monitoring is UNKNOWN** and is a blocking approval (`privacy_mailbox_monitored`). The automation sender `hello@email.wren-builders.online` is unchanged. The release register now separates `recorded_facts` (verified or confirmed, never clear the gate) from `items` (8 blocking approvals: 5 factual, 3 compliance). The gate fails if monitoring is UNKNOWN without a blocking item, and if section 10 stops naming the privacy email. Harry's first SMS is recorded as an enquiry response. The offers are recorded as running, with the creative preserved.
+
+**Update:** the business approved `info@wren-builders.com` as the privacy contact (register item `privacy_contact_selected`, status confirmed, 11 Nov 2026). The gate now fails if the notice stops using that address. Monitoring is still UNKNOWN and pending. `hello@email.wren-builders.online` is preserved as the automation sender.

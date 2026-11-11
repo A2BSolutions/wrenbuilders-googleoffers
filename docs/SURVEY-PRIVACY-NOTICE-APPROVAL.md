@@ -1,6 +1,6 @@
 # Survey privacy, consent and release approvals
 
-Status (12 Nov 2026): the notice, consent gate and release gate are built. **Release is blocked only by 7 business confirmations** in `docs/survey-release-register.json`. Nothing here is legal advice. Where the business has not decided something, the notice states a standard UK position, says so here, and a named approval is required.
+Status (11 Nov 2026): the notice, consent gate and release gate are built. **Release is blocked only by 8 business confirmations** in `docs/survey-release-register.json`. Nothing here is legal advice. Where the business has not decided something, the notice states a standard UK position, says so here, and a named approval is required.
 
 ## 1. What changed on the business's two decisions
 
@@ -18,6 +18,8 @@ Status (12 Nov 2026): the notice, consent gate and release gate are built. **Rel
 | Survey service logs hold no names, phones, emails, addresses or answers | Unit tests on log output |
 | Meta `Lead` fires only for Cornwall enquiries, with offer and campaign names, no contact details or answers, and **only after the visitor accepts optional cookies** | `survey/wren-funnel.js`, browser tests |
 | Before Accept, no request goes to Google or Meta from any survey page (GTM, Pixel, preconnect, noscript iframe and Google Fonts all removed or gated; Work Sans is self-hosted) | Browser tests: zero third-party requests on all 6 pages and the notice |
+| **Privacy contact `info@wren-builders.com`: CONFIRMED by Wren, 11 Nov** (notice sections 1 and 10, register item `privacy_contact_selected`) | Address verified by Codex: GHL Location Settings, Business Profile and Harry Wren's user record. An earlier GHL internal notification to it was opened. **Routine monitoring is UNKNOWN** and is tracked as blocking item `privacy_mailbox_monitored`. The automation sender `hello@email.wren-builders.online` is unchanged and is not the privacy contact |
+| Harry's first SMS is an enquiry response, not separate marketing | Stated by Wren, 11 Nov. The stop route is still open (`sms_and_calls`) |
 | Company number 15580800, Penstraze Business Centre, Penstraze, Truro, Cornwall, TR4 8PN, 01872 613608, info@wren-builders.com | Footer already published on the survey pages |
 | Hosting is Vercel, customer system is GoHighLevel, lead sheet is Google Sheets, ads tools are Google and Meta | System configuration |
 
@@ -47,12 +49,13 @@ Treated as a reply to an enquiry the person submitted, not as consent to unrelat
 
 - No ICO registration number (`ico_fee`: the business confirms fee status).
 - No fixed retention period (criteria only; a number and deletion routine are recommended, `retention_number`).
+- No monitoring claim for the privacy mailbox
 - No named agency or SMS carrier (`providers_complete`).
 - No named transfer mechanism (`transfer_safeguards`).
 
 ## 7. Who does what
 
-**Wren Builders must confirm (blocking, in the register):** `notice_signoff`, `sms_and_calls`, `providers_complete`, `transfer_safeguards`, `retention_and_dq_purpose`, `ico_fee`, `offer_claims_true`. To confirm, set `status` to `confirmed` and fill `confirmed_by` and `confirmed_on`.
+**Wren Builders must confirm (blocking, in the register):** `notice_signoff`, `sms_and_calls`, `providers_complete`, `privacy_mailbox_monitored`, `transfer_safeguards`, `retention_and_dq_purpose`, `ico_fee`, `offer_claims_true`. Facts already confirmed or verified are listed under `recorded_facts` in the register. They are not approvals. To confirm, set `status` to `confirmed` and fill `confirmed_by` and `confirmed_on`.
 
 **Recommended, not blocking:** `retention_number`, `lia_and_records`, `firewall_rate_limit`, `test_contacts_cleanup`.
 

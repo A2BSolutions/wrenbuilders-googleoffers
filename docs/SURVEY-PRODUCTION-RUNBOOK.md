@@ -4,7 +4,7 @@ The short approval version, with the exact release order, rollback target and ow
 
 Nothing here has been run. Every step marked **APPROVAL** needs an explicit yes from Wren Builders. Do not merge, deploy, set Production variables or change Meta URLs before the release gate passes.
 
-## 1. Current state (read-only checks, 12 Nov 2026)
+## 1. Current state (read-only checks, 11 Nov 2026)
 
 | Item | State |
 |---|---|
@@ -35,7 +35,7 @@ How to set them without exposing the URLs:
 
 | # | Step | Owner | Gate |
 |---|---|---|---|
-| 1 | Confirm the 7 blocking items in `docs/survey-release-register.json`. `node tests/survey/privacy-approval.js` must exit 0 | Wren | Gate PASS |
+| 1 | Confirm the 8 blocking items in `docs/survey-release-register.json`. `node tests/survey/privacy-approval.js` must exit 0 | Wren | Gate PASS |
 | 2 | Confirm v2 workflows are published with sales actions active, the DQ branch skips opportunity, Sheets, notification and SMS, and no filter is case-sensitive on `DQ - outside Cornwall` | Codex | Written confirmation |
 | 3 | Remove the Preview test contacts from GHL | Codex | Done |
 | 4 | Create the two Production variables (section 2) | Wren or Claude Code with **APPROVAL** | Variables listed as Production, sensitive |

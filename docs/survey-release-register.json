@@ -1,5 +1,49 @@
 {
-  "_readme": "Release register for the Kitchen and Garage survey funnels. The release gate (tests/survey/privacy-approval.js) fails while any item with blocking:true is not status:confirmed. To confirm an item, Wren Builders (or its adviser) sets status to 'confirmed' and fills confirmed_by and confirmed_on (YYYY-MM-DD). Claude Code must never confirm an item on the business's behalf. Evidence for every item: docs/SURVEY-PRIVACY-NOTICE-APPROVAL.md. Each item has a type: 'factual' (a fact only the business can state), 'compliance' (a legal or compliance judgement), or 'technical'. Marking one confirmed is a human act.",
+  "_readme": "Release register for the Kitchen and Garage survey funnels. 'recorded_facts' are statements already verified or confirmed, with their source. They are NOT approvals and never clear the gate. 'items' are what still needs a human decision. The release gate (tests/survey/privacy-approval.js) fails while any item with blocking:true is not status:confirmed with confirmed_by and confirmed_on (YYYY-MM-DD). Claude Code must never confirm an item on the business's behalf. Each item has a type: 'factual' (a fact only the business can state), 'compliance' (a legal or compliance judgement), or 'technical'. Evidence: docs/SURVEY-PRIVACY-NOTICE-APPROVAL.md.",
+  "recorded_facts": [
+    {
+      "id": "privacy_contact_email",
+      "status": "confirmed_by_user",
+      "statement": "info@wren-builders.com is APPROVED as the privacy contact email for both the Kitchen and Garage surveys, and is a real Wren Builders business address.",
+      "provenance": "Selection approved by the business owner's representative in the release session, 11 Nov 2026. Address verified by Codex, 11 Nov 2026: shown in GHL Location Settings, Business Profile and Harry Wren's GHL user record, and an earlier GHL internal notification sent to it was opened.",
+      "limits": "Selection only. It does not confirm the mailbox is routinely monitored (UNKNOWN, see item privacy_mailbox_monitored). It is not the automation sender hello@email.wren-builders.online, which is unchanged."
+    },
+    {
+      "id": "automation_sender",
+      "status": "verified_by_codex",
+      "statement": "Existing GHL automation email sender is hello@email.wren-builders.online. It is unchanged and is not used as the privacy contact.",
+      "provenance": "Codex, 11 Nov 2026.",
+      "limits": "Not changed by this work."
+    },
+    {
+      "id": "mailbox_monitoring",
+      "status": "unknown",
+      "statement": "Routine monitoring of info@wren-builders.com is UNKNOWN.",
+      "provenance": "Codex could not verify it.",
+      "limits": "Awaiting business confirmation. Tracked as blocking item privacy_mailbox_monitored."
+    },
+    {
+      "id": "harry_sms_intent",
+      "status": "confirmed_by_user",
+      "statement": "Harry's initial SMS is an enquiry response, not separate marketing.",
+      "provenance": "Stated by the business owner's representative in the release session, 11 Nov 2026. No name and date signature yet.",
+      "limits": "The stop-request route and 'no marketing without permission' are still open (item sms_and_calls)."
+    },
+    {
+      "id": "offers_running",
+      "status": "confirmed_by_user",
+      "statement": "The existing Kitchen £1,000 appliance upgrade and Garage free AC campaigns are running separately. Preserve the existing creative unless a specific factual claim is disproven.",
+      "provenance": "Stated by the business owner's representative in the release session, 11 Nov 2026.",
+      "limits": "Confirms the offers exist and the creative stays. It does not attest the scarcity, 'reserved', timing, response-time or review claims (item offer_claims_true)."
+    },
+    {
+      "id": "dq_handling",
+      "status": "verified_by_codex",
+      "statement": "Outside-Cornwall enquiries are stored and tagged in GHL, with no opportunity, Sheets row, internal notification or Harry SMS.",
+      "provenance": "Business confirmed; matches Codex's published workflow state; hosted v2 test read back the contact and tag.",
+      "limits": "None."
+    }
+  ],
   "items": [
     {
       "id": "notice_signoff",
@@ -16,8 +60,8 @@
       "blocking": true,
       "type": "factual",
       "status": "pending",
-      "title": "Calls and texts: stop route and nature of the first SMS",
-      "detail": "Confirm that (a) Harry's first text is only a reply to the enquiry, not marketing, (b) a person who replies 'stop' or asks us to stop is removed from texts and calls (GHL do-not-disturb is honoured), and (c) no marketing text or email is sent without separate permission. Notice section 4 states all three.",
+      "title": "Calls and texts: stop route and no marketing without permission",
+      "detail": "Recorded already: Harry's first text is an enquiry response, not separate marketing. Still to confirm: (a) a person who replies 'stop' or asks us to stop is removed from texts and calls (GHL do-not-disturb is honoured), and (b) no marketing text or email is sent without separate permission. Notice section 4 states both.",
       "confirmed_by": "",
       "confirmed_on": ""
     },
@@ -28,6 +72,27 @@
       "status": "pending",
       "title": "Service-provider list is complete",
       "detail": "The notice lists GoHighLevel, Google Sheets, Vercel and 'the agency and IT providers that manage our advertising and systems'. Confirm there is no other processor (for example a separate SMS carrier or email provider chosen by the business) and that data processing terms are in place with each.",
+      "confirmed_by": "",
+      "confirmed_on": ""
+    },
+    {
+      "id": "privacy_contact_selected",
+      "blocking": true,
+      "type": "factual",
+      "status": "confirmed",
+      "value": "info@wren-builders.com",
+      "title": "Privacy contact email for the survey Privacy Notice",
+      "detail": "CONFIRMED: info@wren-builders.com, used in notice sections 1 and 10. Selection only. Monitoring is a separate pending item (privacy_mailbox_monitored). The GHL automation sender hello@email.wren-builders.online is preserved and unchanged.",
+      "confirmed_by": "Wren Builders owner's representative (instruction to Claude Code in the release session)",
+      "confirmed_on": "2026-11-11"
+    },
+    {
+      "id": "privacy_mailbox_monitored",
+      "blocking": true,
+      "type": "factual",
+      "status": "pending",
+      "title": "info@wren-builders.com is read routinely, and someone answers privacy requests within one month",
+      "detail": "The address is verified as a Wren business address (see recorded fact privacy_contact_email) but monitoring is UNKNOWN. Also confirm who handles replies sent to the automation sender hello@email.wren-builders.online, since people may reply to automated emails. Do not change the sender.",
       "confirmed_by": "",
       "confirmed_on": ""
     },
@@ -66,8 +131,8 @@
       "blocking": true,
       "type": "factual",
       "status": "pending",
-      "title": "Promotional claims are true on the launch date",
-      "detail": "The business chose to keep the existing creative. Each claim must be factually true and honoured when the ads go live: Garage 'Free AC unit included when you book this month, limited to 3 homeowners' and 'only taking on 3 garage conversions this month'; Kitchen '£1,000 free appliance upgrade'; thank-you pages 'reserved', 'Book this month to secure your upgrade', 'Limited to 3 homeowners this month'; 'reach out within a few hours'; 'fixed quote with no hidden costs'; kitchen option 'Before Christmas' and 'Book soon to get fitted before Christmas'; the '100% would come back' customer quote. Full list: docs/SURVEY-CAMPAIGN-COPY.md.",
+      "title": "Remaining promotional claims are true on the launch date",
+      "detail": "Recorded already: the Kitchen £1,000 appliance upgrade and Garage free AC campaigns exist and the creative stays. Still to attest as true on launch day: Garage 'limited to 3 homeowners' and 'only taking on 3 garage conversions this month'; 'reserved' on both thank-you pages; 'Book this month to secure your upgrade'; 'reach out within a few hours'; 'fixed quote with no hidden costs'; 'Free home visit'; 'We'll call you from 01872 613608'; kitchen 'Before Christmas' timing; the review labels and 'Cornwall homeowners' heading; '100% would come back'. Exact text: docs/SURVEY-RELEASE-APPROVAL.md section 4.",
       "confirmed_by": "",
       "confirmed_on": ""
     },

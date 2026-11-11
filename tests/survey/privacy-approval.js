@@ -43,6 +43,7 @@ function evaluate(f) {
   if (!/only for as long as we need them/.test(s7)) problems.push('notice section 7 must state retention criteria');
   if (/\b\d+\s*(days?|weeks?|months?|years?)\b/i.test(s7)) problems.push('notice section 7 states a numeric retention period that is not in the approved register');
   if (/\bZ[A-Z]\d{6,8}\b|ICO (registration|reference)( number| no\.?)?\s*[:\-]/i.test(text)) problems.push('notice publishes an ICO registration number that has not been verified');
+  if (!/privacy request[^<]*<a href="mailto:info@wren-builders\.com"/.test(section(html, 10))) problems.push('notice section 10 must name info@wren-builders.com for privacy requests');
   if (!/id="cookies"/.test(html)) problems.push('notice cookie section needs id="cookies" (the banner links to it)');
   if (!/id="wren-cookie-settings"/.test(html)) problems.push('notice has no cookie-choice controls');
   if (!/Last updated: \d{1,2} [A-Z][a-z]+ 20\d\d/.test(text)) problems.push('notice has no last-updated date');
@@ -90,7 +91,14 @@ function evaluate(f) {
       if (!it.blocking && !done) notes.push(it);
     }
   }
-  return { problems, pending, notes };
+  const cc = reg && (reg.items || []).find((i) => i.id === 'privacy_contact_selected');
+  if (reg && !cc) problems.push('register has no privacy_contact_selected item');
+  else if (cc && cc.status === 'confirmed' && !new RegExp(`mailto:${cc.value.replace(/[.]/g, '\\.')}"`).test(section(html, 10))) problems.push(`notice section 10 does not use the confirmed privacy contact ${cc.value}`);
+  const facts = reg && Array.isArray(reg.recorded_facts) ? reg.recorded_facts : [];
+  for (const x of facts) if (!x.id || !['verified_by_codex', 'confirmed_by_user', 'unknown'].includes(x.status) || !x.statement || !x.provenance) problems.push(`recorded fact "${x.id}" is malformed`);
+  // A fact that is UNKNOWN must have a blocking approval item, so unknowns can never be skipped.
+  if (reg && facts.some((x) => x.id === 'mailbox_monitoring' && x.status === 'unknown') && !(reg.items || []).some((i) => i.id === 'privacy_mailbox_monitored' && i.blocking)) problems.push('mailbox monitoring is UNKNOWN but has no blocking approval item');
+  return { problems, pending, notes, facts };
 }
 
 module.exports = { evaluate, loadFiles, PAGES };
@@ -99,6 +107,7 @@ if (require.main === module) {
   const r = evaluate(loadFiles());
   if (r.problems.length) { console.log('A. BUILD PROBLEMS (fix in code or content):'); r.problems.forEach((p) => console.log(' - ' + p)); }
   if (r.pending.length) { console.log('B. OUTSTANDING BUSINESS APPROVALS (blocking):'); r.pending.forEach((p, i) => console.log(` ${i + 1}. [${p.type}] [${p.id}] ${p.title}`)); }
+  if (r.facts.length) { console.log('Recorded facts (not approvals):'); r.facts.forEach((x) => console.log(` - [${x.status}] ${x.id}`)); }
   if (r.notes.length) { console.log('Recommended, not blocking:'); r.notes.forEach((p) => console.log(` - [${p.id}] ${p.title}`)); }
   if (r.problems.length || r.pending.length) { console.log(`\nRELEASE GATE: BLOCKED (${r.problems.length} build problem(s), ${r.pending.length} approval(s) outstanding).`); process.exit(1); }
   console.log('RELEASE GATE: PASS (notice complete, consent wiring verified, all blocking approvals confirmed).');

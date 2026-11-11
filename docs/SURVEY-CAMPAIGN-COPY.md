@@ -1,6 +1,8 @@
 # Survey campaign copy: claims to verify
 
-Decision (12 Nov 2026): **keep the existing Kitchen and Garage creative and offer names.** Nothing on the pages was changed. This is approval to keep the wording. It is not proof that any claim below is true. Each needs a fact check before ads go live. Release register item: `offer_claims_true` (blocking).
+Decision (11 Nov 2026): **keep the existing Kitchen and Garage creative and offer names.** Nothing on the pages was changed. This is approval to keep the wording. It is not proof that any claim below is true. Each needs a fact check before ads go live. Release register item: `offer_claims_true` (blocking).
+
+**Update 11 Nov:** Wren confirmed the Kitchen £1,000 appliance upgrade and Garage free AC campaigns are running separately, and that the creative stays unless a specific claim is disproven. That settles that the offers exist. It does not attest the cap of 3, "reserved", "this month", response time, fixed-quote, review or timing wording. Those stay in the table below until Wren attests them.
 
 ## A. Claims that need a fact check
 

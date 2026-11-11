@@ -7,15 +7,15 @@ const confirmAll = (f) => { const r = JSON.parse(f.register); r.items.forEach((i
 test('real repo: no build problems, approvals outstanding, so the gate blocks', () => {
   const r = evaluate(loadFiles());
   assert.deepStrictEqual(r.problems, []);
-  assert.ok(r.pending.length >= 7, 'blocking approvals must be pending until the business confirms');
+  assert.ok(r.pending.length >= 8, 'blocking approvals must be pending until the business confirms');
 });
 test('fully confirmed register and clean build passes', () => {
   const r = evaluate(confirmAll(clone()));
   assert.deepStrictEqual(r.problems, []); assert.strictEqual(r.pending.length, 0);
 });
-test('every item has a type and the 7 blocking items split into 4 factual and 3 compliance', () => {
+test('every item has a type and the 8 blocking items split into 5 factual and 3 compliance', () => {
   const r = evaluate(loadFiles());
-  assert.strictEqual(r.pending.filter((i) => i.type === 'factual').length, 4);
+  assert.strictEqual(r.pending.filter((i) => i.type === 'factual').length, 5);
   assert.strictEqual(r.pending.filter((i) => i.type === 'compliance').length, 3);
 });
 test('an item without a valid type is rejected', () => {
@@ -25,6 +25,31 @@ test('an item without a valid type is rejected', () => {
 test('a confirmation without who and when is rejected', () => {
   const f = clone(); const r = JSON.parse(f.register); r.items.forEach((i) => { i.status = 'confirmed'; }); f.register = JSON.stringify(r);
   assert.ok(evaluate(f).problems.some((p) => /without confirmed_by/.test(p)));
+});
+test('recorded facts never clear the gate and unknown monitoring cannot be skipped', () => {
+  const f = clone(); const r = JSON.parse(f.register); r.recorded_facts.forEach((x) => { if (x.status === 'unknown') x.status = 'confirmed_by_user'; });
+  r.items = r.items.filter((i) => i.id !== 'privacy_mailbox_monitored'); f.register = JSON.stringify(r);
+  assert.ok(evaluate(f).pending.length >= 7);
+  const g = clone(); const q = JSON.parse(g.register); q.items = q.items.filter((i) => i.id !== 'privacy_mailbox_monitored'); g.register = JSON.stringify(q);
+  assert.ok(evaluate(g).problems.some((p) => /mailbox monitoring is UNKNOWN/.test(p)));
+});
+test('monitoring stays UNKNOWN and the privacy contact is confirmed with Codex provenance', () => {
+  const r = JSON.parse(loadFiles().register); const by = (id) => r.recorded_facts.find((x) => x.id === id);
+  assert.strictEqual(by('mailbox_monitoring').status, 'unknown');
+  assert.strictEqual(by('privacy_contact_email').status, 'confirmed_by_user');
+  assert.ok(/Business Profile/.test(by('privacy_contact_email').provenance));
+  assert.ok(/hello@email\.wren-builders\.online/.test(by('automation_sender').statement));
+});
+test('privacy contact is confirmed, matches the notice, and monitoring stays pending', () => {
+  const r = evaluate(loadFiles());
+  assert.ok(!r.pending.some((i) => i.id === 'privacy_contact_selected'));
+  assert.ok(r.pending.some((i) => i.id === 'privacy_mailbox_monitored'));
+  assert.strictEqual(r.facts.find((x) => x.id === 'privacy_contact_email').status, 'confirmed_by_user');
+  assert.ok(/hello@email\.wren-builders\.online/.test(JSON.stringify(JSON.parse(loadFiles().register).recorded_facts)));
+});
+test('changing the notice email away from the confirmed contact is caught', () => {
+  const f = confirmAll(clone()); f.privacy = f.privacy.split('mailto:info@wren-builders.com').join('mailto:other@example.com');
+  assert.ok(evaluate(f).problems.length > 0);
 });
 test('non-blocking items never block', () => {
   const f = confirmAll(clone()); const r = JSON.parse(f.register); r.items.filter((i) => !i.blocking).forEach((i) => { i.status = 'pending'; i.confirmed_by = ''; i.confirmed_on = ''; }); f.register = JSON.stringify(r);
@@ -48,6 +73,7 @@ const mutations = {
   'GTM loads without a consent check': (f) => { f.consent = f.consent.replace("if (state() === 'granted') loadGtm()", 'loadGtm()'); },
   'not-in-area link removed': (f) => { f.pages['garage-not-in-area'] = f.pages['garage-not-in-area'].replace('href="/survey/privacy"', 'href="#"'); },
   'survey link switched off': (f) => { f.funnel = f.funnel.replace("privacy: { url: '/survey/privacy' }", 'privacy: { url: null }'); },
+  'notice drops the privacy-request email': (f) => { f.privacy = f.privacy.replace('For any privacy request or question', 'For general questions'); },
   'register unreadable': (f) => { f.register = '{not json'; }
 };
 for (const [name, mut] of Object.entries(mutations)) {
