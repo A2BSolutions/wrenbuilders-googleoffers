@@ -72,6 +72,15 @@ function evaluate(f) {
   PAGES.forEach((p) => { if (/\.dc\.html|WREN_WEBHOOK|WREN_THANK_YOU|<x-import/.test(f.pages[p])) problems.push(`${p}: still references a .dc.html file, a placeholder webhook or redirect override, or an x-import`); });
   if (/\.dc\.html|WREN_WEBHOOK|WREN_THANK_YOU/.test(f.funnel)) problems.push('wren-funnel.js still references a .dc.html file or a placeholder webhook or redirect override');
 
+  // ---- A3c. Accessibility baseline (axe wcag2a/2aa/21aa found zero issues; these were the fixed ones) ----
+  PAGES.forEach((p) => {
+    const h = f.pages[p];
+    if (!/<html lang="en-GB"/.test(h)) problems.push(`${p}: <html> needs lang="en-GB"`);
+    if (!/<main[ >]/.test(h)) problems.push(`${p}: needs a main landmark`);
+    if (/role="progressbar"(?![^>]*aria-label=)/.test(h)) problems.push(`${p}: the progress bar needs an accessible name`);
+    if (/<div aria-label="5 out of 5 stars"/.test(h)) problems.push(`${p}: review star ratings need role="img"`);
+  });
+
   // ---- A4. Notice reachable where details are collected or kept ----
   for (const c of ['kitchen', 'garage']) {
     const na = f.pages[`${c}-not-in-area`];

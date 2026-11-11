@@ -77,6 +77,20 @@
       "statement": "Meta ad account 'Wrenbuildersaccount1' has 7 ACTIVE ads, all in the campaign 'A2B | Garage Conversion + Free AC | Conversions | Leads | IF'. No Kitchen ads were ACTIVE.",
       "provenance": "Read-only Meta Ads API check, 11 Nov 2026. Nothing changed.",
       "limits": "The API returned no primary text, headline or link URL for these post-backed ads, so expired deadlines in the live ad text could NOT be checked. A person must read the ad text in Ads Manager before the URL switch (part of item offer_claims_true)."
+    },
+    {
+      "id": "a11y_baseline",
+      "status": "verified_in_repo",
+      "statement": "All 7 survey pages pass an axe-core scan (WCAG 2 A/AA, 2.1 A/AA, best practice) at phone and desktop widths, with the cookie banner shown and hidden, with no console errors.",
+      "provenance": "Local scan against the mock dev server, 11 Nov 2026. Fixed: html lang, main landmark, progress bar name, star rating roles. Enforced by the release gate.",
+      "limits": "Automated scan only. No manual screen-reader test."
+    },
+    {
+      "id": "client_package_prepared",
+      "status": "verified_in_repo",
+      "statement": "The client approval package is prepared: docs/client-approval/wren-survey-approval-package.html. It has NOT been sent and NO client approval has been received.",
+      "provenance": "Prepared by A2B, 11 Nov 2026. Evidence and claim status: docs/SURVEY-EVIDENCE-PACK.md.",
+      "limits": "Preparing the package approves nothing. Items stay pending until the client replies in writing with a name and date."
     }
   ],
   "items": [

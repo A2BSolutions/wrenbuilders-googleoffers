@@ -85,6 +85,9 @@ const mutations = {
   'notice drops the privacy-request email': (f) => { f.privacy = f.privacy.replace('For any privacy request or question', 'For general questions'); },
   'a .dc.html redirect target returns': (f) => { f.funnel = f.funnel.replace("thankYou: '/survey/kitchen-thank-you'", "thankYou: '/survey/Wren Thank You.dc.html'"); },
   'a placeholder webhook override returns': (f) => { f.pages['garage-survey'] += "<script>window.WREN_WEBHOOK = 'x'</script>"; },
+  'lang attribute removed': (f) => { f.pages['kitchen-survey'] = f.pages['kitchen-survey'].replace('<html lang="en-GB">', '<html>'); },
+  'main landmark removed': (f) => { f.pages['garage-thank-you'] = f.pages['garage-thank-you'].replace('<main>', '<div>').replace('</main>', '</div>'); },
+  'progress bar loses its name': (f) => { f.pages['garage-survey'] = f.pages['garage-survey'].replace('aria-label="Survey progress" ', ''); },
   'register unreadable': (f) => { f.register = '{not json'; }
 };
 for (const [name, mut] of Object.entries(mutations)) {

@@ -317,3 +317,8 @@ The notice names `info@wren-builders.com` for privacy requests. Codex verified i
 - **support.js is NOT gone.** The survey pages use `survey/support.js`, the Design Component runtime, byte-identical to `garage-conversion/support.js`. It is self-hosted, React and ReactDOM are served from `/survey/vendor`, and Babel never loads. Its `.dc.html` and unpkg code paths are dormant.
 - **Live ads (read-only).** 7 Garage "Free AC" ads are ACTIVE in the Wren ad account, no Kitchen ads. The API could not return ad text, so expired deadlines in live ad copy are unchecked and sit in `offer_claims_true`.
 - **Date-sensitive:** "Before Christmas" (kitchen option and line) goes stale after 25 Dec 2026 (non-blocking register item `before_christmas_review`).
+
+## 25. Client approval package and accessibility pass (11 Nov 2026)
+
+- Accessibility: axe-core found no contrast or console issues. Fixed `lang="en-GB"`, a `main` landmark (survey and thank-you pages), the progress bar name and star-rating roles, with no visual change. Zero violations remain. The gate enforces it.
+- Client package: `docs/client-approval/wren-survey-approval-package.html` (offers, what visitors see with screenshots, how enquiries are handled, the Privacy Notice text, a checklist of 4 areas, next steps). Evidence, the claims A2B cannot substantiate and how answers map to the register: `docs/SURVEY-EVIDENCE-PACK.md`. No approval received.

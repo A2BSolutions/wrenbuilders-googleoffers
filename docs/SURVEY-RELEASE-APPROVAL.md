@@ -1,5 +1,7 @@
 # Kitchen and Garage surveys: final release approval
 
+The client-facing version is `docs/client-approval/wren-survey-approval-package.html`. Evidence and unsubstantiated claims: `docs/SURVEY-EVIDENCE-PACK.md`.
+
 Branch `claude/modest-cori-ozevju`, commit below. Updated 11 Nov 2026. **Nothing in this document is approved yet.** Claude Code does not tick any box. To approve, a named person sets the item to `confirmed` in `docs/survey-release-register.json` (status, `confirmed_by`, `confirmed_on`). The release gate (`node tests/survey/privacy-approval.js`) exits 0 only when all eight are done.
 
 ## 1. GO / NO-GO
