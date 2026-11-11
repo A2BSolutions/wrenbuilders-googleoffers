@@ -270,5 +270,17 @@ Outside-Cornwall submissions are **saved in GHL** (contact, survey answers, attr
 - 33 unit and API tests, mutation-checked (re-introducing the old DQ block, dropping the DQ tag, reporting DQ as sales-qualified, or making qualification fail-open each fails tests).
 - 146 browser checks, including typed-response validation, and 20 screenshots identical to the original export.
 - Local live run (real endpoint code, real GHL receivers, fictional contacts): 3 qualified and 3 DQ submissions (kitchen, garage, kitchen low priority), 6 outgoing requests, 6 contacts created. DQ contacts carry the DQ tag (plus `low priority` on the combined case), answers and attribution persisted, no opportunities. No conversion fired for DQ.
-- NOT yet run on a hosted preview. Run `tests/survey/hosted-boundary.js` after the receiver and payload contract is confirmed with Codex.
+- Hosted preview run against the v2 receivers: see section 19.
+
+## 19. Hosted Preview verification against the GHL v2 receivers (11 Nov 2026, commit `6afdb37`)
+
+The two branch-scoped, Sensitive, Preview-only variables (`GHL_SURVEY_KITCHEN_WEBHOOK_URL`, `GHL_SURVEY_GARAGE_WEBHOOK_URL`) now hold the v2 receiver URLs (kitchen v2 published v21, garage v2 published v18; Codex reported the opportunity, internal notification, Google Sheets and SMS actions disabled). The branch Preview was redeployed (`dpl_83a7sUcDcs4N2mpDBPRFycnJrnuQ`, READY, protected). A 40-minute deployment-scoped share link was used and revoked. Production variables are untouched. Fictional contacts only.
+
+- Routes, noindex headers, assets, legacy routes and API gates: 41 of 41 (`tests/survey/hosted-checks.js`).
+- `tests/survey/hosted-boundary.js`: DQ kitchen (run first), kitchen Yes plus a same-submission-id retry, garage Yes, DQ garage, and kitchen "Just looking for now" with Cornwall No. All passed: typed response, correct redirect, `wren_survey_lead` and Meta `Lead` once for Yes and none for DQ (browser level, GTM and Meta stubbed).
+- Qualified retry with the same submission id: `duplicate:true`, not forwarded again (same warm instance; best-effort only).
+- GHL readback: every contact was created by the correct v2 workflow (`createdBy.sourceId` equals the v2 kitchen or garage workflow id), with answers, attribution, base tags and `submission_id` correct. DQ contacts carry `dq - outside cornwall` (added about 2 to 3 seconds after creation, so read tags after a short delay). The low-priority DQ contact also carries `low priority`. Qualified contacts carry no DQ tag.
+- Function logs: `accepted` for Yes, `accepted_dq` for No, `duplicate_done` for the retry, matched to the browser submission ids.
+- Sales effects: no opportunity, no conversation or SMS, and no Leads Master sheet row for any test contact (sheet baseline taken before and re-read after). The internal notification could not be checked directly; a mailbox search for the test identities found nothing.
+- Not verifiable here: GHL execution logs and workflow definitions (the workflow API is not enabled for this location), and real delivery of Meta and GTM events (stubbed).
 
