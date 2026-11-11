@@ -31,7 +31,7 @@ function createMemoryStore({ leaseMs = 30000, doneTtlMs = 24 * 60 * 60 * 1000, m
     durable: false,
     async begin(key, now) {
       const r = map.get(key);
-      if (r && r.state === 'done' && r.expires > now) return { outcome: 'done' };
+      if (r && r.state === 'done' && r.expires > now) return { outcome: 'done', info: r.info };
       if (r && r.state === 'processing' && r.lease_until > now) return { outcome: 'in_progress' };
       const token = crypto.randomUUID();
       const attempts = (r && r.state === 'processing' ? r.attempts : 0) + 1;
@@ -39,8 +39,8 @@ function createMemoryStore({ leaseMs = 30000, doneTtlMs = 24 * 60 * 60 * 1000, m
       map.set(key, { state: 'processing', token, lease_until: now + leaseMs, attempts });
       return { outcome: r && r.state === 'processing' ? 'takeover' : 'claimed', token, attempts };
     },
-    async complete(key, token, now) {
-      map.set(key, { state: 'done', expires: now + doneTtlMs });
+    async complete(key, token, now, info) {
+      map.set(key, { state: 'done', expires: now + doneTtlMs, info }); // info = what was delivered ({qualified}); no personal data
     },
     async release(key, token) {
       const r = map.get(key);

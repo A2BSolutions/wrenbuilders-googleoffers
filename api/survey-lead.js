@@ -1,12 +1,13 @@
 'use strict';
 /*
  * POST /api/survey-lead  (same-origin only)
- * Validates a survey submission and applies the qualification boundary:
- *   in_cornwall = "Yes": forward to the campaign's GHL inbound webhook. { ok:true, outcome:'accepted' } ONLY after GHL answered 2xx
- *                        (or the same submission_id was already accepted).
- *   in_cornwall = "No":  { ok:true, outcome:'disqualified', reason:'outside_cornwall' }. NO request to GHL, nothing stored or updated.
- *   Missing or unexpected in_cornwall: 400 INVALID_PAYLOAD (schema validation), never treated as qualified or DQ.
- * Any other outcome is non-2xx with ok:false. It fails closed. Clients must read `outcome`, not just `ok`.
+ * Validates a survey submission and forwards it to the campaign's GHL inbound webhook (BOTH Cornwall answers):
+ *   in_cornwall = "Yes": { ok:true, outcome:'accepted', sales_qualified:true, stored_in_ghl:true } after GHL answered 2xx.
+ *   in_cornwall = "No":  { ok:true, outcome:'disqualified', reason:'outside_cornwall', sales_qualified:false, stored_in_ghl:true }
+ *                        after GHL answered 2xx. The contact is stored with a DQ tag. No sales action, no conversion.
+ *   Missing or unexpected in_cornwall: 400 INVALID_PAYLOAD (schema validation), never forwarded.
+ * HTTP 2xx from GHL means the webhook was RECEIVED, not that the GHL workflow finished persisting the contact.
+ * Any other outcome is non-2xx with ok:false. It fails closed. Clients must read `outcome`, `sales_qualified` and `stored_in_ghl`.
  *
  * Env (server side only, never sent to the browser):
  *   GHL_SURVEY_KITCHEN_WEBHOOK_URL   GHL inbound webhook URL for the kitchen workflow
@@ -16,7 +17,7 @@
  * No PII is ever logged. Logs carry the event code, campaign, submission_id (random UUID) and status only.
  */
 
-const { CAMPAIGNS, validatePayload, buildGhlPayload, isQualified } = require('./_lib/survey-core');
+const { CAMPAIGNS, validatePayload, buildGhlPayload, isQualified, outcomeBody } = require('./_lib/survey-core');
 const { createMemoryStore } = require('./_lib/idempotency');
 
 const MAX_BODY_CHARS = 16 * 1024;
@@ -114,23 +115,27 @@ function createHandler(opts = {}) {
       const idem = String(req.headers['idempotency-key'] || '').toLowerCase();
       if (idem !== lead.submission_id) return done(400, { ok: false, error: 'IDEMPOTENCY_MISMATCH' }, 'rejected', Object.assign({ reason: 'idempotency-key' }, base));
 
-      // QUALIFICATION BOUNDARY. Only the validated server-side answer decides. Outside Cornwall: explicit DQ outcome,
-      // no GHL request, no store entry, nothing created or updated anywhere. This runs before the webhook is even read.
-      if (!isQualified(lead.answers)) return done(200, { ok: true, outcome: 'disqualified', reason: 'outside_cornwall' }, 'disqualified', base);
+      // Both Cornwall answers are forwarded to the campaign's GHL receiver. Only the validated server-side answer decides
+      // the outcome. A DQ lead is stored (contact, answers, attribution, DQ tag) but is NOT sales-qualified.
+      const qualified = isQualified(lead.answers);
 
       const url = webhookFor(lead.campaign, env, ghl);
       if (!url || !store) return done(503, { ok: false, error: 'NOT_CONFIGURED' }, 'not_configured', base);
 
       const key = lead.campaign + ':' + lead.submission_id;
       const claim = await store.begin(key, now());
-      if (claim.outcome === 'done') return done(200, { ok: true, outcome: 'accepted', duplicate: true }, 'duplicate_done', base);
+      if (claim.outcome === 'done') {
+        // Best-effort duplicate: answer with what was actually delivered the first time, not with this request's answers.
+        const delivered = claim.info && typeof claim.info.qualified === 'boolean' ? claim.info.qualified : qualified;
+        return done(200, outcomeBody(delivered, { duplicate: true }), 'duplicate_done', base);
+      }
       if (claim.outcome === 'in_progress') return done(409, { ok: false, error: 'IN_PROGRESS' }, 'in_progress', base, { 'Retry-After': '2' });
       if (claim.outcome === 'takeover') log('takeover_in_doubt', Object.assign({ attempts: claim.attempts }, base));
 
       const result = await forward(url, buildGhlPayload(lead, new Date(now()).toISOString()), fetchImpl, forwardTimeoutMs);
       if (result.ok) {
-        await store.complete(key, claim.token, now());
-        return done(200, { ok: true, outcome: 'accepted' }, 'accepted', base);
+        await store.complete(key, claim.token, now(), { qualified });
+        return done(200, outcomeBody(qualified), qualified ? 'accepted' : 'accepted_dq', base);
       }
       await store.release(key, claim.token);
       const status = result.kind === 'UPSTREAM_TIMEOUT' ? 504 : 502;

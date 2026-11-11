@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { validatePayload, qualify, isQualified, buildGhlPayload, normalisePhone, normalisePostcode, TAG_LOW } = require('../../api/_lib/survey-core');
+const { validatePayload, qualify, isQualified, buildGhlPayload, normalisePhone, normalisePostcode, outcomeBody, TAG_DQ, TAG_LOW } = require('../../api/_lib/survey-core');
 const { kitchen, garage, clone } = require('./helpers');
 
 const bad = (p) => { const r = validatePayload(p); assert.equal(r.ok, false); return r.fields; };
@@ -81,24 +81,38 @@ test('qualification boundary: qualified ONLY when the answer is exactly "Yes" (p
   assert.equal(isQualified({}), false); assert.equal(isQualified(null), false); assert.equal(isQualified(undefined), false);
 });
 
-test('qualification flags: kitchen low priority only applies to forwardable (Cornwall Yes) leads', () => {
+test('qualification flags: DQ tag for Cornwall No, Low priority for kitchen just-looking, both can apply', () => {
   assert.deepEqual(qualify('kitchen', { in_cornwall: 'Yes', fitting_timeframe: 'Before Christmas', owns_property: 'Yes' }).tags, []);
   assert.deepEqual(qualify('kitchen', { in_cornwall: 'Yes', fitting_timeframe: 'Just looking for now', owns_property: 'Yes' }).tags, [TAG_LOW]);
-  assert.equal(qualify('kitchen', { in_cornwall: 'No', fitting_timeframe: 'Early 2027', owns_property: 'Yes' }).qualified, false);
-  assert.equal(qualify('garage', { in_cornwall: 'No', owns_property: 'Yes' }).qualified, false);
+  assert.deepEqual(qualify('kitchen', { in_cornwall: 'No', fitting_timeframe: 'Early 2027', owns_property: 'Yes' }).tags, [TAG_DQ]);
+  assert.deepEqual(qualify('kitchen', { in_cornwall: 'No', fitting_timeframe: 'Just looking for now', owns_property: 'No' }).tags, [TAG_DQ, TAG_LOW]);
+  assert.deepEqual(qualify('garage', { in_cornwall: 'No', owns_property: 'Yes' }).tags, [TAG_DQ]);
   assert.deepEqual(qualify('garage', { in_cornwall: 'Yes', owns_property: 'No' }).tags, []); // owns_property: record only
   assert.equal(qualify('garage', { in_cornwall: 'Yes', fitting_timeframe: 'Just looking for now' }).low_priority, false);
-  assert.equal(TAG_LOW, 'Low priority');
+  assert.equal(qualify('kitchen', { in_cornwall: 'No', fitting_timeframe: 'Early 2027' }).qualified, false);
+  assert.equal(TAG_DQ, 'DQ - outside Cornwall'); assert.equal(TAG_LOW, 'Low priority');
 });
 
-test('a DQ lead can never be turned into a GHL payload (last line of defence)', () => {
-  const k = kitchen(); k.answers.in_cornwall = 'No';
-  assert.throws(() => buildGhlPayload(validatePayload(k).value, 't'), /DQ_NOT_FORWARDABLE/);
-  const g = garage(); g.answers.in_cornwall = 'No';
-  assert.throws(() => buildGhlPayload(validatePayload(g).value, 't'), /DQ_NOT_FORWARDABLE/);
+test('typed outcome bodies: only Cornwall Yes is sales-qualified; both are stored_in_ghl', () => {
+  assert.deepEqual(outcomeBody(true), { ok: true, outcome: 'accepted', sales_qualified: true, stored_in_ghl: true });
+  assert.deepEqual(outcomeBody(false), { ok: true, outcome: 'disqualified', reason: 'outside_cornwall', sales_qualified: false, stored_in_ghl: true });
+  assert.equal(outcomeBody(false, { duplicate: true }).duplicate, true);
+  assert.equal(outcomeBody(isQualified({ in_cornwall: 'No' })).sales_qualified, false);
+  assert.equal(outcomeBody(isQualified({ in_cornwall: 'Yes' })).sales_qualified, true);
 });
 
-test('GHL payload (qualified only): flat, normalised, flags, no Meta cookies, no referrer', () => {
+test('a DQ lead IS turned into a GHL payload: same fields, DQ flags and tag, no sales flags', () => {
+  const k = kitchen(); k.answers.in_cornwall = 'No'; k.answers.fitting_timeframe = 'Just looking for now';
+  const v = validatePayload(k).value; const g = buildGhlPayload(v, 't');
+  assert.equal(g.survey_qualified, false); assert.equal(g.survey_dq_outside_cornwall, true); assert.equal(g.survey_answer_in_cornwall, 'No');
+  assert.deepEqual(g.tags, ['DQ - outside Cornwall', 'Low priority']); assert.equal(g.tags_csv, 'DQ - outside Cornwall,Low priority');
+  const yes = buildGhlPayload(validatePayload(kitchen()).value, 't');
+  assert.deepEqual(Object.keys(g).sort(), Object.keys(yes).sort(), 'same key set for Yes and No');
+  assert.equal(g.survey_campaign, 'kitchen'); assert.equal(g.survey_offer, '1000-appliance-upgrade'); assert.equal(g.survey_submission_id, v.submission_id);
+  assert.equal(g.phone, '+447700900123'); assert.equal(g.survey_utm_source, 'facebook');
+});
+
+test('GHL payload: flat, normalised, flags, no Meta cookies, no referrer', () => {
   const k = kitchen(); k.answers.fitting_timeframe = 'Just looking for now';
   const v = validatePayload(k).value; const g = buildGhlPayload(v, '2026-11-10T10:00:01.000Z');
   assert.equal(g.phone, '+447700900123'); assert.equal(g.postal_code, 'TR1 2AB'); assert.equal(g.address1, '12 Secret Lane');

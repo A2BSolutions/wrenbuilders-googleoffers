@@ -45,7 +45,7 @@ const good = () => ({ schema_version: '1.0', submission_id: 'aaaaaaaa-bbbb-4ccc-
   x = await post(bad); let j = await x.json(); check('api POST invalid payload -> 400, field names only', x.status() === 400 && j.error === 'INVALID_PAYLOAD' && !JSON.stringify(j).includes('private-value'), [x.status(), j]);
   const off = good(); off.offer = 'free-ac-unit'; x = await post(off); check('api POST offer/campaign mismatch -> 400', x.status() === 400, x.status());
   x = await post(good(), { 'Idempotency-Key': 'aaaaaaaa-bbbb-4ccc-8ddd-000000000002' }); j = await x.json(); check('api POST idempotency mismatch -> 400', x.status() === 400 && j.error === 'IDEMPOTENCY_MISMATCH', [x.status(), j]);
-  // Qualification boundary on the hosted function: invalid Cornwall values fail closed (400), a valid DQ answers explicitly.
+  // Qualification boundary on the hosted function: invalid Cornwall values fail closed (400), valid submissions of either answer are exercised by hosted-boundary.js (they reach GHL).
   const BADS = [undefined, null, '', 'yes', 'YES', ' Yes', 'Yes ', 'no', 'NO', 'No ', 'Maybe', 'true', true, false, 1, ['Yes'], ['No'], {}];
   let allBad = true; const badDetail = [];
   for (const v of BADS) {
@@ -55,10 +55,7 @@ const good = () => ({ schema_version: '1.0', submission_id: 'aaaaaaaa-bbbb-4ccc-
     if (!ok) { allBad = false; badDetail.push([JSON.stringify(v), r.status(), j.error]); }
   }
   check(`api invalid or missing Cornwall value (${BADS.length} variants) -> 400 INVALID_PAYLOAD, never accepted or disqualified`, allBad, badDetail);
-  const dq = good(); dq.answers.in_cornwall = 'No';
-  for (let i = 0; i < 2; i++) { x = await post(dq); j = await x.json(); check(`api valid Cornwall = No (try ${i + 1}) -> 200 {ok:true,outcome:'disqualified'}`, x.status() === 200 && j.ok === true && j.outcome === 'disqualified' && j.reason === 'outside_cornwall' && j.duplicate === undefined, [x.status(), j]); }
-  const dqg = good(); dqg.campaign = 'garage'; dqg.offer = 'free-ac-unit'; dqg.answers = { conversion_use: 'Gym', garage_type: 'Detached', owns_property: 'Yes', in_cornwall: 'No' };
-  x = await post(dqg); j = await x.json(); check("api garage Cornwall = No -> 200 outcome 'disqualified'", x.status() === 200 && j.outcome === 'disqualified', [x.status(), j]);
+  // Valid Cornwall = No is NOT posted here: it is forwarded to GHL and would create a contact. See hosted-boundary.js.
   check('api responses are no-store', (await ctx.request.get(api)).headers()['cache-control'] === 'no-store');
   await br.close();
   const bad2 = res.filter((r) => !r).length; console.log(`\n${res.length - bad2}/${res.length} hosted checks passed`); process.exit(bad2 ? 1 : 0);

@@ -1,25 +1,24 @@
 'use strict';
 /*
- * CONTROLLED live test of the qualification boundary against the REAL GHL webhooks (fictional contacts only).
+ * CONTROLLED live test of the qualification outcome against the REAL GHL webhooks (fictional contacts only).
+ * BOTH Cornwall answers are forwarded. Cornwall = No is stored in GHL with a DQ tag but is never a conversion.
  * Needs the dev server in live mode:  SURVEY_DEV_LIVE=1 GHL_SURVEY_*_WEBHOOK_URL=... node tests/survey/dev-server.js 8771
  *   BASE=http://localhost:8771 RUN=<id> OUT=<dir> node tests/survey/live-boundary.js
  * Every outgoing request the endpoint makes is counted by the dev server (GET /__mock/outgoing).
- * Expectation: qualified (Cornwall Yes) = exactly 1 outgoing request. DQ (Cornwall No) = exactly 0, even for an existing contact's identity.
+ * Expectation: every submission (Yes or No) = exactly 1 outgoing request. Yes fires one conversion. No fires none.
  * GTM and Meta are stubbed so test traffic never reaches real analytics. The script never reads or prints webhook URLs.
  */
 const { chromium } = require('playwright');
 const fs = require('fs'); const path = require('path');
 const BASE = process.env.BASE; const RUN = process.env.RUN; const OUT = process.env.OUT || '/tmp';
-const EXISTING = JSON.parse(process.env.EXISTING_IDENTITIES || '{}'); // { kitchen: {...identity}, garage: {...identity} }
-const mk = (i, id) => ({ full_name: `ZZ Test ${id} B${RUN}`, phone: `07700 9008${String(i).padStart(2, '0')}`, email: `zz-survey-boundary-${RUN}-${id}@example.com`, street_address: `${i} Boundary Street (fictional)`, city: 'Truro', postcode: 'TR1 2AB' });
+const mk = (i, id) => ({ full_name: `ZZ Test ${id} B${RUN}`, phone: `07700 9010${String(i).padStart(2, "0")}`, email: `zz-survey-boundary-${RUN}-${id}@example.com`, street_address: `${i} Boundary Street (fictional)`, city: 'Truro', postcode: 'TR1 2AB' });
 const SC = [
   { id: 'l1', c: 'kitchen', a: ['A full new kitchen', 'Before Christmas', 'Yes', 'Yes'], who: mk(1, 'l1'), want: 1, dest: 'thank-you' },
   { id: 'l2', c: 'kitchen', a: ['Not sure yet', 'Just looking for now', 'Yes', 'Yes'], who: mk(2, 'l2'), want: 1, dest: 'thank-you' }, // low priority, Cornwall Yes
   { id: 'l3', c: 'garage', a: ['Home office', 'Attached to the house', 'Yes', 'Yes'], who: mk(3, 'l3'), want: 1, dest: 'thank-you' },
-  { id: 'd1', c: 'kitchen', a: ['A full new kitchen', 'Early 2027', 'Yes', 'No'], who: mk(4, 'd1'), want: 0, dest: 'not-in-area' },
-  { id: 'd2', c: 'garage', a: ['Gym', 'Detached', 'Yes', 'No'], who: mk(5, 'd2'), want: 0, dest: 'not-in-area' },
-  { id: 'd3', c: 'kitchen', a: ['Not sure yet', 'Just looking for now', 'No', 'No'], who: EXISTING.kitchen, want: 0, dest: 'not-in-area', existing: true },
-  { id: 'd4', c: 'garage', a: ['Gym', 'Integral', 'No', 'No'], who: EXISTING.garage, want: 0, dest: 'not-in-area', existing: true },
+  { id: 'd1', c: 'kitchen', a: ['A full new kitchen', 'Early 2027', 'Yes', 'No'], who: mk(4, 'd1'), want: 1, dest: 'not-in-area', dq: true },
+  { id: 'd2', c: 'garage', a: ['Gym', 'Detached', 'Yes', 'No'], who: mk(5, 'd2'), want: 1, dest: 'not-in-area', dq: true },
+  { id: 'd3', c: 'kitchen', a: ['Not sure yet', 'Just looking for now', 'No', 'No'], who: mk(6, 'd3'), want: 1, dest: 'not-in-area', dq: true }, // low priority + DQ
 ];
 const out1 = () => fetch(BASE + '/__mock/outgoing').then((r) => r.json()).then((x) => x.n);
 (async () => {
@@ -45,13 +44,15 @@ const out1 = () => fetch(BASE + '/__mock/outgoing').then((r) => r.json()).then((
     rec.leadEvents = (await pg.evaluate(() => (window.dataLayer || []).filter((e) => e.event === 'wren_survey_lead'))).length;
     rec.metaLead = (await pg.evaluate(() => (window.fbq && window.fbq.queue ? window.fbq.queue.filter((a) => a[1] === 'Lead').length : 0)));
     rec.token = await pg.evaluate(() => sessionStorage.getItem('wren_conversion'));
-    if (!s.want) { // after a DQ, even visiting the thank-you page must fire nothing
+    if (s.dq) { // after a DQ, even visiting the thank-you page must fire nothing
       await pg.goto(`${BASE}/survey/${s.c}-thank-you`); await pg.waitForTimeout(1200);
       rec.leadAfterVisitingThankYou = (await pg.evaluate(() => (window.dataLayer || []).filter((e) => e.event === 'wren_survey_lead').length)) + (await pg.evaluate(() => (window.fbq && window.fbq.queue ? window.fbq.queue.filter((a) => a[1] === 'Lead').length : 0)));
     }
     results.push(rec); await ctx.close();
-    const ok = rec.finalUrl.endsWith(s.dest) && rec.outgoingDelta === s.want && (s.want ? rec.leadEvents === 1 && rec.metaLead === 1 : rec.leadEvents === 0 && rec.metaLead === 0 && rec.token === null && rec.leadAfterVisitingThankYou === 0);
-    console.log((ok ? 'PASS ' : 'FAIL ') + s.id, s.c, 'api', JSON.stringify(rec.api.map((a) => a.status + ':' + (a.body && a.body.outcome))), '->', rec.finalUrl, '| outgoing requests', rec.outgoingDelta, '(want ' + s.want + ') | wren_survey_lead', rec.leadEvents, '| Meta Lead', rec.metaLead, rec.existingIdentity ? '| EXISTING contact identity' : '');
+    const body = rec.api[0] && rec.api[0].body;
+    const typed = !body || (body.stored_in_ghl === true && body.sales_qualified === !s.dq && body.outcome === (s.dq ? 'disqualified' : 'accepted'));
+    const ok = rec.finalUrl.endsWith(s.dest) && rec.outgoingDelta === s.want && typed && (s.dq ? rec.leadEvents === 0 && rec.metaLead === 0 && rec.token === null && rec.leadAfterVisitingThankYou === 0 : rec.leadEvents === 1 && rec.metaLead === 1);
+    console.log((ok ? 'PASS ' : 'FAIL ') + s.id, s.c, 'api', JSON.stringify(rec.api.map((a) => a.status + ':' + (a.body && a.body.outcome))), '->', rec.finalUrl, '| outgoing requests', rec.outgoingDelta, '(want ' + s.want + ') | wren_survey_lead', rec.leadEvents, '| Meta Lead', rec.metaLead, s.dq ? '| DQ (stored, no sales)' : '');
   }
   console.log('total outgoing requests this run:', await out1(), '(expected', SC.filter((s) => s.who).reduce((n, s) => n + s.want, 0) + ')');
   fs.writeFileSync(path.join(OUT, 'live-boundary.json'), JSON.stringify(results, null, 1));

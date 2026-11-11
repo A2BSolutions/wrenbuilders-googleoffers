@@ -5,6 +5,10 @@ const { createHandler } = require('../../api/survey-lead');
 const { createMemoryStore } = require('../../api/_lib/idempotency');
 const { startReceiver, startApi, kitchen, garage, uuid } = require('./helpers');
 
+const ACC = { ok: true, outcome: 'accepted', sales_qualified: true, stored_in_ghl: true };
+const DQB = { ok: true, outcome: 'disqualified', reason: 'outside_cornwall', sales_qualified: false, stored_in_ghl: true };
+const zeroOutgoing = (t) => { assert.equal(t.outgoing.n, 0, 'ZERO outgoing requests'); assert.equal(t.rx.state.calls.length, 0, 'receiver saw nothing'); };
+
 async function setup(over = {}) {
   const rx = await startReceiver();
   const logs = [];
@@ -31,7 +35,7 @@ async function setup(over = {}) {
 test('success: kitchen forwards once to the kitchen webhook and returns ok:true', async () => {
   const t = await setup();
   const r = await t.api.post(kitchen());
-  assert.equal(r.status, 200); assert.deepEqual(r.json, { ok: true, outcome: 'accepted' });
+  assert.equal(r.status, 200); assert.deepEqual(r.json, ACC);
   assert.equal(t.outgoing.n, 1);
   assert.equal(r.headers.get('cache-control'), 'no-store');
   assert.equal(t.rx.state.calls.length, 1);
@@ -44,7 +48,7 @@ test('success: kitchen forwards once to the kitchen webhook and returns ok:true'
 test('success: garage qualified goes to the garage webhook only', async () => {
   const t = await setup();
   const r = await t.api.post(garage());
-  assert.equal(r.status, 200); assert.deepEqual(r.json, { ok: true, outcome: 'accepted' });
+  assert.equal(r.status, 200); assert.deepEqual(r.json, ACC);
   assert.equal(t.rx.state.calls.length, 1); assert.equal(t.rx.state.calls[0].url, '/hooks/garage-test');
   assert.deepEqual(t.rx.state.calls[0].body.tags, []);
   assert.equal(t.rx.state.calls[0].body.survey_answer_in_cornwall, 'Yes');
@@ -55,104 +59,121 @@ test('success: garage qualified goes to the garage webhook only', async () => {
 test('kitchen low priority (Cornwall Yes) is forwarded with the Low priority tag', async () => {
   const t = await setup();
   const a = kitchen(); a.answers.fitting_timeframe = 'Just looking for now';
-  assert.deepEqual((await t.api.post(a)).json, { ok: true, outcome: 'accepted' });
+  assert.deepEqual((await t.api.post(a)).json, ACC);
   assert.deepEqual(t.rx.state.calls[0].body.tags, ['Low priority']); assert.equal(t.rx.state.calls[0].body.survey_low_priority, true);
   assert.equal(t.rx.state.calls.length, 1);
   await t.close();
 });
 
-// ---- QUALIFICATION BOUNDARY: outside Cornwall never reaches GHL ----
-const DQ = { ok: true, outcome: 'disqualified', reason: 'outside_cornwall' };
-const noContact = (t) => { assert.equal(t.outgoing.n, 0, 'ZERO outgoing requests'); assert.equal(t.rx.state.calls.length, 0, 'receiver saw nothing'); assert.deepEqual(t.storeCalls, { begin: 0, complete: 0, release: 0 }, 'idempotency store untouched'); };
+// ---- QUALIFICATION: outside Cornwall is STORED in GHL (DQ tag) but is never sales-qualified ----
+const dqOf = (mk, over = {}) => { const p = mk(); p.answers.in_cornwall = 'No'; return Object.assign(p, over); };
 
-test('DQ: kitchen and garage, Cornwall No: explicit DQ outcome, zero outgoing requests, zero store calls', async () => {
+test('DQ: kitchen and garage Cornwall No are forwarded once each to the CORRECT receiver with the DQ tag', async () => {
   const t = await setup();
-  for (const mk of [kitchen, garage]) {
-    const p = mk(); p.answers.in_cornwall = 'No';
-    const r = await t.api.post(p);
-    assert.equal(r.status, 200); assert.deepEqual(r.json, DQ); assert.equal(r.headers.get('cache-control'), 'no-store');
+  const k = dqOf(kitchen), g = dqOf(garage);
+  let r = await t.api.post(k); assert.equal(r.status, 200); assert.deepEqual(r.json, DQB); assert.equal(r.headers.get('cache-control'), 'no-store');
+  r = await t.api.post(g); assert.equal(r.status, 200); assert.deepEqual(r.json, DQB);
+  assert.equal(t.outgoing.n, 2); assert.equal(t.rx.state.calls.length, 2);
+  assert.equal(t.rx.state.calls[0].url, '/hooks/kitchen-test'); assert.equal(t.rx.state.calls[1].url, '/hooks/garage-test');
+  for (const c of t.rx.state.calls) {
+    assert.equal(c.body.survey_answer_in_cornwall, 'No'); assert.equal(c.body.survey_qualified, false); assert.equal(c.body.survey_dq_outside_cornwall, true);
+    assert.deepEqual(c.body.tags, ['DQ - outside Cornwall']); assert.equal(c.body.tags_csv, 'DQ - outside Cornwall');
   }
-  noContact(t);
+  assert.equal(t.rx.state.calls[0].body.survey_campaign, 'kitchen'); assert.equal(t.rx.state.calls[1].body.survey_campaign, 'garage');
+  assert.equal(t.rx.state.calls[0].body.survey_offer, '1000-appliance-upgrade'); assert.equal(t.rx.state.calls[1].body.survey_offer, 'free-ac-unit');
+  assert.equal(t.rx.state.calls[0].body.survey_submission_id, k.submission_id);
   await t.close();
 });
 
-test('DQ: kitchen combined (outside Cornwall + just looking) is DQ, not forwarded with any tag', async () => {
+test('DQ payload keeps every field, answer and attribution value that a qualified one has (same mapping contract)', async () => {
   const t = await setup();
-  const p = kitchen(); p.answers.in_cornwall = 'No'; p.answers.fitting_timeframe = 'Just looking for now';
-  assert.deepEqual((await t.api.post(p)).json, DQ);
-  noContact(t); await t.close();
+  const yes = kitchen(); const no = dqOf(kitchen);
+  await t.api.post(yes); await t.api.post(no);
+  const [a, b] = t.rx.state.calls.map((c) => c.body);
+  assert.deepEqual(Object.keys(a).sort(), Object.keys(b).sort(), 'identical key set for Yes and No');
+  for (const k of ['phone', 'email', 'address1', 'postal_code', 'first_name', 'last_name', 'survey_utm_source', 'survey_fbclid', 'survey_kitchen_type', 'survey_answer_fitting_timeframe', 'survey_answer_owns_property']) assert.equal(b[k], a[k], k);
+  assert.equal(a.survey_dq_outside_cornwall, false); assert.equal(b.survey_dq_outside_cornwall, true);
+  await t.close();
 });
 
-test('DQ never touches GHL even when the webhook is missing, the receiver is failing, or hangs', async () => {
-  let t = await setup({ env: { GHL_SURVEY_KITCHEN_WEBHOOK_URL: '', GHL_SURVEY_GARAGE_WEBHOOK_URL: '' } });
-  const a = kitchen(); a.answers.in_cornwall = 'No'; const b = garage(); b.answers.in_cornwall = 'No';
-  assert.deepEqual((await t.api.post(a)).json, DQ); assert.deepEqual((await t.api.post(b)).json, DQ); noContact(t); await t.close();
-  t = await setup(); t.rx.state.mode = '500'; const c = kitchen(); c.answers.in_cornwall = 'No';
-  assert.deepEqual((await t.api.post(c)).json, DQ); t.rx.state.mode = 'hang'; assert.deepEqual((await t.api.post(c)).json, DQ); noContact(t); await t.close();
-  t = await setup({ store: null }); const d = garage(); d.answers.in_cornwall = 'No';
-  assert.deepEqual((await t.api.post(d)).json, DQ, 'DQ does not need the idempotency store'); noContact(t); await t.close();
+test('kitchen low priority: Yes gives Low priority, No gives DQ + Low priority', async () => {
+  const t = await setup();
+  const a = kitchen(); a.answers.fitting_timeframe = 'Just looking for now';
+  const b = dqOf(kitchen); b.answers.fitting_timeframe = 'Just looking for now';
+  const c = kitchen(); const d = dqOf(kitchen);
+  for (const p of [a, b, c, d]) assert.equal((await t.api.post(p)).status, 200);
+  const tags = t.rx.state.calls.map((x) => x.body.tags);
+  assert.deepEqual(tags[0], ['Low priority']); assert.deepEqual(tags[1], ['DQ - outside Cornwall', 'Low priority']);
+  assert.deepEqual(tags[2], []); assert.deepEqual(tags[3], ['DQ - outside Cornwall']);
+  assert.equal(t.rx.state.calls[1].body.survey_low_priority, true);
+  await t.close();
 });
 
-test('DQ with the identity (email and phone) of an existing contact still sends nothing and updates nothing', async () => {
+test('DQ is only "stored" after GHL answers 2xx: failure, redirect, timeout, unreachable and missing webhook all fail closed', async () => {
   const t = await setup();
-  const q = kitchen(); assert.deepEqual((await t.api.post(q)).json, { ok: true, outcome: 'accepted' }); // existing contact created via a qualified lead
+  const p = dqOf(kitchen);
+  t.rx.state.mode = '500'; let r = await t.api.post(p); assert.equal(r.status, 502); assert.equal(r.json.ok, false); assert.equal(r.json.stored_in_ghl, undefined); assert.equal(r.json.outcome, undefined);
+  t.rx.state.mode = 'redirect'; r = await t.api.post(p); assert.equal(r.status, 502); assert.equal(r.json.ok, false);
+  t.rx.state.mode = 'hang'; r = await t.api.post(p); assert.equal(r.status, 504); assert.equal(r.json.stored_in_ghl, undefined);
+  t.rx.state.mode = 'ok'; r = await t.api.post(p); assert.deepEqual(r.json, DQB);
+  assert.equal(t.rx.state.calls.length, 4); assert.ok(t.rx.state.calls.every((c) => c.body.survey_submission_id === p.submission_id), 'stable submission id across retries');
+  await t.close();
+  const t2 = await setup({ env: { GHL_SURVEY_KITCHEN_WEBHOOK_URL: '' } });
+  r = await t2.api.post(dqOf(kitchen)); assert.equal(r.status, 503); assert.equal(r.json.error, 'NOT_CONFIGURED'); assert.equal(r.json.stored_in_ghl, undefined);
+  assert.equal((await t2.api.post(dqOf(garage))).status, 200, 'garage still configured');
+  await t2.close();
+  const t3 = await setup(); await t3.rx.close(); r = await t3.api.post(dqOf(garage)); assert.equal(r.status, 502); assert.equal(r.json.ok, false); await t3.api.close();
+});
+
+test('DQ duplicate handling is best-effort: a repeat is not forwarded again and keeps the DELIVERED outcome', async () => {
+  const t = await setup();
+  const p = dqOf(kitchen);
+  assert.deepEqual((await t.api.post(p)).json, DQB);
+  const dup = await t.api.post(p); assert.equal(dup.status, 200); assert.deepEqual(dup.json, Object.assign({}, DQB, { duplicate: true }));
   assert.equal(t.outgoing.n, 1);
-  const dq = kitchen(); dq.answers.in_cornwall = 'No'; // same email, same phone, same name, new submission id
-  assert.deepEqual((await t.api.post(dq)).json, DQ);
-  const dq2 = garage(); dq2.contact = Object.assign({}, q.contact); dq2.answers.in_cornwall = 'No';
-  assert.deepEqual((await t.api.post(dq2)).json, DQ);
-  assert.equal(t.outgoing.n, 1, 'still exactly the one qualified request'); assert.equal(t.rx.state.calls.length, 1);
-  await t.close();
-});
-
-test('DQ retry and duplicate handling: same response every time, zero requests, id never claimed', async () => {
-  const t = await setup();
-  const p = kitchen(); p.answers.in_cornwall = 'No';
-  for (let i = 0; i < 4; i++) assert.deepEqual((await t.api.post(p)).json, DQ);
-  noContact(t);
-  // the same submission_id later arriving as qualified is forwarded normally, once, then deduplicated
-  const q = JSON.parse(JSON.stringify(p)); q.answers.in_cornwall = 'Yes';
-  assert.deepEqual((await t.api.post(q)).json, { ok: true, outcome: 'accepted' });
-  assert.equal((await t.api.post(q)).json.duplicate, true);
+  // same id replayed with the OTHER Cornwall answer: nothing is forwarded and the originally delivered outcome is returned
+  const flip = JSON.parse(JSON.stringify(p)); flip.answers.in_cornwall = 'Yes';
+  const r = await t.api.post(flip); assert.equal(r.json.outcome, 'disqualified'); assert.equal(r.json.sales_qualified, false); assert.equal(r.json.duplicate, true);
   assert.equal(t.outgoing.n, 1);
-  // and a qualified id replayed as DQ does not forward again
-  assert.deepEqual((await t.api.post(p)).json, DQ); assert.equal(t.outgoing.n, 1);
+  // and the reverse
+  const q = kitchen(); await t.api.post(q); const flipQ = JSON.parse(JSON.stringify(q)); flipQ.answers.in_cornwall = 'No';
+  const r2 = await t.api.post(flipQ); assert.equal(r2.json.outcome, 'accepted'); assert.equal(r2.json.sales_qualified, true); assert.equal(t.outgoing.n, 2);
   await t.close();
 });
 
-test('missing, malformed or unexpected Cornwall answer is 400, never DQ and never forwarded', async () => {
+test('missing, malformed or unexpected Cornwall answer is 400 and is NEVER forwarded', async () => {
   const t = await setup();
   const bads = [undefined, null, '', 'yes', 'YES', ' Yes', 'Yes ', 'no', 'NO', 'No ', 'Maybe', 'Y', 'true', true, false, 1, 0, ['Yes'], ['No'], {}, { v: 'Yes' }];
   for (const v of bads) {
     const p = kitchen(); if (v === undefined) delete p.answers.in_cornwall; else p.answers.in_cornwall = v;
     const r = await t.api.post(p);
     assert.equal(r.status, 400, 'value: ' + JSON.stringify(v)); assert.equal(r.json.error, 'INVALID_PAYLOAD'); assert.ok(r.json.fields.includes('answers.in_cornwall'));
-    assert.equal(r.json.ok, false); assert.notEqual(r.json.outcome, 'disqualified');
+    assert.equal(r.json.ok, false); assert.equal(r.json.outcome, undefined); assert.equal(r.json.stored_in_ghl, undefined);
   }
   const g = garage(); delete g.answers; assert.equal((await t.api.post(g)).status, 400);
   const k = kitchen(); k.answers = { in_cornwall: 'Yes' }; assert.equal((await t.api.post(k)).status, 400);
   const x = kitchen(); x.in_cornwall = 'No'; assert.equal((await t.api.post(x)).status, 400, 'top-level shadow key rejected');
   const y = kitchen(); y.answers.survey_answer_in_cornwall = 'No'; assert.equal((await t.api.post(y)).status, 400, 'unknown answer key rejected');
-  noContact(t); await t.close();
+  zeroOutgoing(t); await t.close();
 });
 
-test('DQ-looking requests that fail other gates are rejected, not answered as DQ', async () => {
+test('other gates still apply to DQ requests: origin, content type, idempotency header, schema, offer, phone', async () => {
   const t = await setup();
-  const p = kitchen(); p.answers.in_cornwall = 'No';
+  const p = dqOf(kitchen);
   assert.equal((await t.api.post(p, { Origin: 'https://evil.example' })).status, 403);
   assert.equal((await t.api.post(p, { 'Content-Type': 'text/plain' })).status, 415);
   assert.equal((await t.api.post(p, { 'Idempotency-Key': 'aaaaaaaa-bbbb-4ccc-8ddd-0000000000ff' })).json.error, 'IDEMPOTENCY_MISMATCH');
   const bad = JSON.parse(JSON.stringify(p)); bad.contact.phone = '01872 613608'; assert.equal((await t.api.post(bad)).status, 400);
   const off = JSON.parse(JSON.stringify(p)); off.offer = 'free-ac-unit'; assert.equal((await t.api.post(off)).status, 400);
-  noContact(t); await t.close();
+  zeroOutgoing(t); await t.close();
 });
 
 test('DQ logs hold only event code, campaign and submission_id: no personal data', async () => {
   const t = await setup();
-  const p = kitchen(); p.answers.in_cornwall = 'No'; await t.api.post(p);
-  const ev = t.logs.find((l) => l.evt === 'disqualified'); assert.ok(ev); assert.equal(ev.campaign, 'kitchen'); assert.equal(ev.status, 200);
+  const p = dqOf(kitchen); await t.api.post(p);
+  const ev = t.logs.find((l) => l.evt === 'accepted_dq'); assert.ok(ev); assert.equal(ev.campaign, 'kitchen'); assert.equal(ev.status, 200);
   const all = JSON.stringify(t.logs);
-  for (const secret of ['alex.tester', 'Alex', 'Tester', '07700', '447700', 'Secret Lane', 'TR1 2', 'fb.1.2.3', 'abc']) assert.ok(!all.includes(secret), 'log leaked: ' + secret);
+  for (const secret of ['alex.tester', 'Alex', 'Tester', '07700', '447700', 'Secret Lane', 'TR1 2', 'fb.1.2.3', 'abc', 'hooks/kitchen-test']) assert.ok(!all.includes(secret), 'log leaked: ' + secret);
   await t.close();
 });
 
@@ -209,7 +230,7 @@ test('GHL 500, redirect, unreachable and timeout all fail closed; same submissio
   t.rx.state.mode = 'hang';
   r = await t.api.post(p); assert.equal(r.status, 504); assert.equal(r.json.error, 'UPSTREAM_TIMEOUT');
   t.rx.state.mode = 'ok';
-  r = await t.api.post(p); assert.equal(r.status, 200); assert.deepEqual(r.json, { ok: true, outcome: 'accepted' });
+  r = await t.api.post(p); assert.equal(r.status, 200); assert.deepEqual(r.json, ACC);
   assert.equal(t.rx.state.calls.length, 4, '3 failed attempts + 1 success');
   assert.ok(t.rx.state.calls.every((c) => c.body.survey_submission_id === p.submission_id), 'submission_id stable across retries');
   await t.close();
@@ -222,7 +243,7 @@ test('GHL 500, redirect, unreachable and timeout all fail closed; same submissio
 test('duplicate after success: ok:true, GHL is not called again', async () => {
   const t = await setup();
   const p = kitchen();
-  assert.deepEqual((await t.api.post(p)).json, { ok: true, outcome: 'accepted' });
+  assert.deepEqual((await t.api.post(p)).json, ACC);
   const r = await t.api.post(p); assert.equal(r.status, 200); assert.equal(r.json.ok, true); assert.equal(r.json.outcome, 'accepted'); assert.equal(r.json.duplicate, true);
   assert.equal(t.rx.state.calls.length, 1);
   // same id on the other campaign key is a different submission

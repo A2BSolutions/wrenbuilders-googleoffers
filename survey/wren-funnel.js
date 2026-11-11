@@ -96,10 +96,11 @@
     return u.toString();
   }
 
-  // Resolves only on HTTP 2xx with JSON body { ok:true, outcome:'accepted' | 'disqualified' }. Anything else rejects.
-  //   accepted     = the lead reached GHL (Cornwall = Yes). Thank-you page, conversion allowed.
-  //   disqualified = outside Cornwall. Nothing was sent to GHL. Not-in-area page, NEVER a conversion.
-  // `ok:true` with a missing or unknown outcome is NOT_CONFIRMED (fail closed). The SERVER decides, not the page.
+  // Resolves only on HTTP 2xx with a fully typed body. Anything else rejects (fail closed). The SERVER decides, not the page.
+  //   accepted     = { ok:true, outcome:'accepted',     sales_qualified:true,  stored_in_ghl:true }  Cornwall = Yes. Thank-you page, conversion allowed.
+  //   disqualified = { ok:true, outcome:'disqualified', sales_qualified:false, stored_in_ghl:true }  Outside Cornwall. Stored in GHL (DQ tag).
+  //                  Not-in-area page, NEVER a conversion. A disqualified body without stored_in_ghl:true is NOT_CONFIRMED.
+  // stored_in_ghl means the GHL receiver acknowledged the webhook (HTTP 2xx), not that the workflow finished.
   function submitLead(payload) {
     var url;
     try { url = endpointUrl(); } catch (e) { return Promise.reject(e); }
@@ -114,7 +115,9 @@
     }).then(function (res) {
       return res.json().catch(function () { return null; }).then(function (body) {
         if (!res.ok) throw fail('HTTP_' + res.status, 'Endpoint returned ' + res.status, { body: body });
-        if (!body || body.ok !== true || (body.outcome !== 'accepted' && body.outcome !== 'disqualified')) throw fail('NOT_CONFIRMED', 'Endpoint did not confirm a known outcome', { body: body });
+        var typed = body && body.ok === true && body.stored_in_ghl === true &&
+          ((body.outcome === 'accepted' && body.sales_qualified === true) || (body.outcome === 'disqualified' && body.sales_qualified === false));
+        if (!typed) throw fail('NOT_CONFIRMED', 'Endpoint did not confirm a typed outcome', { body: body });
         return body;
       });
     }, function (err) {
@@ -123,7 +126,7 @@
   }
 
   // Call ONLY after submitLead() resolves. Clears the submission id. Leaves a one-time conversion token for the matching
-  // thank-you page ONLY when the server's outcome is 'accepted'. A disqualified outcome never creates a token.
+  // thank-you page ONLY when the server's outcome is 'accepted' (sales-qualified). A disqualified outcome never creates a token.
   function completeSubmission(info) {
     ss('del', KEY_SUBMISSION_ID + info.campaign);
     if (info.outcome === 'accepted') {
