@@ -7,16 +7,16 @@ const confirmAll = (f) => { const r = JSON.parse(f.register); r.items.forEach((i
 test('real repo: no build problems, approvals outstanding, so the gate blocks', () => {
   const r = evaluate(loadFiles());
   assert.deepStrictEqual(r.problems, []);
-  assert.ok(r.pending.length >= 8, 'blocking approvals must be pending until the business confirms');
+  assert.deepStrictEqual(r.pending.map((i) => i.id).sort(), ['ico_fee', 'privacy_mailbox_monitored', 'providers_complete', 'transfer_safeguards'], 'the four unverified items must stay pending');
 });
 test('fully confirmed register and clean build passes', () => {
   const r = evaluate(confirmAll(clone()));
   assert.deepStrictEqual(r.problems, []); assert.strictEqual(r.pending.length, 0);
 });
-test('every item has a type and the 8 blocking items split into 5 factual and 3 compliance', () => {
+test('the four pending items split into 3 factual and 1 compliance', () => {
   const r = evaluate(loadFiles());
-  assert.strictEqual(r.pending.filter((i) => i.type === 'factual').length, 5);
-  assert.strictEqual(r.pending.filter((i) => i.type === 'compliance').length, 3);
+  assert.strictEqual(r.pending.filter((i) => i.type === 'factual').length, 3);
+  assert.strictEqual(r.pending.filter((i) => i.type === 'compliance').length, 1);
 });
 test('an item without a valid type is rejected', () => {
   const f = clone(); const r = JSON.parse(f.register); delete r.items[0].type; f.register = JSON.stringify(r);
@@ -29,7 +29,7 @@ test('a confirmation without who and when is rejected', () => {
 test('recorded facts never clear the gate and unknown monitoring cannot be skipped', () => {
   const f = clone(); const r = JSON.parse(f.register); r.recorded_facts.forEach((x) => { if (x.status === 'unknown') x.status = 'confirmed_by_user'; });
   r.items = r.items.filter((i) => i.id !== 'privacy_mailbox_monitored'); f.register = JSON.stringify(r);
-  assert.ok(evaluate(f).pending.length >= 7);
+  assert.ok(evaluate(f).pending.length >= 3);
   const g = clone(); const q = JSON.parse(g.register); q.items = q.items.filter((i) => i.id !== 'privacy_mailbox_monitored'); g.register = JSON.stringify(q);
   assert.ok(evaluate(g).problems.some((p) => /mailbox monitoring is UNKNOWN/.test(p)));
 });
@@ -58,7 +58,19 @@ test('historical decisions are recorded as facts, never as approvals', () => {
   assert.ok(/A2B/.test(hero.statement) && /NOT by the client/.test(hero.limits));
   assert.ok(!r.items.some((i) => /photo|hero/i.test(i.id)), 'a real garage photo must not be a launch item');
   assert.ok(!JSON.stringify(r.items).match(/book-by|book by date/i), 'no fixed Kitchen book-by date requirement');
-  assert.strictEqual(evaluate(loadFiles()).pending.length, 8);
+  assert.strictEqual(evaluate(loadFiles()).pending.length, 4);
+});
+test('relayed approvals are labelled as relayed, never as direct written evidence, and carry no client timestamp', () => {
+  const reg = JSON.parse(loadFiles().register); const rel = evaluate(loadFiles()).relayed.map((i) => i.id).sort();
+  assert.deepStrictEqual(rel, ['notice_signoff', 'offer_claims_true', 'retention_and_dq_purpose', 'sms_and_calls']);
+  for (const i of reg.items.filter((x) => x.evidence)) { assert.strictEqual(i.evidence, 'relayed_by_a2b'); assert.match(i.confirmed_by, /relayed by A2B/); assert.ok(i.relay_note); }
+  assert.ok(!reg.items.some((i) => i.evidence === 'direct_written'), 'no direct written client approval is held');
+  const f = reg.recorded_facts.find((x) => x.id === 'client_approval_relayed'); assert.match(f.provenance, /Not a direct written approval/); assert.match(f.limits, /ICO fee/);
+  for (const id of ['ico_fee', 'transfer_safeguards', 'providers_complete', 'privacy_mailbox_monitored']) assert.strictEqual(reg.items.find((i) => i.id === id).status, 'pending', id);
+});
+test('an unknown evidence type is rejected', () => {
+  const f = clone(); const r = JSON.parse(f.register); r.items[0].evidence = 'telepathy'; f.register = JSON.stringify(r);
+  assert.ok(evaluate(f).problems.some((p) => /unknown evidence type/.test(p)));
 });
 test('non-blocking items never block', () => {
   const f = confirmAll(clone()); const r = JSON.parse(f.register); r.items.filter((i) => !i.blocking).forEach((i) => { i.status = 'pending'; i.confirmed_by = ''; i.confirmed_on = ''; }); f.register = JSON.stringify(r);

@@ -1,5 +1,5 @@
 {
-  "_readme": "Release register for the Kitchen and Garage survey funnels. 'recorded_facts' are statements already verified or confirmed, with their source. They are NOT approvals and never clear the gate. 'items' are what still needs a human decision. The release gate (tests/survey/privacy-approval.js) fails while any item with blocking:true is not status:confirmed with confirmed_by and confirmed_on (YYYY-MM-DD). Claude Code must never confirm an item on the business's behalf. Each item has a type: 'factual' (a fact only the business can state), 'compliance' (a legal or compliance judgement), or 'technical'. Evidence: docs/SURVEY-PRIVACY-NOTICE-APPROVAL.md.",
+  "_readme": "Release register for the Kitchen and Garage survey funnels. 'recorded_facts' are statements already verified or confirmed, with their source. They are NOT approvals and never clear the gate. 'items' are what still needs a human decision. The release gate (tests/survey/privacy-approval.js) fails while any item with blocking:true is not status:confirmed with confirmed_by and confirmed_on (YYYY-MM-DD). Claude Code must never confirm an item on the business's behalf. Each item has a type: 'factual' (a fact only the business can state), 'compliance' (a legal or compliance judgement), or 'technical'. Evidence: docs/SURVEY-PRIVACY-NOTICE-APPROVAL.md. Items marked evidence:'relayed_by_a2b' rest on A2B relaying the client's approval. There is no direct written client approval, signature or client timestamp; confirmed_on is the date A2B relayed it.",
   "recorded_facts": [
     {
       "id": "privacy_contact_email",
@@ -93,11 +93,39 @@
       "limits": "Preparing the package approves nothing. Items stay pending until the client replies in writing with a name and date."
     },
     {
-      "id": "review_links_built",
-      "status": "verified_in_repo",
-      "statement": "Permanent review routes /review, /review/kitchen, /review/garage (with thank-you and not-in-area) and /review/privacy are built on the development branch. They reuse the real survey pages, post only to /api/survey-review, cannot reach GHL, load no tracking and are noindex.",
-      "provenance": "Local tests, mocks only, 12 Nov 2026. See docs/SURVEY-REVIEW-LINKS.md.",
-      "limits": "NOT published. Publishing needs a merge to main, which also publishes /survey/* (see item review_links_publication)."
+      "id": "review_links_published",
+      "status": "checked_readonly",
+      "statement": "The permanent review links are LIVE on https://go.wren-builders.online: /review, /review/kitchen, /review/garage (each with /thank-you and /not-in-area) and /review/privacy. HTTP 200 without login, X-Robots-Tag noindex, nofollow, no third-party requests, no GTM, Meta or fbq. A review journey (Kitchen Yes, Garage No) posted only to /api/survey-review, which answered review:true, stored_in_ghl:false.",
+      "provenance": "Verified 12 Nov 2026 against Production deployment dpl_NYE1iGCtw2PKknnkLoS7zZbrkJ5q (main f4b9be2) from an unauthenticated browser and curl. Only review-endpoint requests were made. No live lead was submitted.",
+      "limits": "Review copies only. They do not activate the survey funnels."
+    },
+    {
+      "id": "survey_intake_disabled_production",
+      "status": "checked_readonly",
+      "statement": "Production survey lead intake is DISABLED. Production has 0 environment variables for GHL_SURVEY_KITCHEN_WEBHOOK_URL and GHL_SURVEY_GARAGE_WEBHOOK_URL (the two Preview variables are scoped to the development branch). With them absent /api/survey-lead answers 503 NOT_CONFIGURED before storing or sending, for Kitchen and Garage, Yes and No, with zero outgoing requests (tested locally on the deployed code). A request from a /review page is refused with 403 on Production.",
+      "provenance": "Vercel environment variable listing before and after the deploy, 12 Nov 2026; local fail-closed test; Production 403 probe.",
+      "limits": "A valid submission was deliberately NOT sent to the Production real endpoint, because if a variable existed unexpectedly it would create a real lead and text. The 503 is proven by the variable listing plus the identical tested code."
+    },
+    {
+      "id": "legacy_funnels_unchanged",
+      "status": "checked_readonly",
+      "statement": "The live /kitchen and /garage-conversion funnels (and their thank-you pages) are byte-identical before and after the release.",
+      "provenance": "SHA-256 of the served HTML compared before the merge and after the Production deploy, 12 Nov 2026.",
+      "limits": "None."
+    },
+    {
+      "id": "client_approval_relayed",
+      "status": "confirmed_by_user",
+      "statement": "Harry (Wren Builders) approved ALL of: the new Kitchen and Garage survey funnels; the current Kitchen £1,000 appliance upgrade offer including its conditions; the Garage Free AC offer including its conditions; the existing frontend content and promotional claims; the survey-specific Privacy Notice and proposed lead handling; and proceeding with launch.",
+      "provenance": "RELAYED BY A2B to Claude Code in the release session, 12 Nov 2026. Not a direct written approval: no signature, no email and no client timestamp is held. 2026-11-12 is the date A2B relayed it.",
+      "limits": "Does not independently verify the ICO fee status, UK transfer safeguards, provider completeness or privacy mailbox monitoring. Those stay pending."
+    },
+    {
+      "id": "ghl_receivers_state",
+      "status": "verified_by_codex",
+      "statement": "GHL receivers: Kitchen v2 is published at v25 and Garage v2 is published at v22, with full qualified-lead sales actions. DQ submissions are stored and tagged with no opportunity, Sheets, notification or SMS.",
+      "provenance": "Codex's latest evidence, relayed by A2B, 12 Nov 2026. A2B tooling cannot read GHL workflows (API 403).",
+      "limits": "The versions moved on since the hosted test (v24 and v21). The current versions have not been exercised end to end by A2B, so a separately authorised controlled live test is required before real ad traffic."
     }
   ],
   "items": [
@@ -105,21 +133,25 @@
       "id": "notice_signoff",
       "blocking": true,
       "type": "compliance",
-      "status": "pending",
+      "status": "confirmed",
       "title": "Sign-off of the final Privacy Notice and the text under the submit button",
       "detail": "Includes the lawful bases stated in notice section 3 (Article 6(1)(b), 6(1)(f) and consent for optional cookies). These were adopted from standard UK practice on the business's 11 Nov instruction. They are not yet recorded in a legitimate interests assessment or record of processing.",
-      "confirmed_by": "",
-      "confirmed_on": ""
+      "confirmed_by": "Harry (Wren Builders), approval relayed by A2B",
+      "confirmed_on": "2026-11-12",
+      "evidence": "relayed_by_a2b",
+      "relay_note": "Harry approved the survey-specific Privacy Notice and the proposed lead handling, which includes the lawful bases it states."
     },
     {
       "id": "sms_and_calls",
       "blocking": true,
       "type": "factual",
-      "status": "pending",
+      "status": "confirmed",
       "title": "Calls and texts: stop route and no marketing without permission",
       "detail": "Recorded already: Harry's first text is an enquiry response, not separate marketing. Still to confirm: (a) a person who replies 'stop' or asks us to stop is removed from texts and calls (GHL do-not-disturb is honoured), and (b) no marketing text or email is sent without separate permission. Notice section 4 states both.",
-      "confirmed_by": "",
-      "confirmed_on": ""
+      "confirmed_by": "Harry (Wren Builders), approval relayed by A2B",
+      "confirmed_on": "2026-11-12",
+      "evidence": "relayed_by_a2b",
+      "relay_note": "Harry approved the lead handling and the notice commitments on texts, calls and marketing. The business commitment is approved. GHL's stop-text behaviour has NOT been independently tested by A2B."
     },
     {
       "id": "providers_complete",
@@ -129,7 +161,8 @@
       "title": "Service-provider list is complete",
       "detail": "The notice lists GoHighLevel, Google Sheets, Vercel and 'the agency and IT providers that manage our advertising and systems'. Confirm there is no other processor (for example a separate SMS carrier or email provider chosen by the business) and that data processing terms are in place with each.",
       "confirmed_by": "",
-      "confirmed_on": ""
+      "confirmed_on": "",
+      "relay_note": "The client approved the Privacy Notice that states this (relayed by A2B), but it is NOT independently verified and is deliberately left pending."
     },
     {
       "id": "privacy_contact_selected",
@@ -150,7 +183,8 @@
       "title": "info@wren-builders.com is read routinely, and someone answers privacy requests within one month",
       "detail": "The address is verified as a Wren business address (see recorded fact privacy_contact_email) but monitoring is UNKNOWN. Also confirm who handles replies sent to the automation sender hello@email.wren-builders.online, since people may reply to automated emails. Do not change the sender.",
       "confirmed_by": "",
-      "confirmed_on": ""
+      "confirmed_on": "",
+      "relay_note": "The client approved the Privacy Notice that states this (relayed by A2B), but it is NOT independently verified and is deliberately left pending."
     },
     {
       "id": "transfer_safeguards",
@@ -160,17 +194,20 @@
       "title": "International transfer safeguard exists for each non-UK provider",
       "detail": "GoHighLevel, Vercel, Google and Meta process data in the US. Confirm each has a valid UK transfer mechanism (UK-US data bridge certification, or standard contract terms with the UK Addendum). The notice does not name the mechanism.",
       "confirmed_by": "",
-      "confirmed_on": ""
+      "confirmed_on": "",
+      "relay_note": "The client approved the Privacy Notice that states this (relayed by A2B), but it is NOT independently verified and is deliberately left pending."
     },
     {
       "id": "retention_and_dq_purpose",
       "blocking": true,
       "type": "compliance",
-      "status": "pending",
+      "status": "confirmed",
       "title": "Retention criteria and the purpose for keeping outside-Cornwall enquiries",
       "detail": "Notice section 3 and 7 state criteria, not a fixed period. Confirm the criteria and the purposes stated for outside-Cornwall records (a note of the enquiry, dealing with them getting back in touch, advert measurement) are correct and that records are deleted when no longer needed or on request.",
-      "confirmed_by": "",
-      "confirmed_on": ""
+      "confirmed_by": "Harry (Wren Builders), approval relayed by A2B",
+      "confirmed_on": "2026-11-12",
+      "evidence": "relayed_by_a2b",
+      "relay_note": "Covered by the approved Privacy Notice and proposed lead handling (retention criteria and the purposes for outside-Cornwall records)."
     },
     {
       "id": "ico_fee",
@@ -180,17 +217,20 @@
       "title": "ICO data protection fee paid or exemption confirmed",
       "detail": "No registration number is published or invented. The business must confirm its fee status with the ICO.",
       "confirmed_by": "",
-      "confirmed_on": ""
+      "confirmed_on": "",
+      "relay_note": "The client approved the Privacy Notice that states this (relayed by A2B), but it is NOT independently verified and is deliberately left pending."
     },
     {
       "id": "offer_claims_true",
       "blocking": true,
       "type": "factual",
-      "status": "pending",
+      "status": "confirmed",
       "title": "Launch copy signed off, and remaining claims true on the launch date",
       "detail": "Recorded already: both campaigns are running and the creative stays; the Garage AI hero and the Kitchen 'Book this month' line were approved by A2B (no replacement date needed); reassurance copy, error messages, button labels, page titles and review labels were approved provisionally. Still to sign off and attest as true on launch day: Garage 'limited to 3 homeowners' and 'only taking on 3 garage conversions this month'; 'reserved' on both thank-you pages; 'Book this month to secure your upgrade' honoured for people who book that month; 'reach out within a few hours'; 'fixed quote with no hidden costs'; 'Free home visit'; 'We'll call you from 01872 613608'; kitchen 'Before Christmas'; the review labels and the 'Cornwall homeowners' heading; '100% would come back'; and the provisional copy as a whole. Also read the live ad text in Ads Manager and confirm no ad still carries an expired date (the API could not show it). Exact text: docs/SURVEY-RELEASE-APPROVAL.md section 4.",
-      "confirmed_by": "",
-      "confirmed_on": ""
+      "confirmed_by": "Harry (Wren Builders), approval relayed by A2B",
+      "confirmed_on": "2026-11-12",
+      "evidence": "relayed_by_a2b",
+      "relay_note": "Harry approved the Kitchen £1,000 appliance upgrade and the Garage Free AC offers including their conditions, and the existing frontend content and promotional claims. Not covered: the live Meta ad text could not be read, so an expired date in an ad is still an A2B check before the cutover (item ad_text_dates_checked)."
     },
     {
       "id": "retention_number",
@@ -246,9 +286,19 @@
       "id": "review_links_publication",
       "blocking": false,
       "type": "technical",
-      "status": "pending",
+      "status": "confirmed",
       "title": "Authorise publishing the permanent review links on go.wren-builders.online",
-      "detail": "Needs a merge to main, which also puts /survey/* and the real /api/survey-lead on the live domain. Review-first option: merge without the Production webhook variables so the real endpoint fails closed (503). Separate from the 8 launch approvals. Not authorized yet.",
+      "detail": "CONFIRMED and executed 12 Nov 2026: PR #5 merged to main (f4b9be2), Production deployment dpl_NYE1iGCtw2PKknnkLoS7zZbrkJ5q READY. Review-first: no Production webhook variables, so /api/survey-lead fails closed. This does NOT authorise activating the survey funnels.",
+      "confirmed_by": "Wren Builders owner's representative (explicit review-first authorisation to Claude Code, release session)",
+      "confirmed_on": "2026-11-12"
+    },
+    {
+      "id": "ad_text_dates_checked",
+      "blocking": false,
+      "type": "technical",
+      "status": "pending",
+      "title": "Read the live Meta ad text and confirm no ad carries an expired date, before the cutover",
+      "detail": "The Meta API returns no ad text for these post-backed ads. A2B reads it in Ads Manager. Needed before real ad traffic, not before intake is activated.",
       "confirmed_by": "",
       "confirmed_on": ""
     }

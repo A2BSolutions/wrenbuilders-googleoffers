@@ -1,6 +1,6 @@
 # Permanent review links for the Kitchen and Garage surveys
 
-Status 12 Nov 2026: **built and tested on the development branch. Not published.** Publishing needs a merge to `main`, which needs separate authorization (see section 5).
+Status 12 Nov 2026: **PUBLISHED (review-first).** PR #5 merged to `main` as `f4b9be2`. Production deployment `dpl_NYE1iGCtw2PKknnkLoS7zZbrkJ5q` is READY. Rollback target: `dpl_8N23gbjGZcQtxS2YhdcqM7QTn5Yg` (`main` 28e92ed). The survey funnels are NOT activated: Production has no webhook variables.
 
 ## 1. Proposed permanent URLs (on `go.wren-builders.online`)
 
@@ -46,7 +46,11 @@ No GHL URL or secret appears in any review file.
 - `tests/survey/e2e.js`, new section 6e, in a fresh unauthenticated browser with consent seeded as granted: every review page returns 200 without login with noindex, zero third-party requests, no GTM, Meta or fbq, no console errors; the PREVIEW bar shows; Kitchen and Garage, Yes and No, click through every question to the right review result; the form posts only to `/api/survey-review` and never `/api/survey-lead`; the GHL mock receives nothing; a tampered browser call to the real endpoint gets 403; the notice link stays inside the review copy; each review page is pixel-identical to its live page at phone and desktop widths once the bar is hidden; live pages are unchanged and still track after consent.
 - Release gate: now also fails if a review route or noindex header is removed, the review endpoint gains env, network or forwarder code, the real endpoint stops refusing review pages, or review mode stops blocking tracking. 10 new mutation tests.
 
-## 5. Publication (not authorized yet)
+## 5. Publication (done, review-first)
+
+Verified live on 12 Nov 2026 from an unauthenticated browser: all 8 URLs return 200 with noindex, no third-party requests, PREVIEW bar shown; a Kitchen Yes and a Garage No review journey posted only to `/api/survey-review`; a review page calling the real endpoint got 403. Legacy funnels byte-identical to before. Survey intake stays off until the two Production variables exist, which needs the 8 business approvals first.
+
+### Options that were considered
 
 The review pages ship in the same build as the survey funnels, so **publishing them means merging to `main`, which also puts `/survey/*` and the real `/api/survey-lead` on the live domain.** Two ways to do that:
 
