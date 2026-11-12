@@ -93,11 +93,25 @@
       "limits": "Preparing the package approves nothing. Items stay pending until the client replies in writing with a name and date."
     },
     {
-      "id": "review_links_built",
-      "status": "verified_in_repo",
-      "statement": "Permanent review routes /review, /review/kitchen, /review/garage (with thank-you and not-in-area) and /review/privacy are built on the development branch. They reuse the real survey pages, post only to /api/survey-review, cannot reach GHL, load no tracking and are noindex.",
-      "provenance": "Local tests, mocks only, 12 Nov 2026. See docs/SURVEY-REVIEW-LINKS.md.",
-      "limits": "NOT published. Publishing needs a merge to main, which also publishes /survey/* (see item review_links_publication)."
+      "id": "review_links_published",
+      "status": "verified_readonly",
+      "statement": "The permanent review links are LIVE on https://go.wren-builders.online: /review, /review/kitchen, /review/garage (each with /thank-you and /not-in-area) and /review/privacy. HTTP 200 without login, X-Robots-Tag noindex, nofollow, no third-party requests, no GTM, Meta or fbq. A review journey (Kitchen Yes, Garage No) posted only to /api/survey-review, which answered review:true, stored_in_ghl:false.",
+      "provenance": "Verified 12 Nov 2026 against Production deployment dpl_NYE1iGCtw2PKknnkLoS7zZbrkJ5q (main f4b9be2) from an unauthenticated browser and curl. Only review-endpoint requests were made. No live lead was submitted.",
+      "limits": "Review copies only. They do not activate the survey funnels."
+    },
+    {
+      "id": "survey_intake_disabled_production",
+      "status": "verified_readonly",
+      "statement": "Production survey lead intake is DISABLED. Production has 0 environment variables for GHL_SURVEY_KITCHEN_WEBHOOK_URL and GHL_SURVEY_GARAGE_WEBHOOK_URL (the two Preview variables are scoped to the development branch). With them absent /api/survey-lead answers 503 NOT_CONFIGURED before storing or sending, for Kitchen and Garage, Yes and No, with zero outgoing requests (tested locally on the deployed code). A request from a /review page is refused with 403 on Production.",
+      "provenance": "Vercel environment variable listing before and after the deploy, 12 Nov 2026; local fail-closed test; Production 403 probe.",
+      "limits": "A valid submission was deliberately NOT sent to the Production real endpoint, because if a variable existed unexpectedly it would create a real lead and text. The 503 is proven by the variable listing plus the identical tested code."
+    },
+    {
+      "id": "legacy_funnels_unchanged",
+      "status": "verified_readonly",
+      "statement": "The live /kitchen and /garage-conversion funnels (and their thank-you pages) are byte-identical before and after the release.",
+      "provenance": "SHA-256 of the served HTML compared before the merge and after the Production deploy, 12 Nov 2026.",
+      "limits": "None."
     }
   ],
   "items": [
@@ -246,11 +260,11 @@
       "id": "review_links_publication",
       "blocking": false,
       "type": "technical",
-      "status": "pending",
+      "status": "confirmed",
       "title": "Authorise publishing the permanent review links on go.wren-builders.online",
-      "detail": "Needs a merge to main, which also puts /survey/* and the real /api/survey-lead on the live domain. Review-first option: merge without the Production webhook variables so the real endpoint fails closed (503). Separate from the 8 launch approvals. Not authorized yet.",
-      "confirmed_by": "",
-      "confirmed_on": ""
+      "detail": "CONFIRMED and executed 12 Nov 2026: PR #5 merged to main (f4b9be2), Production deployment dpl_NYE1iGCtw2PKknnkLoS7zZbrkJ5q READY. Review-first: no Production webhook variables, so /api/survey-lead fails closed. This does NOT authorise activating the survey funnels.",
+      "confirmed_by": "Wren Builders owner's representative (explicit review-first authorisation to Claude Code, release session)",
+      "confirmed_on": "2026-11-12"
     }
   ]
 }

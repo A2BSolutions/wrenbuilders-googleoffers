@@ -4,6 +4,8 @@ Not for the client. The client receives `docs/client-approval/wren-survey-approv
 
 ## 1. Status
 
+**Update 12 Nov:** the permanent review links are live on Production (review-first, intake still disabled). See `docs/SURVEY-REVIEW-LINKS.md` and register facts `review_links_published`, `survey_intake_disabled_production`, `legacy_funnels_unchanged`.
+
 Implementation, hosted v2 integration and GHL sales workflows are done and verified. Consent controls and the Privacy Notice are built. The package is ready to send. **No client approval has been received.** The release gate (`node tests/survey/privacy-approval.js`) stays BLOCKED on 8 pending approvals, by design.
 
 ## 2. Claude Design handoff reconciled with the repository
