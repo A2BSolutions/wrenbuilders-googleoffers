@@ -1,6 +1,6 @@
 # Permanent review links for the Kitchen and Garage surveys
 
-Status 12 Nov 2026: **PUBLISHED (review-first).** PR #5 merged to `main` as `f4b9be2`. Production deployment `dpl_NYE1iGCtw2PKknnkLoS7zZbrkJ5q` is READY. Rollback target: `dpl_8N23gbjGZcQtxS2YhdcqM7QTn5Yg` (`main` 28e92ed). The survey funnels are NOT activated: Production has no webhook variables.
+Status 12 Nov 2026: **PUBLISHED (review-first).** PR #5 merged to `main` as `f4b9be2`. Production deployment `dpl_NYE1iGCtw2PKknnkLoS7zZbrkJ5q` is READY. Rollback target: `dpl_8N23gbjGZcQtxS2YhdcqM7QTn5Yg` (`main` 28e92ed). Update: later on 12 Nov the survey intake was activated (see `docs/SURVEY-HANDOFF.md` section 28). The review pages are unaffected: they still cannot reach GHL.
 
 ## 1. Proposed permanent URLs (on `go.wren-builders.online`)
 
@@ -48,7 +48,7 @@ No GHL URL or secret appears in any review file.
 
 ## 5. Publication (done, review-first)
 
-Verified live on 12 Nov 2026 from an unauthenticated browser: all 8 URLs return 200 with noindex, no third-party requests, PREVIEW bar shown; a Kitchen Yes and a Garage No review journey posted only to `/api/survey-review`; a review page calling the real endpoint got 403. Legacy funnels byte-identical to before. Survey intake stays off until the two Production variables exist, which needs the 8 business approvals first.
+Verified live on 12 Nov 2026 from an unauthenticated browser: all 8 URLs return 200 with noindex, no third-party requests, PREVIEW bar shown; a Kitchen Yes and a Garage No review journey posted only to `/api/survey-review`; a review page calling the real endpoint got 403. Legacy funnels byte-identical to before. (Superseded: the two Production variables were set on 12 Nov after the relayed client approval. See `docs/SURVEY-HANDOFF.md` section 28.)
 
 ### Options that were considered
 
