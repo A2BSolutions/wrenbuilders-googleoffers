@@ -100,13 +100,6 @@
       "limits": "Review copies only. They do not activate the survey funnels."
     },
     {
-      "id": "survey_intake_disabled_production",
-      "status": "checked_readonly",
-      "statement": "Production survey lead intake is DISABLED. Production has 0 environment variables for GHL_SURVEY_KITCHEN_WEBHOOK_URL and GHL_SURVEY_GARAGE_WEBHOOK_URL (the two Preview variables are scoped to the development branch). With them absent /api/survey-lead answers 503 NOT_CONFIGURED before storing or sending, for Kitchen and Garage, Yes and No, with zero outgoing requests (tested locally on the deployed code). A request from a /review page is refused with 403 on Production.",
-      "provenance": "Vercel environment variable listing before and after the deploy, 12 Nov 2026; local fail-closed test; Production 403 probe.",
-      "limits": "A valid submission was deliberately NOT sent to the Production real endpoint, because if a variable existed unexpectedly it would create a real lead and text. The 503 is proven by the variable listing plus the identical tested code."
-    },
-    {
       "id": "legacy_funnels_unchanged",
       "status": "checked_readonly",
       "statement": "The live /kitchen and /garage-conversion funnels (and their thank-you pages) are byte-identical before and after the release.",
@@ -126,6 +119,20 @@
       "statement": "GHL receivers: Kitchen v2 is published at v25 and Garage v2 is published at v22, with full qualified-lead sales actions. DQ submissions are stored and tagged with no opportunity, Sheets, notification or SMS.",
       "provenance": "Codex's latest evidence, relayed by A2B, 12 Nov 2026. A2B tooling cannot read GHL workflows (API 403).",
       "limits": "The versions moved on since the hosted test (v24 and v21). The current versions have not been exercised end to end by A2B, so a separately authorised controlled live test is required before real ad traffic."
+    },
+    {
+      "id": "production_intake_active",
+      "status": "checked_readonly",
+      "statement": "Production survey lead intake is ACTIVE since 12 Nov 2026. Production deployment dpl_Cu1jZy6BPQBawAMqMJwmYcPhTUw6 (main d054aae) is READY on go.wren-builders.online with GHL_SURVEY_KITCHEN_WEBHOOK_URL and GHL_SURVEY_GARAGE_WEBHOOK_URL set as Sensitive, Production-only variables (the Kitchen and Garage v2 receivers). /survey/kitchen-survey, /survey/garage-survey, both thank-you and not-in-area pages, /survey/privacy and all /review/* routes return 200 with noindex. No advert points at them.",
+      "provenance": "Vercel variable listing and deployment record, curl and browser checks, 12 Nov 2026. Non-submitting probes only: GET 405, wrong content type 415, empty payload 400, no Origin 403, cross-origin 403, from a /review page 403.",
+      "limits": "NO lead was submitted, so end-to-end delivery to the current GHL versions (Kitchen v25, Garage v22) is UNTESTED by A2B. A controlled live test needs separately approved test destinations. Real ad traffic stays NO-GO until it passes."
+    },
+    {
+      "id": "production_tracking_checked",
+      "status": "checked_readonly",
+      "statement": "On Production: a first visit to every survey page makes zero third-party requests and shows the cookie banner. Reject loads nothing. Accept requests GTM-KF4RWHHQ once and starts Pixel 1135200792433711 with PageView once and no Lead. A direct visit to a thank-you page fires no Lead. Review pages ignore stored consent.",
+      "provenance": "Real browser against Production, 12 Nov 2026, with every Google and Meta request intercepted and stubbed so nothing reached Google or Meta. No form was submitted.",
+      "limits": "The real Meta Lead after a qualified submission and its receipt in Events Manager are part of the controlled live test, not yet run."
     }
   ],
   "items": [
