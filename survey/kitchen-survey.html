@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<!-- Consent gate: Google Tag Manager and the Meta Pixel load only after the visitor accepts. See consent.js and SURVEY-HANDOFF.md. -->
+<script src="/survey/consent.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<!-- Self-hosted React and ReactDOM (same files and versions support.js would fetch from unpkg; SRI verified at import). Babel is not needed: support.js only loads it for JSX x-import files and these pages use none. -->
+<script>window.__resources={"https://unpkg.com/react@18.3.1/umd/react.production.min.js":"/survey/vendor/react.production.min.js","https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js":"/survey/vendor/react-dom.production.min.js"};</script>
+<!-- Shared config, submission and tracking. Static so the Meta Pixel PageView does not wait for React/Babel. See SURVEY-HANDOFF.md. -->
+<script src="/survey/wren-funnel.js"></script>
+<script src="/survey/support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#16171a"></rect><text x="100" y="128" text-anchor="middle" font-family="Arial, sans-serif" font-size="84" font-weight="700" fill="#b6935a">W</text></svg></template>
+  <title>Get your free kitchen quote in 60 seconds | Wren Builders Ltd</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preload" as="image" href="/survey/assets/kitchen-hero.webp" fetchpriority="high">
+  <link href="/survey/vendor/work-sans.css" rel="stylesheet">
+  <style>
+    html{scroll-behavior:smooth}
+    body{margin:0;background:#f7f4ee;color:#1d1f22;-webkit-font-smoothing:antialiased}
+    *{box-sizing:border-box}
+    a{color:#8a6a36}
+    a:hover{color:#1d1f22}
+    img{display:block;max-width:100%}
+    @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+  </style>
+</helmet>
+<div ref="{{ rootRef }}" style="font-family:'Work Sans', system-ui, sans-serif; font-size:17px; line-height:1.65; letter-spacing:.03em; color:#1d1f22; background:#f7f4ee; padding-bottom:{{ stickyPad }};">
+
+  <nav style="position:sticky; top:0; z-index:50; background:#f7f4ee; border-bottom:1px solid #e2dacb; box-shadow:{{ navShadow }}; transition:box-shadow .2s ease;">
+    <div style="max-width:1200px; margin:0 auto; padding:8px clamp(16px,4vw,32px); display:flex; align-items:center; gap:16px;">
+      <a href="#top" aria-label="Wren Builders Ltd" style="display:block; flex:none;"><img src="/survey/assets/wren-logo-min.svg" alt="Wren Builders Ltd" style="height:{{ logoH }}; width:auto;"></a>
+      <div style="margin-left:auto; display:flex; align-items:center; gap:18px;">
+        <a href="tel:+441872613608" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:#1d1f22; min-height:44px;">
+          <span style="width:42px; height:42px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path></svg>
+          </span>
+          <span style="display:flex; flex-direction:column; line-height:1.2;">
+            <span style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#5a5d63;">Call us</span>
+            <span style="font-size:17px; font-weight:600; white-space:nowrap;">01872 613608</span>
+          </span>
+        </a>
+        <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+          <button type="button" data-arw-btn="" onClick="{{ toSurvey }}" style="display:inline-flex; align-items:center; gap:10px; font-family:'Work Sans', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.04em; padding:14px 22px; min-height:48px; border:none; border-radius:4px; background:#1d1f22; color:#f7f4ee; cursor:pointer; transition:background .15s ease;" style-hover="background:#33363b;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #b6935a; outline-offset:3px;">Get my free quote<svg data-arw="" aria-hidden="true" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+        </sc-if>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+  <header id="top" style="position:relative; z-index:2; background:#16171a; color:#f7f4ee;">
+    <div aria-hidden="true" style="position:absolute; inset:0; overflow:hidden;">
+      <img src="/survey/assets/kitchen-hero.webp" alt="" fetchpriority="high" decoding="async" style="position:absolute; inset:0; width:100%; height:100%; max-width:none; object-fit:cover; object-position:60% 50%;">
+      <div style="position:absolute; inset:0; background:{{ heroOverlay }};"></div>
+      <div style="position:absolute; inset:0; opacity:.07; background-image:url('/survey/assets/grain-min.svg');"></div>
+    </div>
+    <div style="position:relative; max-width:1200px; margin:0 auto; padding:{{ heroPad }}; display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap:{{ heroGap }}; align-items:center;">
+      <div style="display:flex; flex-direction:column; gap:{{ heroCopyGap }};">
+        <div data-hero="" style="display:flex;">
+          <span style="display:inline-flex; align-items:center; gap:8px; padding:6px 14px 6px 10px; border:1px solid rgba(182,147,90,.7); border-radius:999px; font-size:12.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#f7f4ee; background:rgba(22,23,26,.5);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d2b483" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>Cornwall</span>
+        </div>
+        <h1 data-hero="" style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(30px,5.4vw,66px); line-height:1.06; letter-spacing:-.005em; text-wrap:balance; text-shadow:0 2px 24px rgba(0,0,0,.35);">Get your free kitchen quote in <span style="color:#d2b483; font-weight:600;">60 seconds</span></h1>
+        <p data-hero="" style="margin:0; font-size:clamp(15px,1.6vw,19px); line-height:1.55; color:#e4dfd6; max-width:50ch; text-wrap:pretty;">Answer a few quick questions and we'll be in touch with your quote, plus your £1,000 free appliance upgrade.</p>
+      </div>
+
+      <div id="survey" ref="{{ surveyRef }}" data-hero="" style="position:relative; scroll-margin-top:84px; background:#f7f4ee; color:#1d1f22; border-radius:4px; border:1px solid #e2dacb; border-top:3px solid #b6935a; padding:{{ cardPad }}; box-shadow:0 40px 80px -36px rgba(0,0,0,.65), 0 2px 6px rgba(22,23,26,.08);">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:28px;">
+          <span style="font-size:11.5px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:#8a6a36;">Question {{ stepNum }} of 5</span>
+          <sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}">
+            <button type="button" onClick="{{ back }}" style="display:inline-flex; align-items:center; gap:6px; font-family:inherit; font-size:14px; font-weight:500; padding:4px 8px; margin:-4px -8px; min-height:36px; border:none; border-radius:4px; background:transparent; color:#4f5258; cursor:pointer;" style-hover="color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:2px;"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8H3M7 4L3 8l4 4"></path></svg>Back</button>
+          </sc-if>
+        </div>
+        <div role="progressbar" aria-label="Survey progress" aria-valuemin="1" aria-valuemax="5" aria-valuenow="{{ stepNum }}" style="margin:8px 0 16px; height:4px; border-radius:999px; background:#e2dacb; overflow:hidden;">
+          <div style="height:100%; width:{{ progress }}; background:#b6935a; border-radius:999px; transition:width .35s cubic-bezier(.22,.61,.36,1);"></div>
+        </div>
+
+        <div ref="{{ stepRef }}">
+          <sc-if value="{{ isQuestion }}" hint-placeholder-val="{{ true }}">
+            <h2 style="margin:0 0 14px; font-family:'Work Sans', system-ui, sans-serif; font-weight:500; font-size:clamp(21px,2.4vw,27px); line-height:1.2; text-wrap:balance;">{{ q.title }}</h2>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <sc-for list="{{ q.options }}" as="opt" hint-placeholder-count="4">
+                <button type="button" onClick="{{ opt.pick }}" aria-pressed="{{ opt.pressed }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; text-align:left; font-family:'Work Sans', system-ui, sans-serif; font-size:16.5px; font-weight:500; letter-spacing:.02em; padding:14px 18px; min-height:56px; border:1px solid {{ opt.border }}; border-radius:4px; background:{{ opt.bg }}; color:#1d1f22; cursor:pointer; transition:border-color .15s ease, background .15s ease, transform .15s ease;" style-hover="border-color:#b6935a; background:#fbf8f2;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #b6935a; outline-offset:2px;">
+                  <span>{{ opt.label }}</span>
+                  <span style="flex:none; width:28px; height:28px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; background:{{ opt.dotBg }};"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="{{ opt.dotInk }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"></path></svg></span>
+                </button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ q.hasLine }}" hint-placeholder-val="{{ true }}">
+              <p style="display:flex; gap:10px; align-items:flex-start; margin:14px 0 0; font-size:14.5px; line-height:1.5; color:#4f5258;"><span style="flex:none; margin-top:2px; width:18px; height:18px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#8a6a36" stroke-width="2"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span><span>{{ q.line }}</span></p>
+            </sc-if>
+          </sc-if>
+
+          <sc-if value="{{ isContact }}" hint-placeholder-val="{{ false }}">
+            <h2 style="margin:0 0 14px; font-family:'Work Sans', system-ui, sans-serif; font-weight:500; font-size:clamp(21px,2.4vw,27px); line-height:1.2; text-wrap:balance;">Where should we send your free quote?</h2>
+            <form onSubmit="{{ submit }}" noValidate="{{ true }}" style="display:flex; flex-direction:column; gap:12px;">
+              <label style="display:flex; flex-direction:column; gap:5px;">
+                <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Full name</span>
+                <input name="full_name" type="text" autoComplete="name" required="{{ true }}" defaultValue="{{ fv.full_name }}" onInput="{{ onField }}" aria-invalid="{{ inv.full_name }}" style="font:inherit; font-size:16px; padding:12px 14px; min-height:48px; border:1px solid {{ bc.full_name }}; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+                <span style="font-size:13px; color:#a2361f;">{{ err.full_name }}</span>
+              </label>
+              <label style="display:flex; flex-direction:column; gap:5px;">
+                <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Contact number</span>
+                <input name="phone" type="tel" inputMode="tel" autoComplete="tel" required="{{ true }}" defaultValue="{{ fv.phone }}" onInput="{{ onField }}" aria-invalid="{{ inv.phone }}" style="font:inherit; font-size:16px; padding:12px 14px; min-height:48px; border:1px solid {{ bc.phone }}; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+                <span style="font-size:13px; color:#a2361f;">{{ err.phone }}</span>
+              </label>
+              <label style="display:flex; flex-direction:column; gap:5px;">
+                <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Email</span>
+                <input name="email" type="email" inputMode="email" autoComplete="email" required="{{ true }}" defaultValue="{{ fv.email }}" onInput="{{ onField }}" aria-invalid="{{ inv.email }}" style="font:inherit; font-size:16px; padding:12px 14px; min-height:48px; border:1px solid {{ bc.email }}; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+                <span style="font-size:13px; color:#a2361f;">{{ err.email }}</span>
+              </label>
+              <label style="display:flex; flex-direction:column; gap:5px;">
+                <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Street address</span>
+                <input name="street_address" type="text" autoComplete="street-address" required="{{ true }}" defaultValue="{{ fv.street_address }}" onInput="{{ onField }}" aria-invalid="{{ inv.street_address }}" style="font:inherit; font-size:16px; padding:12px 14px; min-height:48px; border:1px solid {{ bc.street_address }}; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+                <span style="font-size:13px; color:#a2361f;">{{ err.street_address }}</span>
+              </label>
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap:12px;">
+                <label style="display:flex; flex-direction:column; gap:5px;">
+                  <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">City / town</span>
+                  <input name="city" type="text" autoComplete="address-level2" required="{{ true }}" defaultValue="{{ fv.city }}" onInput="{{ onField }}" aria-invalid="{{ inv.city }}" style="font:inherit; font-size:16px; padding:12px 14px; min-height:48px; border:1px solid {{ bc.city }}; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+                  <span style="font-size:13px; color:#a2361f;">{{ err.city }}</span>
+                </label>
+                <label style="display:flex; flex-direction:column; gap:5px;">
+                  <span style="font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#4f5258;">Postcode</span>
+                  <input name="postcode" type="text" autoComplete="postal-code" autoCapitalize="characters" required="{{ true }}" defaultValue="{{ fv.postcode }}" onInput="{{ onField }}" aria-invalid="{{ inv.postcode }}" style="font:inherit; font-size:16px; padding:12px 14px; min-height:48px; border:1px solid {{ bc.postcode }}; border-radius:4px; background:#ffffff; color:#1d1f22; text-transform:uppercase;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
+                  <span style="font-size:13px; color:#a2361f;">{{ err.postcode }}</span>
+                </label>
+              </div>
+              <button type="submit" data-arw-btn="" disabled="{{ sending }}" style="display:flex; align-items:center; justify-content:center; gap:12px; margin-top:4px; font-family:'Work Sans', system-ui, sans-serif; font-size:16px; font-weight:600; letter-spacing:.04em; padding:18px 22px; min-height:58px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer; transition:background .15s ease;" style-hover="background:#a5834d;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #1d1f22; outline-offset:3px;">{{ submitLabel }}<svg data-arw="" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+              <sc-if value="{{ hasSubmitError }}" hint-placeholder-val="{{ false }}">
+                <p role="alert" style="margin:0; padding:10px 12px; border:1px solid #a2361f; border-radius:4px; background:#fbeee9; font-size:14px; line-height:1.5; color:#a2361f;">{{ submitError }}</p>
+              </sc-if>
+              <p style="margin:0; font-size:13px; line-height:1.5; color:#5a5d63; text-align:center;">We use your details to respond to your enquiry. If your property is in Cornwall, we may call or text you about your project. We also keep enquiries from outside Cornwall, without sales follow-up.</p>
+              <sc-if value="{{ hasPrivacy }}" hint-placeholder-val="{{ false }}">
+                <p style="margin:0; font-size:13px; line-height:1.5; color:#5a5d63; text-align:center;"><a href="{{ privacyUrl }}" target="_blank" rel="noopener" style="color:#8a6a36;">Privacy Notice</a></p>
+              </sc-if>
+            </form>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="reviews" data-rv="" style="background:#f7f4ee; padding:clamp(56px,8vw,104px) 0;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px); display:flex; flex-direction:column; align-items:center; gap:clamp(28px,4vw,44px);">
+      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:18px;">
+        <!-- Google rating 4.9 from 65 reviews, supplied by client (Nov 2026). Keep in sync with the live Google profile. -->
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:10px 14px; font-size:14.5px; color:#4f5258;">
+          <span style="display:inline-flex; align-items:center; gap:8px; padding:8px 14px; background:#ffffff; border:1px solid #e2dacb; border-radius:999px;"><span style="font-weight:600; color:#1d1f22;">4.9</span><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg>on Google</span>
+          <span style="display:inline-flex; align-items:center; gap:8px; padding:8px 14px; background:#ffffff; border:1px solid #e2dacb; border-radius:999px;"><span style="font-weight:600; color:#1d1f22;">65</span>reviews</span>
+        </div>
+        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(30px,4.2vw,50px); line-height:1.08; text-wrap:balance;">Real reviews from Cornwall homeowners</h2>
+      </div>
+      <!-- Real Google reviews supplied by client, word for word. Do not edit the text. -->
+      <div data-stagger="" style="width:100%; display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 300px), 1fr)); align-items:stretch; gap:16px;">
+        <article style="display:flex; flex-direction:column; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="flex:1; padding:24px; display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div role="img" aria-label="5 out of 5 stars" style="display:flex; gap:3px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg></div>
+              <span style="font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:#8a6a36;">Kitchen renovation</span>
+            </div>
+            <p id="rv-0" style="margin:0; font-size:15.5px; line-height:1.6; color:#33363b; white-space:pre-line; overflow:hidden; display:{{ rv.d0 }}; -webkit-box-orient:vertical; -webkit-line-clamp:{{ rv.c0 }};">So unbelievably pleased with the kitchen renovation completed by Wren Builders.
+From the initial consultation through to completion, Harry provided an excellent service. He was professional, reliable and courteous throughout the entire project, taking the time to understand our requirements and ensuring that everything was carried out to a very high standard.
+
+The quality of the workmanship was exceptional, with great attention to detail throughout the renovation. Harry and his team worked efficiently, maintained a high level of professionalism and were respectful of our home at all times.
+
+The completed kitchen has completely transformed the space, and we are delighted with the final result. The standard of work has exceeded our expectations, and it is clear that Harry takes great pride in delivering a quality finish.
+
+We would have no hesitation whatsoever in recommending Wren Builders to anyone considering a kitchen renovation or other building work. Harry was a pleasure to deal with from start to finish, and we would certainly use Wren Builders again in the future.
+
+Thank you to Harry and the team for an excellent job.</p>
+            <button type="button" onClick="{{ rv.t0 }}" aria-expanded="{{ rv.e0 }}" aria-controls="rv-0" style="align-self:flex-start; display:inline-flex; align-items:center; gap:6px; font-family:inherit; font-size:14px; font-weight:600; letter-spacing:.03em; padding:6px 0; min-height:36px; border:none; background:transparent; color:#8a6a36; cursor:pointer; text-decoration:underline; text-underline-offset:3px;" style-hover="color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:2px;">{{ rv.l0 }}</button>
+            <div style="margin-top:auto; padding-top:14px; border-top:1px solid #ece6dc; display:flex; flex-direction:column; gap:2px;">
+              <span style="font-size:16px; font-weight:600; color:#1d1f22;">fauve porter</span>
+              <span style="font-size:13.5px; color:#5a5d63;">Google review · 2 months ago</span>
+            </div>
+          </div>
+        </article>
+        <article style="display:flex; flex-direction:column; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="flex:1; padding:24px; display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div role="img" aria-label="5 out of 5 stars" style="display:flex; gap:3px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg></div>
+              <span style="font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:#8a6a36;">Extension and kitchen refurbishment</span>
+            </div>
+            <p id="rv-1" style="margin:0; font-size:15.5px; line-height:1.6; color:#33363b; white-space:pre-line; overflow:hidden; display:{{ rv.d1 }}; -webkit-box-orient:vertical; -webkit-line-clamp:{{ rv.c1 }};">We recently subcontracted Wren Builders to carry out a two-storey wraparound extension for one of our clients, as the project was outside of our usual working area and more local to their team.
+
+The works included the full extension along with a kitchen refurbishment, new utility and associated internal works.
+
+From start to finish, they were brilliant to work with. The workmanship and quality of finish were excellent, and most importantly for us as the main contractor, we could trust them to take control of the project and run everything smoothly without us needing to constantly be on site.
+
+The project was delivered on time, communication throughout was great, and our clients were extremely pleased with the finished result.
+
+We wouldn't hesitate to work with Wren Builders again and would highly recommend them to anyone looking for a reliable, professional building contractor.</p>
+            <button type="button" onClick="{{ rv.t1 }}" aria-expanded="{{ rv.e1 }}" aria-controls="rv-1" style="align-self:flex-start; display:inline-flex; align-items:center; gap:6px; font-family:inherit; font-size:14px; font-weight:600; letter-spacing:.03em; padding:6px 0; min-height:36px; border:none; background:transparent; color:#8a6a36; cursor:pointer; text-decoration:underline; text-underline-offset:3px;" style-hover="color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:2px;">{{ rv.l1 }}</button>
+            <div style="margin-top:auto; padding-top:14px; border-top:1px solid #ece6dc; display:flex; flex-direction:column; gap:2px;">
+              <span style="font-size:16px; font-weight:600; color:#1d1f22;">Waldron Build Ltd</span>
+              <span style="font-size:13.5px; color:#5a5d63;">Google review · a month ago</span>
+            </div>
+          </div>
+        </article>
+        <article style="display:flex; flex-direction:column; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
+          <div style="flex:1; padding:24px; display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div role="img" aria-label="5 out of 5 stars" style="display:flex; gap:3px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#b6935a"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg></div>
+              <span style="font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:#8a6a36;">Home project</span>
+            </div>
+            <p id="rv-2" style="margin:0; font-size:15.5px; line-height:1.6; color:#33363b; white-space:pre-line; overflow:hidden; display:{{ rv.d2 }}; -webkit-box-orient:vertical; -webkit-line-clamp:{{ rv.c2 }};">Truly excellent.
+Very focused on doing the very best job regardless of size and complexity. Attention to every detail is exemplary. Talk through the job in detail without complicated jargon and always available to answer questions.
+Once on site everyone was extremely polite and considerate, down to wearing overshoes when in the house.
+Post completion a thorough review to check customer is happy with the work and understands exactly what has been done.
+Highly recommended</p>
+            <button type="button" onClick="{{ rv.t2 }}" aria-expanded="{{ rv.e2 }}" aria-controls="rv-2" style="align-self:flex-start; display:inline-flex; align-items:center; gap:6px; font-family:inherit; font-size:14px; font-weight:600; letter-spacing:.03em; padding:6px 0; min-height:36px; border:none; background:transparent; color:#8a6a36; cursor:pointer; text-decoration:underline; text-underline-offset:3px;" style-hover="color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:2px;">{{ rv.l2 }}</button>
+            <div style="margin-top:auto; padding-top:14px; border-top:1px solid #ece6dc; display:flex; flex-direction:column; gap:2px;">
+              <span style="font-size:16px; font-weight:600; color:#1d1f22;">Mike Williams</span>
+              <span style="font-size:13.5px; color:#5a5d63;">Google review · a month ago</span>
+            </div>
+          </div>
+        </article>
+      </div>
+      <button type="button" data-arw-btn="" onClick="{{ toSurvey }}" style="display:inline-flex; align-items:center; justify-content:center; gap:12px; font-family:'Work Sans', system-ui, sans-serif; font-size:16px; font-weight:600; letter-spacing:.04em; padding:18px 30px; min-height:58px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer; transition:background .15s ease; width:{{ ctaWidth }};" style-hover="background:#a5834d;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #1d1f22; outline-offset:3px;">Get my free quote<svg data-arw="" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+    </div>
+  </section>
+
+  </main>
+  <footer style="background:#16171a; color:#c9c4bb; padding:56px 0 28px; font-size:14.5px; border-top:1px solid #2e3034;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px);">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap:36px;">
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <img src="/survey/assets/wren-logo-reversed-min.svg" alt="Wren Builders Ltd" loading="lazy" decoding="async" style="height:76px; width:auto; align-self:flex-start;">
+          <span>Wren Builders Ltd. Serving homeowners across Cornwall.</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <span style="font-size:11.5px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#d2b483;">Contact</span>
+          <a href="tel:+441872613608" style="color:#f7f4ee; text-decoration:none; font-size:17px; font-weight:600;">01872 613608</a>
+          <a href="mailto:info@wren-builders.com" style="color:#c9c4bb; text-decoration:none;" style-hover="text-decoration:underline; color:#f7f4ee;">info@wren-builders.com</a>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <span style="font-size:11.5px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#d2b483;">Address</span>
+          <span>Penstraze Business Centre, Penstraze, Truro, Cornwall, TR4 8PN</span>
+        </div>
+      </div>
+      <div style="margin-top:40px; padding-top:20px; border-top:1px solid #2e3034; font-size:12.5px; color:#a9a49b;">
+        <p style="margin:0;">© 2026 Wren Builders Ltd. Registered in England &amp; Wales, company number 15580800.</p>
+      </div>
+    </div>
+  </footer>
+
+  <sc-if value="{{ showSticky }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:0; right:0; bottom:0; z-index:70; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); background:rgba(22,23,26,.96); border-top:1px solid #2e3034; display:flex; gap:10px;">
+      <a href="tel:+441872613608" aria-label="Call 01872 613608" style="flex:none; width:56px; min-height:52px; border:1px solid #b6935a; border-radius:4px; display:grid; place-items:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d2b483" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path></svg>
+      </a>
+      <button type="button" onClick="{{ toSurvey }}" style="flex:1; display:flex; align-items:center; justify-content:center; gap:8px; font-family:'Work Sans', system-ui, sans-serif; font-size:16px; font-weight:600; letter-spacing:.03em; padding:14px 12px; min-height:52px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer;" style-active="transform:translateY(1px);">Get my free quote<svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  // Campaign config. Endpoint, routes and tracking live in wren-funnel.js (window.WrenFunnel).
+  cfg = {
+    campaign: 'kitchen',
+    offer: '1000-appliance-upgrade',
+    leadSource: 'Meta',
+    // Qualification tags (DQ - outside Cornwall, Low priority) are derived SERVER-SIDE from answers. See HANDOFF.md.
+    questions: [
+      // Reassurance line written by A2B for sign-off (not in the MD)
+      { key: 'kitchen_type', title: 'What are you looking for?', options: ['A full new kitchen', 'A partial refit (doors, worktops)', 'Not sure yet'], line: 'This helps us plan your project and give you an accurate quote.' },
+      { key: 'fitting_timeframe', title: 'When would you like your new kitchen fitted?', options: ['Before Christmas', 'Early 2027', 'Just looking for now'], line: 'Book soon to get fitted before Christmas.' },
+      // Reassurance line written by A2B for sign-off (not in the MD)
+      { key: 'owns_property', title: 'Do you own the property?', options: ['Yes', 'No'], line: 'This helps us plan the right next steps for your project.' },
+      // Reassurance line written by A2B for sign-off (not in the MD)
+      { key: 'in_cornwall', title: 'Is the property in Cornwall?', options: ['Yes', 'No'], line: 'We serve homeowners across Cornwall.' },
+    ],
+  };
+  state = { w: typeof window !== 'undefined' ? window.innerWidth : 1200, step: 0, answers: [], errors: {}, sending: false, submitError: '', scrolled: false, surveyInView: true, attr: {} };
+  rootRef = React.createRef();
+  surveyRef = React.createRef();
+  stepRef = React.createRef();
+  fields = {};
+
+  componentDidMount() {
+    const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid'];
+    const p = new URLSearchParams(location.search);
+    let stored = {};
+    try { stored = JSON.parse(sessionStorage.getItem('wren_attr') || '{}'); } catch (e) {}
+    const attr = { page_url: location.origin + location.pathname };
+    keys.forEach(k => { attr[k] = p.get(k) || stored[k] || ''; });
+    try { sessionStorage.setItem('wren_attr', JSON.stringify(attr)); } catch (e) {}
+    this.setState({ attr });
+
+    this.onResize = () => this.setState({ w: window.innerWidth });
+    this.onScroll = () => { const s = window.scrollY > 40; if (s !== this.state.scrolled) this.setState({ scrolled: s }); };
+    this.onArw = (e) => {
+      const b = e.target.closest && e.target.closest('[data-arw-btn]');
+      if (!b) return;
+      const a = b.querySelector('[data-arw]');
+      if (a) a.style.transform = e.type === 'mouseover' ? 'translateX(4px)' : '';
+    };
+    window.addEventListener('resize', this.onResize);
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    document.addEventListener('mouseover', this.onArw);
+    document.addEventListener('mouseout', this.onArw);
+    if (this.surveyRef.current && 'IntersectionObserver' in window) {
+      this.sio = new IntersectionObserver(([en]) => this.setState({ surveyInView: en.isIntersecting }), { threshold: 0.05 });
+      this.sio.observe(this.surveyRef.current);
+    }
+    setTimeout(() => this.setupMotion(), 60);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize);
+    window.removeEventListener('scroll', this.onScroll);
+    document.removeEventListener('mouseover', this.onArw);
+    document.removeEventListener('mouseout', this.onArw);
+    this.io && this.io.disconnect();
+    this.sio && this.sio.disconnect();
+  }
+  componentDidUpdate(pp, ps) {
+    // The x-dc runtime calls componentDidUpdate(prevProps) only, so prevState (ps) is always undefined here.
+    // Guarded so it no longer throws. The step slide-in below has therefore never run in this runtime; it stays dormant to keep the approved visuals unchanged.
+    if (ps && ps.step !== this.state.step) {
+      const el = this.stepRef.current;
+      if (el && el.animate && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const dir = this.state.step > ps.step ? 1 : -1;
+        el.animate([{ opacity: 0, transform: `translateX(${14 * dir}px)` }, { opacity: 1, transform: 'none' }], { duration: 280, easing: 'cubic-bezier(.22,.61,.36,1)' });
+      }
+    }
+  }
+  // Once-only reveals. Content is visible by default; JS only hides sections that start below the fold.
+  setupMotion() {
+    const root = this.rootRef.current;
+    if (!root || !('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const ease = 'cubic-bezier(.22,.61,.36,1)';
+    const hide = (el) => { el.style.opacity = '0'; el.style.transform = 'translateY(20px)'; };
+    const show = (el, d) => { el.style.transition = `opacity 520ms ${ease} ${d}ms, transform 520ms ${ease} ${d}ms`; el.style.opacity = '1'; el.style.transform = 'none'; setTimeout(() => { el.style.transition = ''; el.style.transform = ''; }, 560 + d); };
+    root.querySelectorAll('[data-hero]').forEach((el, i) => { hide(el); setTimeout(() => show(el, 60 + i * 70), 30); });
+    this.io = new IntersectionObserver((entries) => {
+      entries.forEach(en => {
+        if (!en.isIntersecting) return;
+        const sec = en.target; this.io.unobserve(sec);
+        show(sec, 0);
+        sec.querySelectorAll('[data-stagger]').forEach(g => [...g.children].forEach((c, i) => show(c, 120 + Math.min(i, 6) * 80)));
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    root.querySelectorAll('[data-rv]').forEach(sec => {
+      if (sec.getBoundingClientRect().top < window.innerHeight * 0.9) return;
+      hide(sec);
+      sec.querySelectorAll('[data-stagger]').forEach(g => [...g.children].forEach(c => hide(c)));
+      this.io.observe(sec);
+    });
+  }
+  toSurvey = () => {
+    const t = this.surveyRef.current;
+    if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 84, behavior: 'smooth' });
+  };
+  pick = (label) => {
+    const step = this.state.step;
+    const answers = this.state.answers.slice();
+    answers[step] = label;
+    this.setState({ answers });
+    clearTimeout(this.adv);
+    this.adv = setTimeout(() => this.setState({ step: step + 1 }), 170);
+  };
+  back = () => this.setState(s => ({ step: Math.max(0, s.step - 1) }));
+  onField = (e) => {
+    const { name, value } = e.target;
+    this.fields[name] = value;
+    if (this.state.errors[name]) this.setState(s => ({ errors: { ...s.errors, [name]: '' } }));
+  };
+  validate() {
+    const f = this.fields, v = (k) => (f[k] || '').trim(), e = {};
+    if (v('full_name').length < 2) e.full_name = 'Please enter your full name';
+    if (!/^(?:\+44|0044|0)7\d{9}$/.test(v('phone').replace(/[\s\-().]/g, ''))) e.phone = 'Please enter a valid UK mobile number';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v('email'))) e.email = 'Please enter a valid email address';
+    if (v('street_address').length < 3) e.street_address = 'Please enter your street address';
+    if (v('city').length < 2) e.city = 'Please enter your city or town';
+    if (!/^(GIR ?0AA|[A-PR-UWYZ][A-HK-Y]?\d[A-Z\d]? ?\d[ABD-HJLNP-UW-Z]{2})$/i.test(v('postcode').replace(/\s+/g, ' '))) e.postcode = 'Please enter a valid UK postcode';
+    return e;
+  }
+  buildPayload(submissionId) {
+    const v = (k) => (this.fields[k] || '').trim();
+    const fullName = v('full_name').replace(/\s+/g, ' ');
+    const answers = {};
+    this.cfg.questions.forEach((q, i) => { answers[q.key] = this.state.answers[i] || ''; });
+    const a = this.state.attr || {};
+    const extra = window.WrenFunnel.attributionExtras();
+    return {
+      schema_version: window.WrenFunnel.config.schemaVersion,
+      submission_id: submissionId,
+      campaign: this.cfg.campaign,
+      offer: this.cfg.offer,
+      lead_source: this.cfg.leadSource,
+      contact: {
+        full_name: fullName,
+        first_name: fullName.split(' ')[0] || '',
+        phone: v('phone'),
+        email: v('email'),
+        street_address: v('street_address'),
+        city: v('city'),
+        postcode: v('postcode').toUpperCase().replace(/\s+/g, ' '),
+      },
+      answers,
+      attribution: {
+        page_url: a.page_url || '',
+        utm_source: a.utm_source || '', utm_medium: a.utm_medium || '', utm_campaign: a.utm_campaign || '',
+        utm_content: a.utm_content || '', utm_term: a.utm_term || '', fbclid: a.fbclid || '',
+        fbp: extra.fbp, fbc: extra.fbc, referrer: extra.referrer,
+      },
+      submission_timestamp: new Date().toISOString(),
+    };
+  }
+  // INTEGRATION BOUNDARY: transport lives in wren-funnel.js (WrenFunnel.submitLead). Redirect happens ONLY after confirmed success.
+  submit = (e) => {
+    e.preventDefault();
+    if (this.inFlight) return;
+    const errors = this.validate();
+    const bad = Object.keys(errors);
+    if (bad.length) {
+      this.setState({ errors });
+      const el = this.rootRef.current && this.rootRef.current.querySelector('[name="' + bad[0] + '"]');
+      el && el.focus();
+      return;
+    }
+    this.inFlight = true;
+    this.setState({ sending: true, errors: {}, submitError: '' });
+    const onFail = (err) => {
+      console.error('[Wren funnel] submission failed:', err && (err.code || err.message), err);
+      this.inFlight = false;
+      this.setState({ sending: false, submitError: "Sorry, we couldn't send your details just now. Please try again, or call us on 01872 613608." });
+    };
+    let F, payload, expectAccepted, routes;
+    try {
+      F = window.WrenFunnel;
+      if (!F) { const x = new Error('wren-funnel.js not loaded'); x.code = 'FUNNEL_SCRIPT_MISSING'; throw x; }
+      payload = this.buildPayload(F.getSubmissionId(this.cfg.campaign));
+      expectAccepted = payload.answers.in_cornwall === 'Yes'; // expectation only. The server's outcome decides.
+      routes = { accepted: F.route(this.cfg.campaign, 'thankYou'), disqualified: F.route(this.cfg.campaign, 'notInArea') }; // fail early if a route is missing
+    } catch (err) { onFail(err); return; }
+    F.submitLead(payload).then((res) => {
+      // Qualification boundary: Cornwall = Yes is forwarded to GHL ('accepted'); Cornwall = No is 'disqualified' and never leaves the server.
+      if ((res.outcome === 'accepted') !== expectAccepted) console.warn('[Wren funnel] server outcome differs from the page answer. Using the server outcome.');
+      F.completeSubmission({ campaign: payload.campaign, offer: payload.offer, submission_id: payload.submission_id, outcome: res.outcome });
+      // First name travels in session storage only, never in the URL.
+      try { sessionStorage.setItem('wren_first_name', payload.contact.first_name); } catch (err) {}
+      window.location.assign(routes[res.outcome]);
+    }, onFail);
+  };
+  rvVals() {
+    const o = this.state.rvOpen || {}, v = {};
+    [0, 1, 2].forEach(i => {
+      v['d' + i] = o[i] ? 'block' : '-webkit-box';
+      v['c' + i] = o[i] ? 'none' : '4';
+      v['e' + i] = o[i] ? 'true' : 'false';
+      v['l' + i] = o[i] ? 'Read less' : 'Read more';
+      v['t' + i] = () => this.setState(s => ({ rvOpen: { ...(s.rvOpen || {}), [i]: !(s.rvOpen || {})[i] } }));
+    });
+    return v;
+  }
+  renderVals() {
+    const { w, step, answers, errors } = this.state;
+    const mobile = w < 760;
+    const twoCol = w >= 1040;
+    const qs = this.cfg.questions;
+    const isContact = step >= qs.length;
+    const qd = qs[Math.min(step, qs.length - 1)];
+    const q = {
+      title: qd.title, line: qd.line || '', hasLine: !!qd.line,
+      options: qd.options.map(label => {
+        const on = answers[step] === label;
+        return { label, pick: () => this.pick(label), pressed: on ? 'true' : 'false', border: on ? '#b6935a' : '#d8cfbf', bg: on ? '#fbf6ec' : '#ffffff', dotBg: on ? '#b6935a' : 'transparent', dotInk: on ? '#1d1f22' : '#8a6a36' };
+      }),
+    };
+    const names = ['full_name', 'phone', 'email', 'street_address', 'city', 'postcode'];
+    const err = {}, bc = {}, inv = {}, fv = {};
+    names.forEach(n => { err[n] = errors[n] || ''; bc[n] = errors[n] ? '#a2361f' : '#d8cfbf'; inv[n] = errors[n] ? 'true' : 'false'; fv[n] = this.fields[n] || ''; });
+    return {
+      rv: this.rvVals(),
+      rootRef: this.rootRef, surveyRef: this.surveyRef, stepRef: this.stepRef,
+      isDesktop: w >= 900,
+      logoH: mobile ? '44px' : '52px',
+      navShadow: this.state.scrolled ? '0 8px 24px -16px rgba(22,23,26,.45)' : 'none',
+      heroOverlay: twoCol
+        ? 'linear-gradient(90deg, rgba(22,23,26,.94) 0%, rgba(22,23,26,.82) 40%, rgba(22,23,26,.45) 70%, rgba(22,23,26,.3) 100%)'
+        : 'linear-gradient(180deg, rgba(22,23,26,.8) 0%, rgba(22,23,26,.9) 100%)',
+      heroPad: mobile ? '18px 16px 28px' : 'clamp(36px,5vw,72px) clamp(18px,4vw,32px)',
+      heroGap: twoCol ? 'clamp(32px,5vw,64px)' : (mobile ? '18px' : '28px'),
+      heroCopyGap: mobile ? '12px' : '20px',
+      cardPad: mobile ? '18px 16px 20px' : 'clamp(24px,3vw,34px)',
+      stepNum: Math.min(step + 1, 5),
+      progress: `${(Math.min(step + 1, 5) / 5) * 100}%`,
+      canBack: step > 0 && !this.state.sending,
+      isQuestion: !isContact,
+      isContact,
+      q,
+      err, bc, inv, fv,
+      attr: this.state.attr,
+      submitError: this.state.submitError || '',
+      hasSubmitError: !!this.state.submitError,
+      // Privacy policy link: rendered only when CONFIG.privacy.url is set in wren-funnel.js.
+      hasPrivacy: !!(window.WrenFunnel && window.WrenFunnel.config.privacy && window.WrenFunnel.config.privacy.url),
+      privacyUrl: (window.WrenFunnel && window.WrenFunnel.config.privacy && window.WrenFunnel.config.privacy.url) || '',
+      onField: this.onField,
+      submit: this.submit,
+      sending: this.state.sending,
+      submitLabel: this.state.sending ? 'Sending…' : 'Get my free quote',
+      back: this.back,
+      toSurvey: this.toSurvey,
+      ctaWidth: mobile ? '100%' : 'auto',
+      showSticky: mobile && !this.state.surveyInView,
+      stickyPad: mobile ? '76px' : '0px',
+    };
+  }
+}
+</script>
+</body>
+</html>
