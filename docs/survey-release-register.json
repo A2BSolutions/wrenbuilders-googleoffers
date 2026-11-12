@@ -133,6 +133,20 @@
       "statement": "On Production: a first visit to every survey page makes zero third-party requests and shows the cookie banner. Reject loads nothing. Accept requests GTM-KF4RWHHQ once and starts Pixel 1135200792433711 with PageView once and no Lead. A direct visit to a thank-you page fires no Lead. Review pages ignore stored consent.",
       "provenance": "Real browser against Production, 12 Nov 2026, with every Google and Meta request intercepted and stubbed so nothing reached Google or Meta. No form was submitted.",
       "limits": "The real Meta Lead after a qualified submission and its receipt in Events Manager are part of the controlled live test, not yet run."
+    },
+    {
+      "id": "controlled_test_dq_12nov",
+      "status": "live_tested",
+      "statement": "Controlled Production tests of the outside-Cornwall (No) path PASSED for Kitchen and Garage. Each submission through the real Production website created one GHL contact (Kitchen 5Ir3RB7QhaHAHgBWoYua, Garage vbeBD1qmrU1ASJ0qHTMv) within about 3 seconds, created by the correct v2 workflow (Kitchen 952d05ee…, Garage 0490b32d…), tagged 'dq - outside cornwall' plus the offer and survey-funnel tags, with all answers and attribution stored. No opportunity, no Leads Master row, no conversation or SMS followed, and the browser fired no Meta Lead and no wren_survey_lead (re-checked after several minutes).",
+      "provenance": "Live tests, 12 Nov 2026, one submission each, run ids T1112A and T1112B, via Playwright against go.wren-builders.online. GHL read back through the GHL API. Sheet read back through the Sheets API (last data row stayed at 73). Opportunities stayed at 53.",
+      "limits": "Records created and left in place: 2 ZZ TEST contacts using fictional Ofcom drama-range numbers (07700 900881, 07700 900882) and @example.com emails. No cleanup done (not authorised). The internal notification could not be observed (info@ inbox not accessible to A2B), so 'no internal notification' rests on the absence of any opportunity or sheet row plus Codex's workflow configuration. Real Meta receipt of events was not checked (browser Google and Meta requests were stubbed)."
+    },
+    {
+      "id": "controlled_test_qualified_12nov",
+      "status": "unknown",
+      "statement": "Cornwall Yes tests (Kitchen and Garage) were NOT run. They create a real opportunity, Leads Master row, internal notification and Harry's SMS, and no approved A2B-controlled test phone or email destination exists.",
+      "provenance": "No approved test destination was supplied. The instruction was not to invent or use an unapproved test phone number.",
+      "limits": "Opportunity creation, Leads Master reporting, internal notification, SMS delivery, Kitchen low-priority tagging, absence of a stale DQ tag, and Meta Lead receipt are all UNVERIFIED on Kitchen v25 and Garage v22."
     }
   ],
   "items": [

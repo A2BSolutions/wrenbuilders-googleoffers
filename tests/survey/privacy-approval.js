@@ -127,7 +127,7 @@ function evaluate(f) {
   if (reg && !cc) problems.push('register has no privacy_contact_selected item');
   else if (cc && cc.status === 'confirmed' && !new RegExp(`mailto:${cc.value.replace(/[.]/g, '\\.')}"`).test(section(html, 10))) problems.push(`notice section 10 does not use the confirmed privacy contact ${cc.value}`);
   const facts = reg && Array.isArray(reg.recorded_facts) ? reg.recorded_facts : [];
-  for (const x of facts) if (!x.id || !['verified_by_codex', 'confirmed_by_user', 'verified_in_repo', 'checked_readonly', 'unknown'].includes(x.status) || !x.statement || !x.provenance) problems.push(`recorded fact "${x.id}" is malformed`);
+  for (const x of facts) if (!x.id || !['verified_by_codex', 'confirmed_by_user', 'verified_in_repo', 'checked_readonly', 'live_tested', 'unknown'].includes(x.status) || !x.statement || !x.provenance) problems.push(`recorded fact "${x.id}" is malformed`);
   // A fact that is UNKNOWN must have a blocking approval item, so unknowns can never be skipped.
   if (reg && facts.some((x) => x.id === 'mailbox_monitoring' && x.status === 'unknown') && !(reg.items || []).some((i) => i.id === 'privacy_mailbox_monitored' && i.blocking)) problems.push('mailbox monitoring is UNKNOWN but has no blocking approval item');
   return { problems, pending, notes, facts, relayed };
