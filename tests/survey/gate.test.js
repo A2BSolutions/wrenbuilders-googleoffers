@@ -88,6 +88,16 @@ const mutations = {
   'lang attribute removed': (f) => { f.pages['kitchen-survey'] = f.pages['kitchen-survey'].replace('<html lang="en-GB">', '<html>'); },
   'main landmark removed': (f) => { f.pages['garage-thank-you'] = f.pages['garage-thank-you'].replace('<main>', '<div>').replace('</main>', '</div>'); },
   'progress bar loses its name': (f) => { f.pages['garage-survey'] = f.pages['garage-survey'].replace('aria-label="Survey progress" ', ''); },
+  'a review route is removed': (f) => { f.vercel = f.vercel.replace('"/review/garage/thank-you"', '"/review/garage/gone"'); },
+  'review noindex header removed': (f) => { const v = JSON.parse(f.vercel); v.headers = v.headers.filter((h) => h.source !== '/review/(.*)'); f.vercel = JSON.stringify(v); },
+  'review endpoint reads env': (f) => { f.reviewApi += "\nconst u = process.env.GHL_SURVEY_KITCHEN_WEBHOOK_URL;"; },
+  'review endpoint gains a network call': (f) => { f.reviewApi += "\nfetch('https://example.com', {});"; },
+  'review endpoint imports the forwarder': (f) => { f.reviewApi += "\nconst x = require('./_lib/idempotency');"; },
+  'real endpoint stops refusing review pages': (f) => { f.leadApi = f.leadApi.replace('fromReviewPage(req)) return done(403', 'false) return done(403'); },
+  'consent loads GTM on review pages': (f) => { f.consent = f.consent.replace("if (manage || review || gtmLoaded) return;", 'if (manage || gtmLoaded) return;'); },
+  'review mode stops blocking the Pixel': (f) => { f.funnel = f.funnel.replace('if (REVIEW || !CONFIG.tracking.inlineMetaPixel) return;', 'if (!CONFIG.tracking.inlineMetaPixel) return;'); },
+  'review mode creates a conversion token': (f) => { f.funnel = f.funnel.replace('if (REVIEW) return; // a review copy never creates a conversion token', ''); },
+  'review hub gains a script': (f) => { f.reviewIndex = f.reviewIndex.replace('</body>', '<script src="/x.js"></script></body>'); },
   'register unreadable': (f) => { f.register = '{not json'; }
 };
 for (const [name, mut] of Object.entries(mutations)) {

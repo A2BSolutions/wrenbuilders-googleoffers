@@ -17,6 +17,9 @@
  *   data-mode="manage" privacy page: never loads trackers and never shows the banner. It only renders the Accept and
  *                      Reject controls into #wren-cookie-settings so a visitor can change or withdraw their choice.
  *
+ *   REVIEW COPY      /review/* pages (the same pages, served for internal and client review). Never loads GTM or the Pixel, whatever
+ *                      choice is stored, shows no cookie banner, and shows a fixed PREVIEW bar instead. See api/survey-review.js.
+ *
  * API (window.WrenConsent): state() 'granted'|'denied'|'unset', onGrant(cb), onDeny(cb), accept(), reject().
  */
 (function () {
@@ -28,6 +31,7 @@
   var GTM_ID = 'GTM-KF4RWHHQ';
   var script = document.currentScript;
   var manage = !!(script && script.getAttribute('data-mode') === 'manage');
+  var review = /^\/review(\/|$)/.test(window.location.pathname);
 
   var memory = null; // used only when storage is blocked: this page only
   var grantCbs = [];
@@ -45,6 +49,7 @@
   }
 
   function state() {
+    if (review) return 'denied'; // a review copy never has tracking consent, whatever this browser stored for the live site
     var raw = readRaw();
     if (!raw) return 'unset';
     var o;
@@ -56,7 +61,7 @@
   }
 
   function loadGtm() {
-    if (manage || gtmLoaded) return;
+    if (manage || review || gtmLoaded) return;
     gtmLoaded = true;
     var w = window, d = document, l = 'dataLayer';
     w[l] = w[l] || [];
@@ -85,6 +90,7 @@
   function run(list) { list.slice().forEach(function (cb) { try { cb(); } catch (e) {} }); }
 
   function set(v) {
+    if (review) return;
     var before = state();
     writeRaw(JSON.stringify({ v: v, t: Date.now() }));
     hideBanner();
@@ -98,7 +104,7 @@
   }
 
   function onGrant(cb) {
-    if (manage) return;
+    if (manage || review) return;
     if (state() === 'granted') { try { cb(); } catch (e) {} return; }
     grantCbs.push(cb);
   }
@@ -135,7 +141,7 @@
   }
 
   function showBanner() {
-    if (manage || banner || state() !== 'unset' || !document.body) return;
+    if (manage || review || banner || state() !== 'unset' || !document.body) return;
     addStyle();
     banner = document.createElement('div');
     banner.className = 'wc-bar'; banner.setAttribute('role', 'region'); banner.setAttribute('aria-label', 'Cookie choices');
@@ -152,7 +158,37 @@
   }
   function hideBanner() { if (banner && banner.parentNode) banner.parentNode.removeChild(banner); banner = null; }
 
+  var REVIEW_CSS =
+    '.wr-bar{position:fixed;left:0;right:0;bottom:0;z-index:2147483001;background:#fff4d6;color:#4a3b00;border-top:3px solid #d9a400;' +
+    'padding:10px 16px calc(10px + env(safe-area-inset-bottom));font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-align:center}' +
+    '.wr-bar b{letter-spacing:.06em}.wr-bar a{color:#4a3b00;font-weight:600;white-space:nowrap}';
+
+  // Review copies only: a fixed bar that says what this is. Nothing typed on a review page is sent or saved.
+  function showReviewBar() {
+    if (!review || !document.body || document.getElementById('wren-review-bar')) return;
+    var st = document.createElement('style'); st.id = 'wren-review-style'; st.textContent = REVIEW_CSS; (document.head || document.documentElement).appendChild(st);
+    var what = /privacy/.test(window.location.pathname) ? 'Privacy Notice' : /garage/.test(window.location.pathname) ? 'Garage funnel' : 'Kitchen funnel';
+    var bar = document.createElement('div'); bar.id = 'wren-review-bar'; bar.className = 'wr-bar'; bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Preview notice');
+    bar.setAttribute('data-wren-review', 'bar');
+    bar.innerHTML = '<b>PREVIEW ONLY</b> · Review copy of the ' + what + '. Not a live campaign page. Nothing you enter is sent or saved, and no tracking runs. <a href="/review">All review pages</a>';
+    document.body.appendChild(bar);
+    document.body.style.paddingBottom = '84px';
+  }
+
+  // Keep reviewers inside the review copy: the notice link points at the review notice.
+  if (review) document.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a) return;
+    var h = a.getAttribute('href') || '';
+    if (/^\/survey\/privacy(#.*)?$/.test(h)) a.setAttribute('href', h.replace('/survey/privacy', '/review/privacy'));
+  }, true);
+
   function render() {
+    if (review) {
+      var rh = document.getElementById('wren-cookie-settings');
+      if (rh) { rh.className = ''; rh.innerHTML = '<p class="note">On the live page, two buttons here let a visitor accept or reject optional cookies. They are switched off on this review copy.</p>'; }
+      return;
+    }
     if (!manage) return;
     var host = document.getElementById('wren-cookie-settings');
     if (!host) return;
@@ -171,11 +207,11 @@
     host.appendChild(status); host.appendChild(row);
   }
 
-  window.WrenConsent = { state: state, onGrant: onGrant, onDeny: onDeny, accept: function () { set('granted'); }, reject: function () { set('denied'); } };
+  window.WrenConsent = { review: review, state: state, onGrant: onGrant, onDeny: onDeny, accept: function () { set('granted'); }, reject: function () { set('denied'); } };
 
   // Load GTM straight away when consent was already given (same position as the old head snippet). Otherwise load nothing.
   if (state() === 'granted') loadGtm();
 
-  function ready() { showBanner(); render(); }
+  function ready() { showBanner(); showReviewBar(); render(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready); else ready();
 })();

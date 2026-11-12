@@ -46,6 +46,14 @@ function originAllowed(req, env) {
   return !!o && extra.includes(o);
 }
 
+// Review copies (/review/*) must never reach this endpoint. Their pages post to /api/survey-review instead. This is the
+// server-side backstop: a request that comes from a /review page (by its Referer) or that carries the review header is refused
+// before any validation, store or outgoing request. See api/survey-review.js and tests/survey/review.test.js.
+function fromReviewPage(req) {
+  if (req.headers['x-wren-review']) return true;
+  try { return /^\/review(\/|$)/.test(new URL(String(req.headers.referer || '')).pathname); } catch (e) { return false; }
+}
+
 function webhookFor(campaign, env, ghl) {
   const raw = env[CAMPAIGNS[campaign].webhookEnv];
   if (!raw) return null;
@@ -97,6 +105,7 @@ function createHandler(opts = {}) {
     try {
       if (req.method !== 'POST') return done(405, { ok: false, error: 'METHOD_NOT_ALLOWED' }, 'rejected', { reason: 'method' }, { Allow: 'POST' });
       if (!originAllowed(req, env)) return done(403, { ok: false, error: 'FORBIDDEN_ORIGIN' }, 'rejected', { reason: 'origin' });
+      if (fromReviewPage(req)) return done(403, { ok: false, error: 'REVIEW_COPY_CANNOT_SUBMIT' }, 'rejected', { reason: 'review' });
       if (!/^application\/json\b/i.test(String(req.headers['content-type'] || ''))) return done(415, { ok: false, error: 'UNSUPPORTED_MEDIA_TYPE' }, 'rejected', { reason: 'content-type' });
       if (Number(req.headers['content-length'] || 0) > MAX_BODY_CHARS * 2) return done(413, { ok: false, error: 'PAYLOAD_TOO_LARGE' }, 'rejected', { reason: 'size' });
 

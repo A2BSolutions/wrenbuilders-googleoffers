@@ -13,6 +13,10 @@
   'use strict';
   if (window.WrenFunnel) return; // guard against double execution (prevents duplicate Pixel init)
 
+  // Review copies (/review/*) reuse these same pages. In review mode the page posts to /api/survey-review (which cannot reach
+  // GHL), uses review routes, starts no Pixel, fires no Lead and creates no conversion token. See api/survey-review.js.
+  var REVIEW = /^\/review(\/|$)/.test(window.location.pathname);
+
   var CONFIG = {
     schemaVersion: '1.0',
 
@@ -43,6 +47,15 @@
       conversionMaxAgeMs: 30 * 60 * 1000
     }
   };
+
+  if (REVIEW) {
+    CONFIG.submitEndpoint = '/api/survey-review';
+    CONFIG.routes = {
+      garage:  { thankYou: '/review/garage/thank-you',  notInArea: '/review/garage/not-in-area' },
+      kitchen: { thankYou: '/review/kitchen/thank-you', notInArea: '/review/kitchen/not-in-area' }
+    };
+    CONFIG.privacy = { url: '/review/privacy' };
+  }
 
   var KEY_SUBMISSION_ID = 'wren_submission_id_';
   var KEY_CONVERSION = 'wren_conversion';
@@ -117,7 +130,9 @@
     }).then(function (res) {
       return res.json().catch(function () { return null; }).then(function (body) {
         if (!res.ok) throw fail('HTTP_' + res.status, 'Endpoint returned ' + res.status, { body: body });
-        var typed = body && body.ok === true && body.stored_in_ghl === true &&
+        // Live: stored_in_ghl:true and never a review body. Review copy: review:true and stored_in_ghl:false (nothing was sent).
+        var shape = REVIEW ? (body && body.review === true && body.stored_in_ghl === false) : (body && body.review !== true && body.stored_in_ghl === true);
+        var typed = body && body.ok === true && shape &&
           ((body.outcome === 'accepted' && body.sales_qualified === true) || (body.outcome === 'disqualified' && body.sales_qualified === false));
         if (!typed) throw fail('NOT_CONFIRMED', 'Endpoint did not confirm a typed outcome', { body: body });
         return body;
@@ -131,6 +146,7 @@
   // thank-you page ONLY when the server's outcome is 'accepted' (sales-qualified). A disqualified outcome never creates a token.
   function completeSubmission(info) {
     ss('del', KEY_SUBMISSION_ID + info.campaign);
+    if (REVIEW) return; // a review copy never creates a conversion token
     if (info.outcome === 'accepted') {
       ss('set', KEY_CONVERSION, JSON.stringify({
         submission_id: info.submission_id, campaign: info.campaign, offer: info.offer, created_at: Date.now()
@@ -139,6 +155,7 @@
   }
 
   function attributionExtras() {
+    if (REVIEW) return { fbp: '', fbc: '', referrer: '' };
     return { fbp: cookie('_fbp'), fbc: cookie('_fbc'), referrer: document.referrer || '' };
   }
 
@@ -146,7 +163,7 @@
   window.dataLayer = window.dataLayer || [];
 
   function loadPixel() {
-    if (!CONFIG.tracking.inlineMetaPixel) return;
+    if (REVIEW || !CONFIG.tracking.inlineMetaPixel) return;
     // Single-owner guard: if a Pixel is already on the page (for example loaded by GTM), do not init it a second time.
     // A second init would double-count PageView. Lead still fires through the existing fbq in onThankYou().
     if (typeof window.fbq === 'function') { window.__wrenPixelOwner = window.__wrenPixelOwner || 'external'; return; }
@@ -193,7 +210,7 @@
     try { t = JSON.parse(raw); } catch (e) {}
     if (!t || t.campaign !== campaign || !t.submission_id) return;
     var C = window.WrenConsent;
-    var st = C ? C.state() : 'denied';
+    var st = !REVIEW && C ? C.state() : 'denied';
     if (st === 'denied') { ss('del', KEY_CONVERSION); return; }
     if (st === 'granted') { fireLead(); return; }
     if (waiting) return;
@@ -204,6 +221,7 @@
 
   window.WrenFunnel = {
     config: CONFIG,
+    review: REVIEW,
     getSubmissionId: getSubmissionId,
     route: route,
     submitLead: submitLead,

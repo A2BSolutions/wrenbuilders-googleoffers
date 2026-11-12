@@ -410,6 +410,62 @@ async function survey(pg, c, cornwall, { stopAtForm = false, base = BASE, route 
     await ctx.close();
   }
 
+  // 6e. REVIEW COPIES (/review/*): permanent, public, unauthenticated, preview-labelled, cannot reach GHL, no tracking
+  const REVIEW_ROUTES = ['/review', '/review/kitchen', '/review/kitchen/thank-you', '/review/kitchen/not-in-area', '/review/garage', '/review/garage/thank-you', '/review/garage/not-in-area', '/review/privacy'];
+  for (const r of REVIEW_ROUTES) { // a brand-new context: no cookies, no login, no auth header. Consent is seeded 'granted' to prove review pages ignore it
+    const { ctx, pg, log } = await mkPage(br, { consent: 'granted' });
+    const res = await pg.goto(`${BASE}${r}`, { waitUntil: 'load' }); await pg.waitForTimeout(1800);
+    const html = await (await fetch(`${BASE}${r}`)).text();
+    check(`review ${r}: 200 without login, noindex header and meta`, res.status() === 200 && /noindex, nofollow/.test(res.headers()['x-robots-tag'] || '') && /name="robots" content="noindex, nofollow"/.test(html), res.status());
+    check(`review ${r}: zero third-party requests, no GTM, no Meta, no fbq, even with consent stored as granted`, thirdParty(log).length === 0 && log.gtmReq === 0 && log.fbReq === 0 && (await pg.evaluate(() => typeof window.fbq)) === 'undefined' && !(await pg.evaluate(() => (window.dataLayer || []).some((e) => e.event === 'gtm.js'))), log.hosts);
+    if (r !== '/review') check(`review ${r}: PREVIEW ONLY bar is shown, links to /review, and there is no cookie banner`, (await pg.locator('[data-wren-review=bar]').count()) === 1 && /PREVIEW ONLY/.test(await pg.locator('[data-wren-review=bar]').innerText()) && /Nothing you enter is sent or saved/.test(await pg.locator('[data-wren-review=bar]').innerText()) && (await pg.locator('[data-wren-review=bar] a[href="/review"]').count()) === 1 && (await bannerOf(pg).count()) === 0);
+    else check('review hub: labelled PREVIEW ONLY, no script at all, links to all seven review pages', /PREVIEW ONLY/.test(html) && !/<script/i.test(html) && REVIEW_ROUTES.slice(1).every((x) => html.includes(`href="${x}"`)));
+    check(`review ${r}: no console errors`, log.console.length === 0, log.console);
+    await ctx.close();
+  }
+  for (const [c, cw] of [['kitchen', 'Yes'], ['kitchen', 'No'], ['garage', 'Yes'], ['garage', 'No']]) { // the whole journey, with the server boundary instrumented
+    await mock('reset');
+    const { ctx, pg, log } = await mkPage(br, { consent: 'granted' });
+    let live = 0, review = 0; let reviewBody = null;
+    await pg.route('**/api/survey-lead', (r) => { live++; r.continue(); });
+    await pg.route('**/api/survey-review', async (r) => { review++; const resp = await r.fetch(); try { reviewBody = await resp.json(); } catch (e) {} r.fulfill({ response: resp }); });
+    await survey(pg, c, cw, { route: `/review/${c}` }); await pg.click('button[type=submit]');
+    const dest = cw === 'Yes' ? 'thank-you' : 'not-in-area';
+    await pg.waitForURL(new RegExp(`/review/${c}/${dest}$`), { timeout: 15000 }).catch(() => {}); await pg.waitForTimeout(1500);
+    check(`review ${c}/${cw}: reviewer can click through every question and reach the review ${dest} page`, pg.url().endsWith(`/review/${c}/${dest}`), pg.url());
+    check(`review ${c}/${cw}: the form posted ONLY to /api/survey-review (once), never to /api/survey-lead`, review === 1 && live === 0, { review, live });
+    check(`review ${c}/${cw}: typed review response, nothing stored`, reviewBody && reviewBody.ok === true && reviewBody.review === true && reviewBody.stored_in_ghl === false && reviewBody.outcome === (cw === 'Yes' ? 'accepted' : 'disqualified'), reviewBody);
+    check(`review ${c}/${cw}: ZERO requests reached the GHL receiver (mock saw nothing, no outgoing request)`, (await calls()).length === 0 && (await outgoing()) === 0);
+    check(`review ${c}/${cw}: no Lead, no wren_survey_lead, no Pixel, no conversion token, nothing third-party`, (await dl(pg, 'wren_survey_lead')).length === 0 && (await pg.evaluate(() => typeof window.fbq)) === 'undefined' && (await pg.evaluate(() => sessionStorage.getItem('wren_conversion'))) === null && thirdParty(log).length === 0 && log.fbReq === 0 && log.gtmReq === 0, log.hosts);
+    check(`review ${c}/${cw}: the result page still carries the PREVIEW bar`, (await pg.locator('[data-wren-review=bar]').count()) === 1);
+    if (cw === 'Yes') { // tamper: a review page tries the REAL endpoint directly from the browser. The server refuses it.
+      const t = await pg.evaluate(async () => { const r = await fetch('/api/survey-lead', { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: location.origin }, body: JSON.stringify({}) }); return { status: r.status, body: await r.json().catch(() => null) }; });
+      check(`review ${c}: a tampered request from a review page to the REAL endpoint is refused by the server (403) and reaches nothing`, t.status === 403 && t.body && t.body.error === 'REVIEW_COPY_CANNOT_SUBMIT' && (await calls()).length === 0 && (await outgoing()) === 0, t);
+    }
+    await ctx.close();
+  }
+  { // the notice stays inside the review copy; the cookie controls are inert
+    const { ctx, pg } = await mkPage(br, { consent: 'none' });
+    await pg.goto(`${BASE}/review/kitchen/not-in-area`, { waitUntil: 'load' }); await pg.waitForTimeout(1500);
+    const [pop] = await Promise.all([ctx.waitForEvent('page'), pg.locator('a:has-text("Privacy Notice")').click()]); await pop.waitForLoadState();
+    check('review: the Privacy Notice link on a review page opens the REVIEW notice', pop.url().endsWith('/review/privacy'), pop.url());
+    check('review: on the review notice the cookie controls are switched off (no buttons, stored consent untouched)', (await pop.locator('#wren-cookie-settings button').count()) === 0 && /switched off on this review copy/.test(await pop.locator('#wren-cookie-settings').innerText()) && (await pop.evaluate(() => localStorage.getItem('wren_consent_v1'))) === null);
+    await ctx.close();
+    const c2 = await mkPage(br, { consent: 'none' }); await survey(c2.pg, 'garage', 'Yes', { stopAtForm: true, route: '/review/garage' });
+    check('review: the survey page links its Privacy Notice to the review notice', (await c2.pg.locator('a:has-text("Privacy Notice")').getAttribute('href')) === '/review/privacy'); await c2.ctx.close();
+  }
+  { // visually representative: the review pages are pixel-identical to the live survey pages once the PREVIEW bar is hidden
+    const SH = async (url, vp, consent, hideBar) => { const { ctx, pg } = await mkPage(br, { viewport: vp, reduced: true, consent }); await pg.goto(url, { waitUntil: 'load' }); await pg.waitForTimeout(2200);
+      if (hideBar) await pg.addStyleTag({ content: '[data-wren-review=bar]{display:none!important}body{padding-bottom:0!important}' }); const b = await pg.screenshot(); await ctx.close(); return b; };
+    for (const [live, rev] of [['kitchen-survey', 'kitchen'], ['kitchen-thank-you', 'kitchen/thank-you'], ['kitchen-not-in-area', 'kitchen/not-in-area'], ['garage-survey', 'garage'], ['garage-thank-you', 'garage/thank-you'], ['garage-not-in-area', 'garage/not-in-area']])
+      for (const [vn, vp] of [['mobile', { width: 390, height: 844 }], ['desktop', { width: 1280, height: 800 }]]) {
+        const a = await SH(`${BASE}/survey/${live}`, vp, 'denied', false); const b = await SH(`${BASE}/review/${rev}`, vp, 'granted', true);
+        check(`review look: /review/${rev} is pixel-identical to /survey/${live} (${vn}), PREVIEW bar aside`, Buffer.compare(a, b) === 0);
+      }
+    const { ctx, pg, log } = await mkPage(br, { consent: 'granted' }); await pg.goto(`${BASE}/survey/kitchen-survey`, { waitUntil: 'load' }); await pg.waitForTimeout(1500);
+    check('review: the LIVE survey pages are unchanged by review mode (no PREVIEW bar; GTM and the Pixel still load after consent)', (await pg.locator('[data-wren-review=bar]').count()) === 0 && log.gtmReq === 1 && log.fbReq === 1, { g: log.gtmReq, f: log.fbReq }); await ctx.close();
+  }
+
   // 7. Screenshots for layout comparison (and tablet check)
   const VPS = { mobile: { width: 390, height: 844 }, tablet: { width: 820, height: 1180 }, desktop: { width: 1440, height: 900 } };
   const dirs = [['new', BASE]]; let origSrv;

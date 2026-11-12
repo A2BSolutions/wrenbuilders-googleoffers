@@ -91,6 +91,13 @@
       "statement": "The client approval package is prepared: docs/client-approval/wren-survey-approval-package.html. It has NOT been sent and NO client approval has been received.",
       "provenance": "Prepared by A2B, 11 Nov 2026. Evidence and claim status: docs/SURVEY-EVIDENCE-PACK.md.",
       "limits": "Preparing the package approves nothing. Items stay pending until the client replies in writing with a name and date."
+    },
+    {
+      "id": "review_links_built",
+      "status": "verified_in_repo",
+      "statement": "Permanent review routes /review, /review/kitchen, /review/garage (with thank-you and not-in-area) and /review/privacy are built on the development branch. They reuse the real survey pages, post only to /api/survey-review, cannot reach GHL, load no tracking and are noindex.",
+      "provenance": "Local tests, mocks only, 12 Nov 2026. See docs/SURVEY-REVIEW-LINKS.md.",
+      "limits": "NOT published. Publishing needs a merge to main, which also publishes /survey/* (see item review_links_publication)."
     }
   ],
   "items": [
@@ -232,6 +239,16 @@
       "status": "pending",
       "title": "Review or remove 'Before Christmas' after 25 Dec 2026",
       "detail": "Kitchen option 'Before Christmas' and 'Book soon to get fitted before Christmas' become a stale deadline after 25 Dec 2026. A date-sensitive reminder, not a launch blocker.",
+      "confirmed_by": "",
+      "confirmed_on": ""
+    },
+    {
+      "id": "review_links_publication",
+      "blocking": false,
+      "type": "technical",
+      "status": "pending",
+      "title": "Authorise publishing the permanent review links on go.wren-builders.online",
+      "detail": "Needs a merge to main, which also puts /survey/* and the real /api/survey-lead on the live domain. Review-first option: merge without the Production webhook variables so the real endpoint fails closed (503). Separate from the 8 launch approvals. Not authorized yet.",
       "confirmed_by": "",
       "confirmed_on": ""
     }

@@ -322,3 +322,7 @@ The notice names `info@wren-builders.com` for privacy requests. Codex verified i
 
 - Accessibility: axe-core found no contrast or console issues. Fixed `lang="en-GB"`, a `main` landmark (survey and thank-you pages), the progress bar name and star-rating roles, with no visual change. Zero violations remain. The gate enforces it.
 - Client package: `docs/client-approval/wren-survey-approval-package.html` (offers, what visitors see with screenshots, how enquiries are handled, the Privacy Notice text, a checklist of 4 areas, next steps). Evidence, the claims A2B cannot substantiate and how answers map to the register: `docs/SURVEY-EVIDENCE-PACK.md`. No approval received.
+
+## 26. Permanent review links (12 Nov 2026, built, not published)
+
+`/review`, `/review/kitchen`, `/review/garage` (with `/thank-you` and `/not-in-area`) and `/review/privacy` are rewrites to the real survey pages. Review mode (by URL) in `consent.js` and `wren-funnel.js` posts to `/api/survey-review` (no env, no network, no store: it cannot reach GHL), blocks GTM and the Pixel whatever consent is stored, creates no conversion token, shows a PREVIEW ONLY bar, and is noindex. The real `/api/survey-lead` refuses any request from a `/review` page (403). Tests: `tests/survey/review.test.js`, e2e section 6e, and gate checks. Details, URLs and the publication decision: `docs/SURVEY-REVIEW-LINKS.md`.

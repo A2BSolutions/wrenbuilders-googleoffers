@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const root = path.resolve(__dirname, '..', '..');
 const cfg = JSON.parse(fs.readFileSync(path.join(root, 'vercel.json'), 'utf8'));
+const reviewHandler = require('../../api/survey-review');
 const { createHandler } = require('../../api/survey-lead');
 const { startReceiver } = require('./helpers');
 
@@ -38,6 +39,12 @@ async function main() {
     if (p === '/__mock/mode') { rx.state.mode = u.searchParams.get('m'); return res.end('ok'); }
     if (p === '/__mock/failnext') { failNext = Number(u.searchParams.get('n') || 1); return res.end('ok'); }
     if (p === '/__mock/calls') { res.setHeader('content-type', 'application/json'); return res.end(JSON.stringify(rx.state.calls)); }
+    if (p === '/api/survey-review') { // review copies only: cannot reach the receiver
+      let raw = ''; req.on('data', (c) => (raw += c)); req.on('end', () => {
+        if (/application\/json/i.test(req.headers['content-type'] || '')) { try { req.body = JSON.parse(raw); } catch (e) { req.body = raw; } } else req.body = raw;
+        reviewHandler(req, res);
+      }); return;
+    }
     if (p === '/api/survey-lead') {
       let raw = ''; req.on('data', (c) => (raw += c)); req.on('end', () => {
         if (/application\/json/i.test(req.headers['content-type'] || '')) { try { req.body = JSON.parse(raw); } catch (e) { req.body = raw; } } else req.body = raw;

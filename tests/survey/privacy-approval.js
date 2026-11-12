@@ -15,7 +15,7 @@ const PAGES = ['kitchen-survey', 'kitchen-thank-you', 'kitchen-not-in-area', 'ga
 
 function loadFiles(root = ROOT) {
   const rd = (p) => fs.readFileSync(path.join(root, p), 'utf8');
-  const f = { privacy: rd('survey/privacy.html'), funnel: rd('survey/wren-funnel.js'), consent: rd('survey/consent.js'), register: rd('docs/survey-release-register.json'), pages: {} };
+  const f = { privacy: rd('survey/privacy.html'), funnel: rd('survey/wren-funnel.js'), consent: rd('survey/consent.js'), register: rd('docs/survey-release-register.json'), vercel: rd('vercel.json'), reviewApi: rd('api/survey-review.js'), leadApi: rd('api/survey-lead.js'), reviewIndex: rd('survey/review-index.html'), pages: {} };
   PAGES.forEach((p) => { f.pages[p] = rd(`survey/${p}.html`); });
   return f;
 }
@@ -65,7 +65,7 @@ function evaluate(f) {
   if (!/GTM-KF4RWHHQ/.test(f.consent) || !/function state\(/.test(f.consent) || !/data-mode/.test(f.consent)) problems.push('consent.js is missing the GTM loader, state or manage mode');
   if (!/if \(state\(\) === 'granted'\) loadGtm\(\)/.test(f.consent)) problems.push('consent.js must load GTM only when consent is granted');
   if (/^\s*loadPixel\(\);/m.test(f.funnel) || !/WrenConsent\.onGrant\(loadPixel\)/.test(f.funnel)) problems.push('wren-funnel.js must start the Meta Pixel only through WrenConsent.onGrant');
-  if (!/var st = C \? C\.state\(\) : 'denied'/.test(f.funnel)) problems.push('wren-funnel.js must fail closed when consent.js is missing');
+  if (!/var st = !REVIEW && C \? C\.state\(\) : 'denied'/.test(f.funnel)) problems.push('wren-funnel.js must fail closed when consent.js is missing');
   if (!/privacy:\s*\{\s*url:\s*'\/survey\/privacy'\s*\}/.test(f.funnel)) problems.push("survey Privacy Notice link is not enabled (wren-funnel.js privacy.url must be '/survey/privacy')");
 
   // ---- A3b. Export placeholders are gone: no .dc.html target, no placeholder webhook or redirect override, no x-import ----
@@ -80,6 +80,23 @@ function evaluate(f) {
     if (/role="progressbar"(?![^>]*aria-label=)/.test(h)) problems.push(`${p}: the progress bar needs an accessible name`);
     if (/<div aria-label="5 out of 5 stars"/.test(h)) problems.push(`${p}: review star ratings need role="img"`);
   });
+
+  // ---- A5. Review copies (/review/*): permanent, public, noindex, cannot reach GHL, no tracking ----
+  let vj = null;
+  try { vj = JSON.parse(f.vercel); } catch (e) { problems.push('vercel.json is not valid JSON'); }
+  if (vj) {
+    const want = { '/review': '/survey/review-index.html', '/review/kitchen': '/survey/kitchen-survey.html', '/review/kitchen/thank-you': '/survey/kitchen-thank-you.html', '/review/kitchen/not-in-area': '/survey/kitchen-not-in-area.html', '/review/garage': '/survey/garage-survey.html', '/review/garage/thank-you': '/survey/garage-thank-you.html', '/review/garage/not-in-area': '/survey/garage-not-in-area.html', '/review/privacy': '/survey/privacy.html' };
+    for (const [src, dest] of Object.entries(want)) if (!(vj.rewrites || []).some((r) => r.source === src && r.destination === dest)) problems.push(`vercel.json: review route ${src} must rewrite to ${dest}`);
+    for (const src of ['/review', '/review/(.*)']) if (!(vj.headers || []).some((h) => h.source === src && (h.headers || []).some((x) => x.key === 'X-Robots-Tag' && /noindex, nofollow/.test(x.value)))) problems.push(`vercel.json: ${src} must send X-Robots-Tag noindex, nofollow`);
+    if ((vj.rewrites || []).some((r) => /^\/review/.test(r.source) && /^\/api\//.test(r.destination))) problems.push('vercel.json: a review route must not rewrite to an API');
+  }
+  const rapi = f.reviewApi.replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const [label, re] of [['process.env', /process\.env/], ['fetch(', /\bfetch\s*\(/], ['a webhook or GHL reference', /leadconnector|webhook|GHL_/i], ['the idempotency store', /idempotency/i], ['an http module', /require\(['"](https?|net|node:http|node:https)['"]\)/]]) if (re.test(rapi)) problems.push(`api/survey-review.js must not use ${label} (it can never reach GHL)`);
+  if (JSON.stringify([...rapi.matchAll(/require\(['"]([^'"]+)['"]\)/g)].map((m) => m[1])) !== JSON.stringify(['./_lib/survey-core'])) problems.push('api/survey-review.js may require only ./_lib/survey-core');
+  if (!/fromReviewPage\(req\)\) return done\(403/.test(f.leadApi)) problems.push('api/survey-lead.js must refuse requests that come from a /review page');
+  if (!/var review = \/\^\\\/review/.test(f.consent) || !/if \(review\) return 'denied'/.test(f.consent) || !/if \(manage \|\| review\) return;/.test(f.consent) || !/if \(manage \|\| review \|\| gtmLoaded\) return;/.test(f.consent)) problems.push('consent.js must never load GTM, grant consent or show the banner on a /review page');
+  if (!/CONFIG\.submitEndpoint = '\/api\/survey-review'/.test(f.funnel) || !/if \(REVIEW\) return; \/\/ a review copy never creates a conversion token/.test(f.funnel) || !/if \(REVIEW \|\| !CONFIG\.tracking\.inlineMetaPixel\) return;/.test(f.funnel)) problems.push('wren-funnel.js must post review copies to /api/survey-review, start no Pixel and create no conversion token in review mode');
+  if (/<script/i.test(f.reviewIndex) || !/name="robots" content="noindex, nofollow"/.test(f.reviewIndex) || !/PREVIEW ONLY/.test(f.reviewIndex)) problems.push('review hub must be a script-free, noindex page labelled PREVIEW ONLY');
 
   // ---- A4. Notice reachable where details are collected or kept ----
   for (const c of ['kitchen', 'garage']) {
