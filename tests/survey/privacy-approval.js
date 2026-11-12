@@ -27,7 +27,7 @@ function section(html, n) {
 
 // Returns { problems: [...], pending: [...], notes: [...] }. Pure: takes file contents so tests can feed mutated copies.
 function evaluate(f) {
-  const problems = []; const pending = []; const notes = [];
+  const problems = []; const pending = []; const notes = []; const relayed = [];
   const html = f.privacy;
   const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
 
@@ -117,6 +117,8 @@ function evaluate(f) {
       ids.add(it.id);
       const done = it.status === 'confirmed';
       if (done && (!it.confirmed_by || !/^\d{4}-\d{2}-\d{2}$/.test(it.confirmed_on || ''))) problems.push(`register item "${it.id}" is marked confirmed without confirmed_by and confirmed_on`);
+      if (it.evidence !== undefined && !['relayed_by_a2b', 'direct_written'].includes(it.evidence)) problems.push(`register item "${it.id}" has an unknown evidence type`);
+      if (done && it.evidence === 'relayed_by_a2b') relayed.push(it);
       if (it.blocking && !done) pending.push(it);
       if (!it.blocking && !done) notes.push(it);
     }
@@ -128,7 +130,7 @@ function evaluate(f) {
   for (const x of facts) if (!x.id || !['verified_by_codex', 'confirmed_by_user', 'verified_in_repo', 'checked_readonly', 'unknown'].includes(x.status) || !x.statement || !x.provenance) problems.push(`recorded fact "${x.id}" is malformed`);
   // A fact that is UNKNOWN must have a blocking approval item, so unknowns can never be skipped.
   if (reg && facts.some((x) => x.id === 'mailbox_monitoring' && x.status === 'unknown') && !(reg.items || []).some((i) => i.id === 'privacy_mailbox_monitored' && i.blocking)) problems.push('mailbox monitoring is UNKNOWN but has no blocking approval item');
-  return { problems, pending, notes, facts };
+  return { problems, pending, notes, facts, relayed };
 }
 
 module.exports = { evaluate, loadFiles, PAGES };
@@ -137,6 +139,7 @@ if (require.main === module) {
   const r = evaluate(loadFiles());
   if (r.problems.length) { console.log('A. BUILD PROBLEMS (fix in code or content):'); r.problems.forEach((p) => console.log(' - ' + p)); }
   if (r.pending.length) { console.log('B. OUTSTANDING BUSINESS APPROVALS (blocking):'); r.pending.forEach((p, i) => console.log(` ${i + 1}. [${p.type}] [${p.id}] ${p.title}`)); }
+  if (r.relayed.length) { console.log('Confirmed by RELAY from A2B (no direct written client approval held):'); r.relayed.forEach((p) => console.log(` - [${p.type}] [${p.id}] ${p.title}`)); }
   if (r.facts.length) { console.log('Recorded facts (not approvals):'); r.facts.forEach((x) => console.log(` - [${x.status}] ${x.id}`)); }
   if (r.notes.length) { console.log('Recommended, not blocking:'); r.notes.forEach((p) => console.log(` - [${p.id}] ${p.title}`)); }
   if (r.problems.length || r.pending.length) { console.log(`\nRELEASE GATE: BLOCKED (${r.problems.length} build problem(s), ${r.pending.length} approval(s) outstanding).`); process.exit(1); }

@@ -1,5 +1,7 @@
 # Kitchen and Garage surveys: final release approval
 
+**Client approval RELAYED BY A2B, 12 Nov 2026.** Harry (Wren Builders) approved the new funnels, the Kitchen £1,000 appliance upgrade and the Garage Free AC offers including their conditions, the existing frontend content and promotional claims, the survey Privacy Notice and proposed lead handling, and proceeding with launch. This is a relayed approval. There is no direct written approval, signature or client timestamp. It does **not** independently verify the ICO fee, UK transfer safeguards, provider completeness or privacy mailbox monitoring: those 4 items stay pending in the register and the release gate still exits 1 on them. Production intake activation was done on A2B's instruction. **Real ad traffic stays NO-GO** until the controlled live test passes and those items are resolved or accepted in writing. Plan: `docs/SURVEY-META-CUTOVER.md`.
+
 The client-facing version is `docs/client-approval/wren-survey-approval-package.html`. Evidence and unsubstantiated claims: `docs/SURVEY-EVIDENCE-PACK.md`.
 
 Branch `claude/modest-cori-ozevju`, commit below. Updated 11 Nov 2026. **Nothing in this document is approved yet.** Claude Code does not tick any box. To approve, a named person sets the item to `confirmed` in `docs/survey-release-register.json` (status, `confirmed_by`, `confirmed_on`). The release gate (`node tests/survey/privacy-approval.js`) exits 0 only when all eight are done.
