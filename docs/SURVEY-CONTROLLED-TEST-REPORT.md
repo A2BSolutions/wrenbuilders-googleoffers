@@ -38,3 +38,34 @@ The phone numbers are in the Ofcom drama range reserved for fictional use, so th
 ## Needed to finish
 
 Approved test destination (a phone A2B controls and is authorised to receive Harry's SMS, plus an email) so C and D can run, and so one qualified test can accept cookies and check a real Meta Lead in Events Manager. A Meta Events Manager or Test Events view is needed for receipt.
+
+
+---
+
+# Addendum: qualified (Cornwall Yes) tests C and D, 12 Nov 2026
+
+Destination supplied and confirmed by A2B: +44 7427 912624 and gabriello@a2bmedia.ie. Names "A2B Kitchen Test" and "A2B Garage Test". Both used the same contact, because GHL matches on phone and email, and that contact already existed (A2B, created 8 Oct, no phone, no tags). One submission per journey, no retries.
+
+## Matrix
+
+| Journey | Result | Observed |
+|---|---|---|
+| C. Kitchen, Cornwall Yes (cookies accepted) | **PASS** | Contact updated, tags `meta lead`, `offer 1: kitchen + £1k upgrade`, `survey funnel`, **no `dq` tag**, no low-priority tag. Opportunity "A2B Kitchen Test" created (Marketing Pipeline, New Lead). Leads Master row 74. Harry's SMS **delivered** with "Reply STOP to unsubscribe". Browser pushed exactly one `wren_survey_lead` |
+| D. Garage, Cornwall Yes (cookies rejected) | **PARTIAL** | Contact updated with the Garage answers and tag `offer 2: garage conversion + free ac upgrade`, **no `dq` tag**. Leads Master row 75. Harry's Garage SMS **delivered**. **No opportunity created** (total stayed at 54; the contact already held the open Kitchen test opportunity). No Google or Meta request, no Lead |
+
+## Meta
+Lead receipt: **UNKNOWN / not received.** Pixel last fired 11 Nov 15:49 UTC, zero Lead events before and after. The headless test browser loaded the Pixel script but sent no beacon. Needs a manual check in a normal browser and Events Manager.
+
+## Records created or changed (left in place)
+- GHL contact `ukEHK10uEq78cg1bo36R` (pre-existing A2B contact) now named A2B Garage Test, phone +447427912624, Truro address, 4 tags, Garage and Kitchen survey fields
+- Opportunity `mxSWwRYGpiBQq22XApWD` "A2B Kitchen Test", open, New Lead
+- 2 automated SMS to +447427912624, both delivered
+- 2 Leads Master rows (74, 75)
+- Internal notification emails: expected 2 to Wren's team, not observable by A2B. Harry's team may want to be told to ignore them
+- Earlier DQ test contacts remain
+
+## Findings (no Production change made)
+1. **Garage opportunity not created** for a contact that already has an open opportunity. Probably a duplicate-opportunity rule plus the shared test contact, not a defect, but unproven. Also a real-world edge case: a person who sends both a Kitchen and a Garage enquiry may get only one opportunity. Codex to confirm the intended rule.
+2. **STOP footer:** present on the Kitchen SMS, absent on the second (Garage) SMS in the same conversation. Probably added to first messages only. Confirm on a fresh contact.
+3. **Kitchen low-priority** ("Just looking for now") not exercised.
+4. **Meta Lead receipt** unverified.

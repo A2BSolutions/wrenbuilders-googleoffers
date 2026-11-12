@@ -142,11 +142,25 @@
       "limits": "Records created and left in place: 2 ZZ TEST contacts using fictional Ofcom drama-range numbers (07700 900881, 07700 900882) and @example.com emails. No cleanup done (not authorised). The internal notification could not be observed (info@ inbox not accessible to A2B), so 'no internal notification' rests on the absence of any opportunity or sheet row plus Codex's workflow configuration. Real Meta receipt of events was not checked (browser Google and Meta requests were stubbed)."
     },
     {
-      "id": "controlled_test_qualified_12nov",
+      "id": "controlled_test_kitchen_yes_12nov",
+      "status": "live_tested",
+      "statement": "Kitchen, Cornwall Yes (run T1112C, accepted cookies) PASSED on Production. Reached the Kitchen v2 path: the A2B contact was updated (name A2B Kitchen Test, tags meta lead, offer 1: kitchen + £1k upgrade, survey funnel; NO dq tag; no low-priority tag, as the answer was 'Before Christmas'), opportunity 'A2B Kitchen Test' created in Marketing Pipeline stage New Lead (mxSWwRYGpiBQq22XApWD), Leads Master row added (row 74, Offer 1: Kitchen £1000 Appliance Upgrade), and Harry's automated SMS was DELIVERED (includes 'Reply STOP to unsubscribe'). The browser pushed exactly one wren_survey_lead (event id 0d1a1100-4556-4e76-a732-66f83cb9d440).",
+      "provenance": "Live test 12 Nov 2026 09:40 UTC through go.wren-builders.online, one submission, read back via the GHL and Sheets APIs.",
+      "limits": "The contact already existed (A2B, created 8 Oct, no phone, no tags), so it was updated, not created, and its createdBy does not show the workflow id: routing is evidenced by the Kitchen-specific opportunity, SMS, sheet row and fields. The internal notification email to Wren could not be observed. Kitchen low-priority handling was not exercised."
+    },
+    {
+      "id": "controlled_test_garage_yes_12nov",
+      "status": "live_tested",
+      "statement": "Garage, Cornwall Yes (run T1112D, cookies rejected) PARTIAL. Reached the Garage v2 path: the same A2B contact was updated (name A2B Garage Test, tag offer 2: garage conversion + free ac upgrade added, garage answers stored, NO dq tag), a Leads Master row was added (row 75, Offer 2: Garage Conversion New AC) and Harry's Garage SMS was DELIVERED. NO new opportunity was created: the contact already had the open Kitchen test opportunity and the total stayed at 54. Browser: zero third-party requests, no Lead, no token (cookies rejected).",
+      "provenance": "Live test 12 Nov 2026 09:41 UTC, one submission, read back twice a few minutes apart.",
+      "limits": "Almost certainly an artefact of sharing one contact between both tests (the Phase 2 test contact also holds both offer tags and a single opportunity), but unproven. A fresh destination, or Codex's confirmation of the workflow's duplicate-opportunity rule, is needed. Observation: the Garage SMS had no 'Reply STOP' footer, the Kitchen SMS (first message in the conversation) did; the footer is probably added only to the first message, which a fresh contact would show."
+    },
+    {
+      "id": "meta_lead_receipt_12nov",
       "status": "unknown",
-      "statement": "Cornwall Yes tests (Kitchen and Garage) were NOT run. They create a real opportunity, Leads Master row, internal notification and Harry's SMS, and no approved A2B-controlled test phone or email destination exists.",
-      "provenance": "No approved test destination was supplied. The instruction was not to invent or use an unapproved test phone number.",
-      "limits": "Opportunity creation, Leads Master reporting, internal notification, SMS delivery, Kitchen low-priority tagging, absence of a stale DQ tag, and Meta Lead receipt are all UNVERIFIED on Kitchen v25 and Garage v22."
+      "statement": "Meta Lead receipt is NOT verified. The Pixel (1135200792433711) shows last_fired_time 11 Nov 15:49 UTC and zero Lead events, before and after the Kitchen test. The test browser loaded fbevents.js but no beacon to facebook.com/tr was observed, although the sandbox can reach that endpoint, so the automated headless browser most likely suppressed the Pixel.",
+      "provenance": "Meta Ads API dataset stats and details checked before and at three points after the test, 12 Nov 2026.",
+      "limits": "A person must repeat one qualified-style check in a normal browser (Accept cookies) and look in Events Manager, ideally Test Events. Exactly-one-Lead is unproven. The client side pushed exactly one wren_survey_lead."
     }
   ],
   "items": [
