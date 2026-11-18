@@ -17,6 +17,16 @@
 </script>
 <!-- End Google Tag Manager -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Performance: start runtime, font and first-screen image downloads in parallel with support.js -->
+<link rel="preconnect" href="https://unpkg.com" crossorigin="anonymous">
+<link rel="preload" as="script" href="https://unpkg.com/react@18.3.1/umd/react.production.min.js" integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z" crossorigin="anonymous">
+<link rel="preload" as="script" href="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="assets/work-sans-latin.woff2" crossorigin="anonymous">
+<link rel="preload" as="image" href="assets/exterior.webp" fetchpriority="high">
+<style>
+@font-face{font-family:'Work Sans';font-style:normal;font-weight:400 600;font-display:swap;src:url(assets/work-sans-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Work Sans Fallback';src:local('Arial'),local('ArialMT');ascent-override:83.29%;descent-override:21.76%;line-gap-override:0%;size-adjust:111.66%}
+</style>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -34,13 +44,10 @@
 <helmet>
   <title>Turn Your Garage Into A Room You’ll Actually Use | Wren Builders Ltd</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <!-- Tracking: GTM container + Meta Pixel base (PageView) go here once IDs are supplied. Do not fire Lead on this page. -->
   <!-- CRM webhook: GHL inbound webhook set as default in the form submit logic (override with window.WREN_WEBHOOK). -->
   <style>
-    @keyframes wrenShine{0%,72%{left:-90%}100%{left:140%}}
+    @keyframes wrenShine{0%,72%{transform:translateX(0) skewX(-18deg)}100%{transform:translateX(418%) skewX(-18deg)}}
     @keyframes wrenKenBurns{from{transform:scale(1) translate3d(0,0,0)}to{transform:scale(1.1) translate3d(-1.5%,-1%,0)}}
     html{scroll-behavior:smooth}
     body{margin:0;background:#f7f4ee;color:#1d1f22;-webkit-font-smoothing:antialiased}
@@ -51,7 +58,7 @@
     @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
   </style>
 </helmet>
-<div ref="{{ rootRef }}" style="font-family:'Work Sans', system-ui, sans-serif; font-size:17px; line-height:1.65; letter-spacing:.03em; color:#1d1f22; background:#f7f4ee; padding-bottom:{{ stickyPad }};">
+<div ref="{{ rootRef }}" style="font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:17px; line-height:1.65; letter-spacing:.03em; color:#1d1f22; background:#f7f4ee; padding-bottom:{{ stickyPad }};">
 
   <sc-if value="{{ showTopBar }}" hint-placeholder-val="{{ true }}">
     <div style="background:#16171a; color:#d9d3c8; font-size:11px; letter-spacing:.1em; text-transform:uppercase;">
@@ -68,7 +75,7 @@
 
   <nav style="position:sticky; top:0; z-index:50; background:#f7f4ee; border-bottom:1px solid #e2dacb; box-shadow:{{ navShadow }}; transition:box-shadow .2s ease;">
     <div style="max-width:1200px; margin:0 auto; padding:10px clamp(18px,4vw,32px); display:flex; align-items:center; gap:20px;">
-      <a href="#top" aria-label="Wren Builders Ltd" style="display:block; flex:none;"><img src="assets/wren-logo.svg" alt="Wren Builders Ltd" style="height:52px; width:auto;"></a>
+      <a href="#top" aria-label="Wren Builders Ltd" style="display:block; flex:none;"><img src="assets/wren-logo.svg" alt="Wren Builders Ltd" width="372" height="261" style="height:53.6px; width:auto;"></a>
       <div style="margin-left:auto; display:flex; align-items:center; gap:18px;">
         <a href="tel:+441872613608" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:#1d1f22; min-height:44px;">
           <span style="width:42px; height:42px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;">
@@ -80,7 +87,7 @@
           </span>
         </a>
         <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
-          <button type="button" data-arw-btn="" onClick="{{ cta }}" style="display:inline-flex; align-items:center; gap:10px; font-family:'Work Sans', system-ui, sans-serif; font-size:13px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:14px 20px; min-height:48px; border:none; border-radius:4px; background:#1d1f22; color:#f7f4ee; cursor:pointer; transition:background .15s ease;" style-hover="background:#33363b;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #b6935a; outline-offset:3px;">See What My Garage Could Become<svg data-arw="" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+          <button type="button" data-arw-btn="" onClick="{{ cta }}" style="display:inline-flex; align-items:center; gap:10px; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:13px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:14px 20px; min-height:48px; border:none; border-radius:4px; background:#1d1f22; color:#f7f4ee; cursor:pointer; transition:background .15s ease;" style-hover="background:#33363b;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #b6935a; outline-offset:3px;">See What My Garage Could Become<svg data-arw="" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
         </sc-if>
       </div>
     </div>
@@ -88,7 +95,7 @@
 
   <header id="top" style="position:relative; z-index:2; background:#16171a; color:#f7f4ee;">
     <div aria-hidden="true" style="position:absolute; inset:0; overflow:hidden;">
-      <img src="assets/exterior.png" alt="" style="position:absolute; inset:0; width:100%; height:100%; max-width:none; object-fit:cover; object-position:60% 50%; transform-origin:65% 45%; animation:wrenKenBurns 26s ease-in-out infinite alternate;">
+      <img src="assets/exterior.webp" alt="" width="338" height="253" fetchpriority="high" style="position:absolute; inset:0; width:100%; height:100%; max-width:none; object-fit:cover; object-position:60% 50%; transform-origin:65% 45%; animation:wrenKenBurns 26s ease-in-out infinite alternate;">
       <div style="position:absolute; inset:0; background:{{ heroOverlay }};"></div>
       <div style="position:absolute; inset:0; opacity:.07; background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%22160%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%22.85%22 numOctaves=%222%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');"></div>
     </div>
@@ -97,11 +104,11 @@
         <div data-hero="" style="display:flex; align-items:center; gap:12px; font-size:12.5px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#d2b483;">
           <span style="width:28px; height:1px; background:#b6935a;"></span>For Cornwall Homeowners
         </div>
-        <h1 data-hero="" style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(42px,6.4vw,80px); line-height:1.02; letter-spacing:-.005em; text-wrap:balance; text-shadow:0 2px 24px rgba(0,0,0,.35);">Turn Your Garage Into A Room You’ll <span style="color:#d2b483; font-weight:600;">Actually Use</span></h1>
+        <h1 data-hero="" style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-weight:400; font-size:clamp(42px,6.4vw,80px); line-height:1.02; letter-spacing:-.005em; text-wrap:balance; text-shadow:0 2px 24px rgba(0,0,0,.35);">Turn Your Garage Into A Room You’ll <span style="color:#d2b483; font-weight:600;">Actually Use</span></h1>
         <p data-hero="" style="margin:0; font-size:clamp(16px,1.6vw,19px); color:#e4dfd6; max-width:52ch; text-wrap:pretty;">Create a beautifully finished space designed around your home and lifestyle, with an air conditioning unit supplied and installed included for year-round comfort.</p>
         <div data-hero="" style="display:flex; align-items:center; gap:16px; padding:10px 20px 10px 10px; border:1px solid #b6935a; border-radius:4px; background:rgba(22,23,26,.72); max-width:500px; width:100%; text-align:left; box-shadow:0 18px 40px -26px rgba(0,0,0,.8);">
           <div style="position:relative; flex:none; width:84px; height:84px; border-radius:2px; overflow:hidden;">
-            <img src="assets/kitchen.png" alt="Wren Builders project" style="width:100%; height:100%; object-fit:cover;">
+            <img src="assets/kitchen-thumb.webp" alt="Wren Builders project" width="168" height="168" style="width:100%; height:100%; object-fit:cover;">
             <span style="position:absolute; inset:4px; border:1px solid rgba(247,244,238,.6); border-radius:1px;"></span>
           </div>
           <div style="display:flex; flex-direction:column; gap:3px; min-width:0;">
@@ -111,7 +118,7 @@
           </div>
         </div>
         <div data-hero="" style="display:flex; flex-wrap:wrap; align-items:center; gap:16px 26px; justify-content:{{ heroItems }}; width:100%;">
-          <button type="button" data-arw-btn="" onClick="{{ cta }}" style="position:relative; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; gap:12px; font-family:'Work Sans', system-ui, sans-serif; font-size:14.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:19px 28px; min-height:58px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer; transition:background .15s ease; width:{{ heroBtnWidth }};" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-hover="background:#a5834d;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #f7f4ee; outline-offset:3px;">See What My Garage Could Become<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+          <button type="button" data-arw-btn="" onClick="{{ cta }}" style="position:relative; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; gap:12px; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:14.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:19px 28px; min-height:58px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer; transition:background .15s ease; width:{{ heroBtnWidth }};" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-hover="background:#a5834d;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #f7f4ee; outline-offset:3px;">See What My Garage Could Become<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
           <a href="tel:+441872613608" style="display:flex; flex-direction:column; line-height:1.25; text-decoration:none; color:#f7f4ee; min-height:44px; justify-content:center;">
             <span style="font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:#d2b483;">Or call us</span>
             <span style="font-size:19px; font-weight:600;">01872 613608</span>
@@ -126,7 +133,7 @@
 
       <div id="hero-form" data-hero="" style="position:relative; margin-bottom:{{ formOverlap }}; background:#f7f4ee; color:#1d1f22; border-radius:4px; border:1px solid #e2dacb; border-top:3px solid #b6935a; padding:clamp(22px,3vw,34px); box-shadow:0 40px 80px -36px rgba(0,0,0,.65), 0 2px 6px rgba(22,23,26,.08);">
         <div style="font-size:11px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:#8a6a36;">For Cornwall Homeowners</div>
-        <h2 style="margin:8px 0 6px; font-family:'Work Sans', system-ui, sans-serif; font-weight:500; font-size:clamp(26px,2.8vw,32px); line-height:1.12;">See What My Garage Could Become</h2>
+        <h2 style="margin:8px 0 6px; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-weight:500; font-size:clamp(26px,2.8vw,32px); line-height:1.12;">See What My Garage Could Become</h2>
         <p style="margin:0 0 18px; font-size:15px; color:#4f5258;">Air conditioning supplied and installed as part of your conversion.</p>
         <dc-import name="Wren Offer 2 Lead Form" source="hero" hint-size="100%,700px"></dc-import>
       </div>
@@ -137,7 +144,7 @@
     <div style="max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px); display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 400px), 1fr)); gap:clamp(36px,5vw,64px); align-items:start;">
       <div style="display:flex; flex-direction:column; gap:20px; position:sticky; top:110px;">
         <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#8a6a36;"><span style="width:28px; height:1px; background:#b6935a;"></span>For Cornwall Homeowners</div>
-        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance;">More Space. Without Moving Home.</h2>
+        <h2 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance;">More Space. Without Moving Home.</h2>
         <p style="margin:0; font-size:18px; color:#4f5258; max-width:46ch;">Convert Your Garage Into A Beautiful Year-Round Room With AC Included</p>
       </div>
       <ul data-stagger="" style="list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap:14px;">
@@ -182,7 +189,7 @@
     <div style="position:relative; max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px); display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap:clamp(44px,6vw,88px); align-items:center;">
       <div style="display:flex; flex-direction:column; gap:24px;">
         <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#d2b483;"><span style="width:28px; height:1px; background:#b6935a;"></span>Year-Round Comfort</div>
-        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance;">A Conversion You Can Actually Use All Year</h2>
+        <h2 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance;">A Conversion You Can Actually Use All Year</h2>
         <ul data-stagger="" style="list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; gap:20px;">
           <li style="display:flex; gap:16px; align-items:flex-start; font-size:18.5px; line-height:1.45; color:#e4dfd6;"><span style="width:28px; height:28px; margin-top:1px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;"><svg width="13" height="13" viewBox="0 0 12 12" fill="none" stroke="#d2b483" stroke-width="1.6"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span>A garage conversion should feel like part of your home, not like a dressed-up garage.</li>
           <li style="display:flex; gap:16px; align-items:flex-start; font-size:18.5px; line-height:1.45; color:#e4dfd6;"><span style="width:28px; height:28px; margin-top:1px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;"><svg width="13" height="13" viewBox="0 0 12 12" fill="none" stroke="#d2b483" stroke-width="1.6"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span>That means creating a properly finished space designed around comfort, insulation and everyday use.</li>
@@ -192,14 +199,14 @@
       <div style="position:relative; margin:0 16px 16px 0;">
         <div aria-hidden="true" style="position:absolute; inset:16px -16px -16px 16px; border:1px solid #b6935a; border-radius:4px; pointer-events:none;"></div>
         <div data-card="" style="position:relative; border:1px solid rgba(182,147,90,.55); border-radius:4px; overflow:hidden; background:#1f2124; box-shadow:0 40px 80px -40px rgba(0,0,0,.8);">
-          <img src="assets/kitchen-open-plan.png" alt="Wren Builders open-plan kitchen" style="width:100%; aspect-ratio:16/9; object-fit:cover;">
+          <img src="assets/kitchen-open-plan.webp" alt="Wren Builders open-plan kitchen" width="300" height="177" loading="lazy" decoding="async" style="width:100%; aspect-ratio:16/9; object-fit:cover;">
           <div style="padding:clamp(26px,3vw,40px); display:flex; flex-direction:column; gap:12px; text-align:center; align-items:center;">
             <span style="font-size:11.5px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:#d2b483;">Garage Conversion</span>
-            <span style="font-family:'Work Sans', system-ui, sans-serif; font-size:clamp(44px,5.4vw,68px); font-weight:500; line-height:1; letter-spacing:-.01em; color:#d2b483; text-shadow:0 0 42px rgba(182,147,90,.45), 0 0 2px rgba(210,180,131,.4); text-wrap:balance;">Year-Round Comfort</span>
+            <span style="font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:clamp(44px,5.4vw,68px); font-weight:500; line-height:1; letter-spacing:-.01em; color:#d2b483; text-shadow:0 0 42px rgba(182,147,90,.45), 0 0 2px rgba(210,180,131,.4); text-wrap:balance;">Year-Round Comfort</span>
             <span style="font-size:14px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#f7f4ee;">Air Conditioning Unit Supplied &amp; Installed Included</span>
             <span style="width:48px; height:1px; background:#b6935a; margin:6px 0;"></span>
             <span style="font-size:15px; color:#c9c4bb;">Exact suitability and permitted use confirmed following survey</span>
-            <button type="button" data-arw-btn="" onClick="{{ cta }}" style="position:relative; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; gap:12px; margin-top:10px; font-family:'Work Sans', system-ui, sans-serif; font-size:14.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:19px 26px; min-height:58px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer; width:100%; transition:background .15s ease;" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-hover="background:#a5834d;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #f7f4ee; outline-offset:3px;">See What My Garage Could Become<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+            <button type="button" data-arw-btn="" onClick="{{ cta }}" style="position:relative; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; gap:12px; margin-top:10px; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:14.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:19px 26px; min-height:58px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer; width:100%; transition:background .15s ease;" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-hover="background:#a5834d;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #f7f4ee; outline-offset:3px;">See What My Garage Could Become<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
           </div>
         </div>
       </div>
@@ -210,42 +217,42 @@
     <div style="max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px);">
       <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px;">
         <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#8a6a36;"><span style="width:28px; height:1px; background:#b6935a;"></span>Garage Conversions<span style="width:28px; height:1px; background:#b6935a;"></span></div>
-        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance;">What Could Your Garage Become?</h2>
+        <h2 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance;">What Could Your Garage Become?</h2>
       </div>
       <ul data-stagger="" style="list-style:none; margin:44px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap:14px;">
         <li style="display:flex; flex-direction:column; gap:14px; padding:26px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
           <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1"></rect><path d="M8 20h8M12 16v4"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">01</span></div>
-          <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Home Office</h3>
+          <h3 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Home Office</h3>
           <span style="font-size:16.5px; line-height:1.5; color:#4f5258;">A proper place to work without taking over the kitchen table.</span>
         </li>
         <li style="display:flex; flex-direction:column; gap:14px; padding:26px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
           <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18V8M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"></path><circle cx="7" cy="11" r="1.6"></circle></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">02</span></div>
-          <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Guest Room</h3>
+          <h3 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Guest Room</h3>
           <span style="font-size:16.5px; line-height:1.5; color:#4f5258;">Give friends and family a comfortable place to stay.</span>
         </li>
         <li style="display:flex; flex-direction:column; gap:14px; padding:26px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
           <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">03</span></div>
-          <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Home Gym</h3>
+          <h3 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Home Gym</h3>
           <span style="font-size:16.5px; line-height:1.5; color:#4f5258;">Create your own dedicated training space.</span>
         </li>
         <li style="display:flex; flex-direction:column; gap:14px; padding:26px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
           <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18v-6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6M4 15h16M6 10V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3M6 18v2M18 18v2"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">04</span></div>
-          <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Extra Living Room</h3>
+          <h3 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Extra Living Room</h3>
           <span style="font-size:16.5px; line-height:1.5; color:#4f5258;">Give the family more room without changing home.</span>
         </li>
         <li style="display:flex; flex-direction:column; gap:14px; padding:26px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
           <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="12" width="7" height="8" rx="1"></rect><rect x="13" y="12" width="7" height="8" rx="1"></rect><rect x="8.5" y="4" width="7" height="8" rx="1"></rect></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">05</span></div>
-          <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Playroom</h3>
+          <h3 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Playroom</h3>
           <span style="font-size:16.5px; line-height:1.5; color:#4f5258;">Create dedicated space for children while reclaiming the rest of the house.</span>
         </li>
         <li style="display:flex; flex-direction:column; gap:14px; padding:26px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
           <div style="display:flex; justify-content:space-between; align-items:center;"><span style="width:44px; height:44px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"></path><path d="M14 7l3 3"></path></svg></span><span style="font-size:14px; font-weight:600; letter-spacing:.12em; color:#8a6a36;">06</span></div>
-          <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Studio</h3>
+          <h3 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:15px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; line-height:1.3;">Studio</h3>
           <span style="font-size:16.5px; line-height:1.5; color:#4f5258;">Build a room around work, creativity or hobbies.</span>
         </li>
       </ul>
       <div style="margin-top:40px; display:flex; justify-content:center;">
-        <button type="button" data-arw-btn="" onClick="{{ cta }}" style="display:inline-flex; align-items:center; gap:12px; font-family:'Work Sans', system-ui, sans-serif; font-size:14px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:18px 26px; min-height:56px; border:none; border-radius:4px; background:#1d1f22; color:#f7f4ee; cursor:pointer; transition:background .15s ease; max-width:100%;" style-hover="background:#33363b;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #b6935a; outline-offset:3px;">See What’s Possible<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+        <button type="button" data-arw-btn="" onClick="{{ cta }}" style="display:inline-flex; align-items:center; gap:12px; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:14px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:18px 26px; min-height:56px; border:none; border-radius:4px; background:#1d1f22; color:#f7f4ee; cursor:pointer; transition:background .15s ease; max-width:100%;" style-hover="background:#33363b;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #b6935a; outline-offset:3px;">See What’s Possible<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
       </div>
     </div>
   </section>
@@ -255,20 +262,20 @@
       <div style="position:relative; margin:0 18px 18px 0;">
         <div aria-hidden="true" style="position:absolute; inset:18px -18px -18px 18px; border:1px solid #b6935a; border-radius:4px; pointer-events:none;"></div>
         <div data-card="" style="position:relative; border-radius:4px; overflow:hidden; box-shadow:0 30px 60px -36px rgba(22,23,26,.55);">
-          <img src="assets/builder.webp" alt="A member of the Wren Builders team on site" style="width:100%; aspect-ratio:1/1; object-fit:cover; object-position:30% 20%;">
+          <img src="assets/builder.webp" alt="A member of the Wren Builders team on site" width="598" height="527" loading="lazy" decoding="async" style="width:100%; aspect-ratio:1/1; object-fit:cover; object-position:30% 20%;">
           <span style="position:absolute; left:0; bottom:0; padding:12px 18px; background:rgba(22,23,26,.9); color:#d2b483; font-size:12px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; border-top:1px solid #b6935a; border-right:1px solid #b6935a; border-top-right-radius:4px;">Design | Build | Refurb</span>
         </div>
       </div>
       <div style="display:flex; flex-direction:column; gap:20px;">
         <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#8a6a36;"><span style="width:28px; height:1px; background:#b6935a;"></span>Design | Build | Refurb</div>
-        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(32px,4vw,50px); line-height:1.08; text-wrap:balance;">Work with an established Cornwall design and build company</h2>
+        <h2 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-weight:400; font-size:clamp(32px,4vw,50px); line-height:1.08; text-wrap:balance;">Work with an established Cornwall design and build company</h2>
         <ul data-stagger="" style="list-style:none; margin:4px 0 0; padding:0; display:flex; flex-direction:column; gap:16px;">
           <li style="display:flex; gap:14px; align-items:flex-start; font-size:17.5px;"><span style="width:26px; height:26px; margin-top:1px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#8a6a36" stroke-width="1.7"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span>Have one professional team manage the project from concept through completion</li>
           <li style="display:flex; gap:14px; align-items:flex-start; font-size:17.5px;"><span style="width:26px; height:26px; margin-top:1px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#8a6a36" stroke-width="1.7"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span>Have the conversion professionally designed and completed</li>
           <li style="display:flex; gap:14px; align-items:flex-start; font-size:17.5px;"><span style="width:26px; height:26px; margin-top:1px; border-radius:50%; border:1px solid #b6935a; display:grid; place-items:center; flex:none;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#8a6a36" stroke-width="1.7"><polyline points="2,6.5 5,9 10,3"></polyline></svg></span>Gain extra living space without necessarily moving home</li>
         </ul>
         <div style="margin-top:8px;">
-          <button type="button" data-arw-btn="" onClick="{{ cta }}" style="display:inline-flex; align-items:center; gap:12px; font-family:'Work Sans', system-ui, sans-serif; font-size:14px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:18px 26px; min-height:56px; border:none; border-radius:4px; background:#1d1f22; color:#f7f4ee; cursor:pointer; transition:background .15s ease; max-width:100%;" style-hover="background:#33363b;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #b6935a; outline-offset:3px;">Discuss My Garage Conversion<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+          <button type="button" data-arw-btn="" onClick="{{ cta }}" style="display:inline-flex; align-items:center; gap:12px; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:14px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:18px 26px; min-height:56px; border:none; border-radius:4px; background:#1d1f22; color:#f7f4ee; cursor:pointer; transition:background .15s ease; max-width:100%;" style-hover="background:#33363b;" style-active="transform:translateY(1px);" style-focus="outline:2px solid #b6935a; outline-offset:3px;">Discuss My Garage Conversion<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
         </div>
       </div>
     </div>
@@ -278,7 +285,7 @@
     <div style="max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px);">
       <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px;">
         <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#8a6a36;"><span style="width:28px; height:1px; background:#b6935a;"></span>How It Works<span style="width:28px; height:1px; background:#b6935a;"></span></div>
-        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance;">Turn wasted space into a professionally designed room</h2>
+        <h2 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance;">Turn wasted space into a professionally designed room</h2>
       </div>
       <div style="position:relative; margin-top:52px;">
         <sc-if value="{{ stepsRow }}" hint-placeholder-val="{{ true }}">
@@ -293,7 +300,7 @@
             <div style="flex:1; width:100%; display:flex; flex-direction:column; gap:12px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; padding:28px 26px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); text-align:{{ stepText }}; align-items:{{ stepItems }}; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>
               <span style="font-size:11px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#8a6a36;">Enquire</span>
-              <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:23px; font-weight:500; line-height:1.2;">Check If My Garage Is Suitable</h3>
+              <h3 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:23px; font-weight:500; line-height:1.2;">Check If My Garage Is Suitable</h3>
             </div>
           </div>
           <div style="display:flex; flex-direction:{{ stepDir }}; align-items:{{ stepItems }}; gap:20px;">
@@ -301,7 +308,7 @@
             <div style="flex:1; width:100%; display:flex; flex-direction:column; gap:12px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; padding:28px 26px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); text-align:{{ stepText }}; align-items:{{ stepItems }}; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="1"></rect><path d="M9 4V2.5h6V4M8.5 10h7M8.5 14h7M8.5 18h4"></path></svg>
               <span style="font-size:11px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#8a6a36;">Design / Survey</span>
-              <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:23px; font-weight:500; line-height:1.2;">Exact suitability and permitted use confirmed following survey</h3>
+              <h3 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:23px; font-weight:500; line-height:1.2;">Exact suitability and permitted use confirmed following survey</h3>
             </div>
           </div>
           <div style="display:flex; flex-direction:{{ stepDir }}; align-items:{{ stepItems }}; gap:20px;">
@@ -309,7 +316,7 @@
             <div style="flex:1; width:100%; display:flex; flex-direction:column; gap:12px; background:#ffffff; border:1px solid #e2dacb; border-radius:4px; padding:28px 26px; box-shadow:0 10px 30px -24px rgba(22,23,26,.35); text-align:{{ stepText }}; align-items:{{ stepItems }}; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;" style-hover="transform:translateY(-4px); border-color:#b6935a; box-shadow:0 20px 40px -24px rgba(22,23,26,.4);">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8a6a36" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1"></rect><circle cx="8.5" cy="9.5" r="2"></circle><circle cx="15.5" cy="9.5" r="2"></circle><circle cx="8.5" cy="15" r="2"></circle><circle cx="15.5" cy="15" r="2"></circle></svg>
               <span style="font-size:11px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#8a6a36;">AC Unit Supplied &amp; Installed</span>
-              <h3 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-size:23px; font-weight:500; line-height:1.2;">Professionally designed and completed</h3>
+              <h3 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:23px; font-weight:500; line-height:1.2;">Professionally designed and completed</h3>
             </div>
           </div>
         </div>
@@ -321,31 +328,31 @@
     <div style="max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px);">
       <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px;">
         <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#8a6a36;"><span style="width:28px; height:1px; background:#b6935a;"></span>Wren Builders Ltd<span style="width:28px; height:1px; background:#b6935a;"></span></div>
-        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06;">Recent Projects</h2>
+        <h2 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06;">Recent Projects</h2>
       </div>
       <div data-stagger="" style="margin-top:44px; display:grid; grid-template-columns:{{ galCols }}; grid-auto-rows:{{ galRow }}; gap:14px;">
         <div data-gi="0" onMouseEnter="{{ galEnter }}" onMouseLeave="{{ galLeave }}" style="position:relative; grid-column:span 2; grid-row:span 2; overflow:hidden; border-radius:4px; background:#16171a; box-shadow:0 10px 30px -24px rgba(22,23,26,.45);">
-          <img src="assets/kitchen.png" alt="Kitchen with breakfast bar" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom0 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
+          <img src="assets/kitchen.webp" alt="Kitchen with breakfast bar" width="338" height="253" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom0 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
           <div style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(22,23,26,0) 45%, rgba(22,23,26,.85) 100%); opacity:{{ cap0 }}; transition:opacity .4s ease;"></div>
           <span style="position:absolute; left:18px; right:18px; bottom:16px; pointer-events:none; color:#f7f4ee; font-size:13px; letter-spacing:.14em; text-transform:uppercase; opacity:{{ cap0 }}; transition:opacity .4s ease;">Kitchen with breakfast bar</span>
         </div>
         <div data-gi="1" onMouseEnter="{{ galEnter }}" onMouseLeave="{{ galLeave }}" style="position:relative; overflow:hidden; border-radius:4px; background:#16171a; box-shadow:0 10px 30px -24px rgba(22,23,26,.45);">
-          <img src="assets/kitchen-open-plan.png" alt="Open-plan kitchen" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom1 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
+          <img src="assets/kitchen-open-plan.webp" alt="Open-plan kitchen" width="300" height="177" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom1 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
           <div style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(22,23,26,0) 35%, rgba(22,23,26,.85) 100%); opacity:{{ cap1 }}; transition:opacity .4s ease;"></div>
           <span style="position:absolute; left:14px; right:14px; bottom:12px; pointer-events:none; color:#f7f4ee; font-size:12px; letter-spacing:.12em; text-transform:uppercase; opacity:{{ cap1 }}; transition:opacity .4s ease;">Open-plan kitchen</span>
         </div>
         <div data-gi="2" onMouseEnter="{{ galEnter }}" onMouseLeave="{{ galLeave }}" style="position:relative; overflow:hidden; border-radius:4px; background:#16171a; box-shadow:0 10px 30px -24px rgba(22,23,26,.45);">
-          <img src="assets/bifold.png" alt="Living space opening onto the garden through bifold doors" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom2 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
+          <img src="assets/bifold.webp" alt="Living space opening onto the garden through bifold doors" width="338" height="253" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom2 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
           <div style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(22,23,26,0) 35%, rgba(22,23,26,.85) 100%); opacity:{{ cap2 }}; transition:opacity .4s ease;"></div>
           <span style="position:absolute; left:14px; right:14px; bottom:12px; pointer-events:none; color:#f7f4ee; font-size:12px; letter-spacing:.12em; text-transform:uppercase; opacity:{{ cap2 }}; transition:opacity .4s ease;">Living space opening onto the garden through bifold doors</span>
         </div>
         <div data-gi="3" onMouseEnter="{{ galEnter }}" onMouseLeave="{{ galLeave }}" style="position:relative; overflow:hidden; border-radius:4px; background:#16171a; box-shadow:0 10px 30px -24px rgba(22,23,26,.45);">
-          <img src="assets/exterior.png" alt="Rear extension and garden" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom3 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
+          <img src="assets/exterior.webp" alt="Rear extension and garden" width="338" height="253" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom3 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
           <div style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(22,23,26,0) 35%, rgba(22,23,26,.85) 100%); opacity:{{ cap3 }}; transition:opacity .4s ease;"></div>
           <span style="position:absolute; left:14px; right:14px; bottom:12px; pointer-events:none; color:#f7f4ee; font-size:12px; letter-spacing:.12em; text-transform:uppercase; opacity:{{ cap3 }}; transition:opacity .4s ease;">Rear extension and garden</span>
         </div>
         <div data-gi="4" onMouseEnter="{{ galEnter }}" onMouseLeave="{{ galLeave }}" style="position:relative; overflow:hidden; border-radius:4px; background:#16171a; box-shadow:0 10px 30px -24px rgba(22,23,26,.45);">
-          <img src="assets/bathroom.png" alt="Shower room with oak door" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom4 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
+          <img src="assets/bathroom.webp" alt="Shower room with oak door" width="338" height="253" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; transform:scale({{ zoom4 }}); transition:transform 1.2s cubic-bezier(.22,.61,.36,1);">
           <div style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(22,23,26,0) 35%, rgba(22,23,26,.85) 100%); opacity:{{ cap4 }}; transition:opacity .4s ease;"></div>
           <span style="position:absolute; left:14px; right:14px; bottom:12px; pointer-events:none; color:#f7f4ee; font-size:12px; letter-spacing:.12em; text-transform:uppercase; opacity:{{ cap4 }}; transition:opacity .4s ease;">Shower room with oak door</span>
         </div>
@@ -368,14 +375,14 @@
 
   <section id="final" data-rv="" style="position:relative; background:#16171a; color:#f7f4ee; padding:clamp(72px,9vw,128px) 0; overflow:hidden;">
     <div aria-hidden="true" style="position:absolute; inset:0;">
-      <img src="assets/bifold.png" alt="" style="width:100%; height:100%; max-width:none; object-fit:cover;">
+      <img src="assets/bifold.webp" alt="" width="338" height="253" loading="lazy" decoding="async" style="width:100%; height:100%; max-width:none; object-fit:cover;">
       <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(22,23,26,.92) 0%, rgba(22,23,26,.82) 55%, rgba(22,23,26,.7) 100%);"></div>
       <div style="position:absolute; inset:0; opacity:.07; background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%22160%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%22.85%22 numOctaves=%222%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');"></div>
     </div>
     <div style="position:relative; max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px); display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap:clamp(36px,6vw,72px); align-items:center;">
       <div style="display:flex; flex-direction:column; gap:20px;">
         <div style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#d2b483;"><span style="width:28px; height:1px; background:#b6935a;"></span>For Cornwall Homeowners</div>
-        <h2 style="margin:0; font-family:'Work Sans', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance; text-shadow:0 2px 24px rgba(0,0,0,.35);">Your Next Favourite Room Could Already Be Attached To Your House</h2>
+        <h2 style="margin:0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-weight:400; font-size:clamp(34px,4.4vw,54px); line-height:1.06; text-wrap:balance; text-shadow:0 2px 24px rgba(0,0,0,.35);">Your Next Favourite Room Could Already Be Attached To Your House</h2>
         <p style="margin:0; font-size:18px; color:#e4dfd6; max-width:46ch;">See What Your Garage Could Become With A Professionally Designed Conversion</p>
         <div style="display:flex; flex-wrap:wrap; gap:10px;">
           <span style="padding:9px 16px; border:1px solid rgba(182,147,90,.7); border-radius:999px; font-size:12.5px; letter-spacing:.12em; text-transform:uppercase; color:#f7f4ee; background:rgba(22,23,26,.5);">Design | Build | Refurb</span>
@@ -387,7 +394,7 @@
         </a>
       </div>
       <div id="final-form" data-card="" style="position:relative; background:#f7f4ee; color:#1d1f22; border-radius:4px; border:1px solid #e2dacb; border-top:3px solid #b6935a; padding:clamp(22px,3vw,34px); box-shadow:0 40px 80px -36px rgba(0,0,0,.65), 0 2px 6px rgba(22,23,26,.08);">
-        <h3 style="margin:0 0 6px; font-family:'Work Sans', system-ui, sans-serif; font-weight:500; font-size:clamp(24px,2.8vw,30px); line-height:1.12;">Create My Extra Room</h3>
+        <h3 style="margin:0 0 6px; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-weight:500; font-size:clamp(24px,2.8vw,30px); line-height:1.12;">Create My Extra Room</h3>
         <p style="margin:0 0 18px; font-size:15px; color:#4f5258;">Air conditioning supplied and installed as part of your conversion.</p>
         <dc-import name="Wren Offer 2 Lead Form" source="final-cta" hint-size="100%,700px"></dc-import>
       </div>
@@ -397,7 +404,7 @@
   <footer style="background:#16171a; color:#c9c4bb; padding:56px 0 28px; font-size:14.5px; border-top:1px solid #2e3034;">
     <div style="max-width:1200px; margin:0 auto; padding:0 clamp(18px,4vw,32px);">
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap:36px;">
-        <div><img src="assets/wren-logo-reversed.svg" alt="Wren Builders Ltd" style="height:76px; width:auto;"></div>
+        <div><img src="assets/wren-logo-reversed.svg" alt="Wren Builders Ltd" width="372" height="261" loading="lazy" decoding="async" style="height:78.4px; width:auto;"></div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           <span style="font-size:11.5px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#d2b483;">Contact</span>
           <a href="tel:+441872613608" style="color:#f7f4ee; text-decoration:none; font-size:17px; font-weight:600;">01872 613608</a>
@@ -420,7 +427,7 @@
       <a href="tel:+441872613608" aria-label="Call 01872 613608" style="flex:none; width:56px; min-height:52px; border:1px solid #b6935a; border-radius:4px; display:grid; place-items:center;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d2b483" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path></svg>
       </a>
-      <button type="button" onClick="{{ cta }}" style="position:relative; overflow:hidden; flex:1; display:flex; align-items:center; justify-content:center; gap:8px; font-family:'Work Sans', system-ui, sans-serif; font-size:13px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; padding:14px 12px; min-height:52px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer;" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-active="transform:translateY(1px);">Create My Extra Room<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+      <button type="button" onClick="{{ cta }}" style="position:relative; overflow:hidden; flex:1; display:flex; align-items:center; justify-content:center; gap:8px; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:13px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; padding:14px 12px; min-height:52px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer;" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-active="transform:translateY(1px);">Create My Extra Room<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
     </div>
   </sc-if>
 
@@ -429,7 +436,7 @@
       <div role="dialog" aria-modal="true" aria-label="See What My Garage Could Become" onClick="{{ stop }}" style="position:relative; background:#f7f4ee; border-radius:4px; border-top:3px solid #b6935a; width:100%; max-width:520px; padding:clamp(22px,4vw,34px); box-shadow:0 40px 90px -30px rgba(0,0,0,.7);">
         <button type="button" onClick="{{ closeModal }}" aria-label="Close" style="position:absolute; top:10px; right:10px; width:44px; height:44px; border:none; border-radius:50%; background:#ece6dc; color:#1d1f22; font-size:22px; line-height:1; cursor:pointer;" style-hover="background:#e2dacb;">×</button>
         <div style="font-size:11px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:#8a6a36;">For Cornwall Homeowners</div>
-        <h2 style="margin:8px 44px 6px 0; font-family:'Work Sans', system-ui, sans-serif; font-weight:500; font-size:clamp(26px,4vw,32px); line-height:1.12;">See What My Garage Could Become</h2>
+        <h2 style="margin:8px 44px 6px 0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-weight:500; font-size:clamp(26px,4vw,32px); line-height:1.12;">See What My Garage Could Become</h2>
         <p style="margin:0 0 18px; font-size:15px; color:#4f5258;">Create A Beautifully Finished, Year-Round Living Space With An AC Unit Supplied &amp; Installed Included</p>
         <dc-import name="Wren Offer 2 Lead Form" source="cta-popup" hint-size="100%,700px"></dc-import>
       </div>
@@ -441,7 +448,7 @@
       <div role="dialog" aria-modal="true" aria-label="See what’s possible" onClick="{{ stop }}" style="position:relative; background:#f7f4ee; border-radius:4px; border-top:3px solid #b6935a; width:100%; max-width:440px; padding:32px 28px 28px; box-shadow:0 40px 90px -30px rgba(0,0,0,.7);">
         <button type="button" onClick="{{ closeExit }}" aria-label="Close" style="position:absolute; top:10px; right:10px; width:44px; height:44px; border:none; border-radius:50%; background:#ece6dc; color:#1d1f22; font-size:22px; line-height:1; cursor:pointer;" style-hover="background:#e2dacb;">×</button>
         <div style="font-size:11px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:#8a6a36;">For Cornwall Homeowners</div>
-        <h2 style="margin:8px 44px 8px 0; font-family:'Work Sans', system-ui, sans-serif; font-weight:500; font-size:28px; line-height:1.12;">What Could Your Garage Become?</h2>
+        <h2 style="margin:8px 44px 8px 0; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-weight:500; font-size:28px; line-height:1.12;">What Could Your Garage Become?</h2>
         <p style="margin:0 0 18px; font-size:15px; color:#4f5258;">Transform It Into A Finished Room With Heating &amp; Cooling Built Around Year-Round Comfort</p>
         <form onSubmit="{{ exitSubmit }}" noValidate="{{ true }}" style="display:flex; flex-direction:column; gap:12px;">
           <input type="hidden" name="channel" value="meta">
@@ -456,7 +463,7 @@
             <input name="phone" type="tel" autoComplete="tel" placeholder="07..." style="font:inherit; font-size:16px; padding:13px 14px; min-height:48px; border:1px solid #d8cfbf; border-radius:4px; background:#ffffff; color:#1d1f22;" style-focus="outline:2px solid #b6935a; outline-offset:1px;">
           </label>
           <span style="font-size:13px; color:#a2361f;">{{ exitError }}</span>
-          <button type="submit" data-arw-btn="" disabled="{{ exitLoading }}" style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; gap:12px; font-family:'Work Sans', system-ui, sans-serif; font-size:14.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:18px 22px; min-height:56px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer;" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-hover="background:#a5834d;" style-active="transform:translateY(1px);">{{ exitLabel }}<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
+          <button type="submit" data-arw-btn="" disabled="{{ exitLoading }}" style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; gap:12px; font-family:'Work Sans', 'Work Sans Fallback', system-ui, sans-serif; font-size:14.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:18px 22px; min-height:56px; border:none; border-radius:4px; background:#b6935a; color:#1d1f22; cursor:pointer;" style-after="content:''; position:absolute; top:0; left:-90%; width:55%; height:100%; pointer-events:none; background:linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:skewX(-18deg); animation:wrenShine 4.8s ease-in-out infinite;" style-hover="background:#a5834d;" style-active="transform:translateY(1px);">{{ exitLabel }}<svg data-arw="" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .15s ease;"><path d="M2 8h11M9 4l4 4-4 4"></path></svg></button>
         </form>
       </div>
     </div>
@@ -494,7 +501,35 @@ class Component extends DCLogic {
     document.addEventListener('mouseleave', this.onLeave);
     document.addEventListener('mouseover', this.onArw);
     document.addEventListener('mouseout', this.onArw);
+    this.heroMotion();
+    this.setupKenBurns();
     setTimeout(() => this.setupMotion(), 60);
+  }
+  heroMotion() {
+    const root = this.rootRef.current;
+    if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const ease = 'cubic-bezier(.22,.61,.36,1)';
+    root.querySelectorAll('[data-hero]').forEach((el, i) => {
+      el.style.transform = 'translateY(24px)';
+      const d = 80 + i * 70;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        el.style.transition = `transform 520ms ${ease} ${d}ms`;
+        el.style.transform = 'none';
+        setTimeout(() => { el.style.transition = ''; el.style.transform = ''; }, 560 + d);
+      }));
+    });
+  }
+  setupKenBurns() {
+    const root = this.rootRef.current;
+    const header = root && root.querySelector('header');
+    const img = header && header.querySelector('img');
+    if (!img || !('IntersectionObserver' in window)) return;
+    let onScreen = true;
+    const apply = () => { img.style.animationPlayState = (onScreen && !document.hidden) ? 'running' : 'paused'; };
+    this.kbIo = new IntersectionObserver((en) => { onScreen = en[0].isIntersecting; apply(); });
+    this.kbIo.observe(header);
+    this.onVis = apply;
+    document.addEventListener('visibilitychange', this.onVis);
   }
   componentWillUnmount() {
     window.removeEventListener('resize', this.onResize);
@@ -504,6 +539,8 @@ class Component extends DCLogic {
     document.removeEventListener('mouseover', this.onArw);
     document.removeEventListener('mouseout', this.onArw);
     this.io && this.io.disconnect();
+    this.kbIo && this.kbIo.disconnect();
+    this.onVis && document.removeEventListener('visibilitychange', this.onVis);
   }
   setupMotion() {
     const root = this.rootRef.current;
@@ -511,7 +548,6 @@ class Component extends DCLogic {
     const ease = 'cubic-bezier(.22,.61,.36,1)';
     const hide = (el, scale) => { el.style.opacity = '0'; el.style.transform = 'translateY(24px)' + (scale ? ' scale(.97)' : ''); };
     const show = (el, d) => { el.style.transition = `opacity 520ms ${ease} ${d}ms, transform 520ms ${ease} ${d}ms`; el.style.opacity = '1'; el.style.transform = 'none'; setTimeout(() => { el.style.transition = ''; el.style.transform = ''; }, 560 + d); };
-    root.querySelectorAll('[data-hero]').forEach((el, i) => { hide(el); requestAnimationFrame(() => requestAnimationFrame(() => show(el, 80 + i * 70))); });
     this.io = new IntersectionObserver((entries) => {
       entries.forEach(en => {
         if (!en.isIntersecting) return;
